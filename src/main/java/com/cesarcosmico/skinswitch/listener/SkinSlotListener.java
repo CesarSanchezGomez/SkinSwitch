@@ -122,14 +122,17 @@ public final class SkinSlotListener implements Listener {
         if (skinId == null) return;
 
         SkinSlotService.TooltipApplyResult result = skinSlotService.applyTooltip(target, skinId);
+        SkinDefinition def = skinSupplier.get().get(skinId).orElse(null);
+        String display = def == null ? skinId : def.displayOrId();
         switch (result) {
             case APPLIED -> {
                 consumeOne(player, cursor);
-                SkinDefinition def = skinSupplier.get().get(skinId).orElse(null);
-                String display = def == null ? skinId : def.displayOrId();
-                langSupplier.get().send(player, "command.tooltip-applied",
-                        "{skin}", display);
+                langSupplier.get().send(player, "command.tooltip-applied", "{skin}", display);
             }
+            case NO_SKIN_SLOT -> langSupplier.get().send(player, "command.tooltip-needs-slot",
+                    "{skin}", display);
+            case ALREADY_APPLIED -> langSupplier.get().send(player, "command.tooltip-duplicate",
+                    "{skin}", display);
             case NO_TOOLTIP -> langSupplier.get().send(player, "command.tooltip-missing",
                     "{skin}", skinId);
             case UNKNOWN_SKIN -> langSupplier.get().send(player, "command.unknown-skin",

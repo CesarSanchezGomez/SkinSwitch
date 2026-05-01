@@ -46,6 +46,7 @@ public final class RemoveTooltipCommand {
         switch (result) {
             case REMOVED -> langSupplier.get().send(player, "command.tooltip-removed");
             case NOT_APPLIED -> langSupplier.get().send(player, "command.tooltip-not-applied");
+            case NO_SLOTS -> langSupplier.get().send(player, "command.no-slots");
             case NO_META -> langSupplier.get().send(player, "command.no-item-in-hand");
         }
         return Command.SINGLE_SUCCESS;

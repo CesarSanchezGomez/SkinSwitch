@@ -2,7 +2,7 @@
 # Soporta formato MiniMessage.
 # Usa {prefix} para insertar el prefijo del plugin.
 # Versión interna — no editar. Cambio = nuevos mensajes añadidos.
-config-version: 4
+config-version: 5
 
 prefix: '<white>[<gradient:#C173FF:#950DFF>SkinSwitch</gradient>]</white>'
 
@@ -22,9 +22,11 @@ command:
   token-given: '{prefix} <white>Entregaste <#C173FF>{count}</#C173FF> token(s) de <#C173FF>{skin}</#C173FF> a <#C173FF>{player}</#C173FF>.</white>'
   tooltip-token-given: '{prefix} <white>Entregaste <#C173FF>{count}</#C173FF> token(s) de tooltip <#C173FF>{skin}</#C173FF> a <#C173FF>{player}</#C173FF>.</white>'
   tooltip-applied: '{prefix} <white>Tooltip <#C173FF>{skin}</#C173FF> aplicado.</white>'
-  tooltip-removed: '{prefix} <white>Tooltip eliminado.</white>'
-  tooltip-not-applied: '{prefix} <white>Este ítem no tiene un tooltip de SkinSwitch aplicado.</white>'
+  tooltip-removed: '{prefix} <white>Tooltip eliminado del slot activo.</white>'
+  tooltip-not-applied: '{prefix} <white>El slot activo no tiene tooltip aplicado.</white>'
   tooltip-missing: '{prefix} <red>La skin <white>{skin}</white> no tiene tooltip_style definido.</red>'
+  tooltip-needs-slot: '{prefix} <red>Debes añadir primero el slot de skin <white>{skin}</white> antes de aplicar su tooltip.</red>'
+  tooltip-duplicate: '{prefix} <white>El tooltip de <#C173FF>{skin}</#C173FF> ya está aplicado.</white>'
   player-not-found: '{prefix} <red>Jugador no encontrado: <white>{player}</white>.</red>'
 
 # -- Cambio de skin ---------------------------

@@ -8,17 +8,21 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
 
 /**
- * Renders the skin-slot section appended to an item's lore.
+ * Renders the skin-slot row appended to the item lore.
  *
- * Output is a single inline row, e.g. "[🌷] [🎃]", separated from the
- * original lore by an empty line. Bracket colors are configurable via
- * skins.yml -> slot-colors (active/inactive); each skin can override the
- * active color via its own 'color' field.
+ * Bracket color follows the per-slot tooltip token: a slot with its
+ * tooltip applied uses the skin's color (or slot-colors.active), one
+ * without uses slot-colors.inactive — regardless of which slot is the
+ * currently active one. The active slot is still distinguished via the
+ * lore template (white icon vs. bare icon).
  */
 public final class LoreRenderer {
 
@@ -35,7 +39,8 @@ public final class LoreRenderer {
 
     public List<Component> render(List<Component> originalLore,
                                   List<String> skinIds,
-                                  int currentIndex) {
+                                  int currentIndex,
+                                  Collection<String> tooltipSkinIds) {
         List<Component> out = new ArrayList<>();
         if (originalLore != null) {
             out.addAll(originalLore);
@@ -51,6 +56,7 @@ public final class LoreRenderer {
         SkinConfig skinConfig = skinSupplier.get();
         SkinConfig.SlotColors colors = skinConfig.getSlotColors();
         String separator = lang.getRaw("lore.separator");
+        Set<String> tooltipSet = new HashSet<>(tooltipSkinIds);
 
         StringBuilder line = new StringBuilder();
         for (int i = 0; i < skinIds.size(); i++) {
@@ -60,9 +66,10 @@ public final class LoreRenderer {
             Optional<SkinDefinition> skin = skinConfig.get(id);
             String icon = skin.map(SkinDefinition::icon).orElse(id);
             boolean active = i == currentIndex;
+            boolean hasTooltip = tooltipSet.contains(id);
 
             String color;
-            if (active) {
+            if (hasTooltip) {
                 String skinColor = skin.filter(SkinDefinition::hasColor)
                         .map(SkinDefinition::color)
                         .orElse(null);

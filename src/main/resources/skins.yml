@@ -20,10 +20,15 @@
 #   * If 'icon'    is omitted, the skin id is used (in the lore brackets).
 #   * If 'display' is omitted, the item's original custom_name is restored.
 #   * If 'color'   is omitted, slot-colors.active is used (per-skin override).
-#   * 'tooltip_style' is NOT applied by the skin slot. To set it on an item,
-#     give the player a tooltip token (/ss givetooltip <player> <skin>) and
-#     have them right-click it onto the target item. Remove it with
+#   * 'tooltip_style' is NOT applied by the skin slot. Each slot has its
+#     own tooltip flag (per-slot list). Give the player a tooltip token
+#     (/ss givetooltip <player> <skin>) and have them right-click it onto
+#     the target item — the skin slot must already exist on that item, or
+#     the application is rejected. Remove the active slot's tooltip with
 #     /ss removetooltip while holding the item.
+#   * Bracket color: a slot's bracket uses the skin's color only when
+#     that slot has its tooltip token applied; otherwise the bracket
+#     uses slot-colors.inactive (regardless of which slot is active).
 #
 # Item data (durability, enchants, attributes, other PDC) is preserved
 # when switching; only item_model + custom_name + lore are touched by the

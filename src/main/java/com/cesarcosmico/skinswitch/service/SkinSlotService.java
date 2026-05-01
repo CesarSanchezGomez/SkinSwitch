@@ -24,17 +24,18 @@ import java.util.function.Supplier;
 /**
  * Single source of truth for skin-slot mutations on items.
  *
- * The skin-slot system manages item_model + custom_name + lore. The
- * tooltip_style is tracked independently via the tooltip-token system
- * so that applying/removing skins never touches the tooltip.
+ * Skin slots own item_model + custom_name + lore. Tooltip styles are
+ * tracked per-slot via the tooltip_slots list; the active slot's tooltip
+ * (if any) is what's actually applied to the item, otherwise the item's
+ * captured original tooltip is restored.
  */
 public final class SkinSlotService {
 
     public enum AddResult { ADDED, UNKNOWN_SKIN, FULL, DUPLICATE, NO_META }
     public enum RemoveResult { REMOVED, INVALID_INDEX, NO_SLOTS, NO_META }
     public enum CycleResult { CYCLED, NO_SLOTS, NO_META, SINGLE_SLOT }
-    public enum TooltipApplyResult { APPLIED, UNKNOWN_SKIN, NO_TOOLTIP, NO_META }
-    public enum TooltipRemoveResult { REMOVED, NOT_APPLIED, NO_META }
+    public enum TooltipApplyResult { APPLIED, UNKNOWN_SKIN, NO_TOOLTIP, NO_SKIN_SLOT, ALREADY_APPLIED, NO_META }
+    public enum TooltipRemoveResult { REMOVED, NO_SLOTS, NOT_APPLIED, NO_META }
 
     private static final GsonComponentSerializer GSON = GsonComponentSerializer.gson();
     private static final MiniMessage MINI = MiniMessage.miniMessage();
@@ -85,13 +86,6 @@ public final class SkinSlotService {
         return skinSupplier.get().get(slots.get(idx));
     }
 
-    public boolean hasTooltip(ItemStack item) {
-        if (item == null) return false;
-        ItemMeta meta = item.getItemMeta();
-        if (meta == null) return false;
-        return meta.getPersistentDataContainer().has(keys.appliedTooltipSkin(), PersistentDataType.STRING);
-    }
-
     public AddResult addSlot(ItemStack item, String skinId) {
         if (item == null) return AddResult.NO_META;
         Optional<SkinDefinition> skinOpt = skinSupplier.get().get(skinId);
@@ -101,7 +95,7 @@ public final class SkinSlotService {
         if (meta == null) return AddResult.NO_META;
 
         PersistentDataContainer pdc = meta.getPersistentDataContainer();
-        List<String> current = readSlots(pdc);
+        List<String> current = readList(pdc, keys.slots());
 
         if (current.size() >= pluginSupplier.get().getDefaultMaxSlots()) return AddResult.FULL;
         if (current.contains(skinId)) return AddResult.DUPLICATE;
@@ -122,7 +116,7 @@ public final class SkinSlotService {
             applySkinAppearance(meta, pdc, skin);
         }
 
-        applyLore(meta, current, currentIndex);
+        applyLore(meta, pdc, current, currentIndex);
         item.setItemMeta(meta);
         return AddResult.ADDED;
     }
@@ -135,24 +129,31 @@ public final class SkinSlotService {
         PersistentDataContainer pdc = meta.getPersistentDataContainer();
         if (!pdc.has(keys.slots(), PersistentDataType.LIST.strings())) return RemoveResult.NO_SLOTS;
 
-        List<String> current = readSlots(pdc);
+        List<String> current = readList(pdc, keys.slots());
         if (index < 0 || index >= current.size()) return RemoveResult.INVALID_INDEX;
 
-        current.remove(index);
+        String removedId = current.remove(index);
+        List<String> tooltips = readList(pdc, keys.tooltipSlots());
+        tooltips.remove(removedId);
+
         int currentIndex = readIndex(pdc);
 
         if (current.isEmpty()) {
             restoreOriginalAppearance(meta, pdc);
             pdc.remove(keys.slots());
             pdc.remove(keys.currentIndex());
+            pdc.remove(keys.tooltipSlots());
         } else {
             if (currentIndex >= current.size()) currentIndex = 0;
             pdc.set(keys.slots(), PersistentDataType.LIST.strings(), current);
             pdc.set(keys.currentIndex(), PersistentDataType.INTEGER, currentIndex);
-            int finalIndex = currentIndex;
-            skinSupplier.get().get(current.get(finalIndex))
+            writeTooltipSlots(pdc, tooltips);
+
+            String activeId = current.get(currentIndex);
+            skinSupplier.get().get(activeId)
                     .ifPresent(s -> applySkinAppearance(meta, pdc, s));
-            applyLore(meta, current, currentIndex);
+            applyTooltipForActive(meta, pdc, activeId, tooltips);
+            applyLore(meta, pdc, current, currentIndex);
         }
         item.setItemMeta(meta);
         return RemoveResult.REMOVED;
@@ -166,15 +167,18 @@ public final class SkinSlotService {
         PersistentDataContainer pdc = meta.getPersistentDataContainer();
         if (!pdc.has(keys.slots(), PersistentDataType.LIST.strings())) return CycleResult.NO_SLOTS;
 
-        List<String> current = readSlots(pdc);
+        List<String> current = readList(pdc, keys.slots());
         if (current.isEmpty()) return CycleResult.NO_SLOTS;
         if (current.size() == 1) return CycleResult.SINGLE_SLOT;
 
         int next = (readIndex(pdc) + 1) % current.size();
         pdc.set(keys.currentIndex(), PersistentDataType.INTEGER, next);
-        skinSupplier.get().get(current.get(next))
+
+        String activeId = current.get(next);
+        skinSupplier.get().get(activeId)
                 .ifPresent(s -> applySkinAppearance(meta, pdc, s));
-        applyLore(meta, current, next);
+        applyTooltipForActive(meta, pdc, activeId, readList(pdc, keys.tooltipSlots()));
+        applyLore(meta, pdc, current, next);
         item.setItemMeta(meta);
         return CycleResult.CYCLED;
     }
@@ -190,11 +194,19 @@ public final class SkinSlotService {
         if (meta == null) return TooltipApplyResult.NO_META;
 
         PersistentDataContainer pdc = meta.getPersistentDataContainer();
-        if (!pdc.has(keys.appliedTooltipSkin(), PersistentDataType.STRING)) {
-            captureOriginalTooltipStyle(meta, pdc);
-        }
-        pdc.set(keys.appliedTooltipSkin(), PersistentDataType.STRING, skinId);
-        meta.setTooltipStyle(skin.tooltipStyle());
+        List<String> slots = readList(pdc, keys.slots());
+        if (!slots.contains(skinId)) return TooltipApplyResult.NO_SKIN_SLOT;
+
+        List<String> tooltips = readList(pdc, keys.tooltipSlots());
+        if (tooltips.contains(skinId)) return TooltipApplyResult.ALREADY_APPLIED;
+
+        tooltips.add(skinId);
+        writeTooltipSlots(pdc, tooltips);
+
+        int idx = readIndex(pdc);
+        String activeId = (idx >= 0 && idx < slots.size()) ? slots.get(idx) : null;
+        applyTooltipForActive(meta, pdc, activeId, tooltips);
+        applyLore(meta, pdc, slots, idx);
         item.setItemMeta(meta);
         return TooltipApplyResult.APPLIED;
     }
@@ -205,21 +217,37 @@ public final class SkinSlotService {
         if (meta == null) return TooltipRemoveResult.NO_META;
 
         PersistentDataContainer pdc = meta.getPersistentDataContainer();
-        if (!pdc.has(keys.appliedTooltipSkin(), PersistentDataType.STRING)) {
-            return TooltipRemoveResult.NOT_APPLIED;
-        }
-        restoreOriginalTooltipStyle(meta, pdc);
-        pdc.remove(keys.appliedTooltipSkin());
+        List<String> slots = readList(pdc, keys.slots());
+        if (slots.isEmpty()) return TooltipRemoveResult.NO_SLOTS;
+
+        int idx = readIndex(pdc);
+        if (idx < 0 || idx >= slots.size()) return TooltipRemoveResult.NOT_APPLIED;
+        String activeId = slots.get(idx);
+
+        List<String> tooltips = readList(pdc, keys.tooltipSlots());
+        if (!tooltips.remove(activeId)) return TooltipRemoveResult.NOT_APPLIED;
+
+        writeTooltipSlots(pdc, tooltips);
+        applyTooltipForActive(meta, pdc, activeId, tooltips);
+        applyLore(meta, pdc, slots, idx);
         item.setItemMeta(meta);
         return TooltipRemoveResult.REMOVED;
     }
 
-    private List<String> readSlots(PersistentDataContainer pdc) {
-        if (!pdc.has(keys.slots(), PersistentDataType.LIST.strings())) {
+    private List<String> readList(PersistentDataContainer pdc, NamespacedKey key) {
+        if (!pdc.has(key, PersistentDataType.LIST.strings())) {
             return new ArrayList<>();
         }
-        List<String> stored = pdc.get(keys.slots(), PersistentDataType.LIST.strings());
+        List<String> stored = pdc.get(key, PersistentDataType.LIST.strings());
         return stored == null ? new ArrayList<>() : new ArrayList<>(stored);
+    }
+
+    private void writeTooltipSlots(PersistentDataContainer pdc, List<String> tooltips) {
+        if (tooltips.isEmpty()) {
+            pdc.remove(keys.tooltipSlots());
+        } else {
+            pdc.set(keys.tooltipSlots(), PersistentDataType.LIST.strings(), tooltips);
+        }
     }
 
     private int readIndex(PersistentDataContainer pdc) {
@@ -232,11 +260,13 @@ public final class SkinSlotService {
     private void captureOriginalAppearance(ItemMeta meta, PersistentDataContainer pdc) {
         captureOriginalLore(meta, pdc);
         captureOriginalName(meta, pdc);
+        captureOriginalTooltipStyle(meta, pdc);
     }
 
     private void restoreOriginalAppearance(ItemMeta meta, PersistentDataContainer pdc) {
         restoreOriginalLore(meta, pdc);
         restoreOriginalName(meta, pdc);
+        restoreOriginalTooltipStyle(meta, pdc);
         meta.setItemModel(null);
     }
 
@@ -292,8 +322,7 @@ public final class SkinSlotService {
     private void restoreOriginalTooltipStyle(ItemMeta meta, PersistentDataContainer pdc) {
         if (pdc.has(keys.originalTooltipStyle(), PersistentDataType.STRING)) {
             String s = pdc.get(keys.originalTooltipStyle(), PersistentDataType.STRING);
-            NamespacedKey key = (s != null && !s.isEmpty()) ? NamespacedKey.fromString(s) : null;
-            meta.setTooltipStyle(key);
+            meta.setTooltipStyle((s != null && !s.isEmpty()) ? NamespacedKey.fromString(s) : null);
             pdc.remove(keys.originalTooltipStyle());
         } else {
             meta.setTooltipStyle(null);
@@ -318,8 +347,25 @@ public final class SkinSlotService {
         }
     }
 
-    private void applyLore(ItemMeta meta, List<String> slots, int currentIndex) {
-        PersistentDataContainer pdc = meta.getPersistentDataContainer();
+    private void applyTooltipForActive(ItemMeta meta, PersistentDataContainer pdc,
+                                       String activeSkinId, List<String> tooltipSlots) {
+        if (activeSkinId != null && tooltipSlots.contains(activeSkinId)) {
+            SkinDefinition skin = skinSupplier.get().get(activeSkinId).orElse(null);
+            if (skin != null && skin.tooltipStyle() != null) {
+                meta.setTooltipStyle(skin.tooltipStyle());
+                return;
+            }
+        }
+        if (pdc.has(keys.originalTooltipStyle(), PersistentDataType.STRING)) {
+            String s = pdc.get(keys.originalTooltipStyle(), PersistentDataType.STRING);
+            meta.setTooltipStyle((s != null && !s.isEmpty()) ? NamespacedKey.fromString(s) : null);
+        } else {
+            meta.setTooltipStyle(null);
+        }
+    }
+
+    private void applyLore(ItemMeta meta, PersistentDataContainer pdc,
+                           List<String> slots, int currentIndex) {
         List<Component> originalLore;
         if (pdc.has(keys.originalLore(), PersistentDataType.LIST.strings())) {
             List<String> serialized = pdc.get(keys.originalLore(), PersistentDataType.LIST.strings());
@@ -329,6 +375,7 @@ public final class SkinSlotService {
         } else {
             originalLore = Collections.emptyList();
         }
-        meta.lore(loreRenderer.render(originalLore, slots, currentIndex));
+        List<String> tooltipSlots = readList(pdc, keys.tooltipSlots());
+        meta.lore(loreRenderer.render(originalLore, slots, currentIndex, tooltipSlots));
     }
 }
