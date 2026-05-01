@@ -5,6 +5,7 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Logger;
@@ -44,6 +45,7 @@ public final class SkinConfig {
         String icon;
         String tooltipStyleRaw;
         String color;
+        List<String> lore;
 
         if (root.isConfigurationSection(id)) {
             ConfigurationSection section = root.getConfigurationSection(id);
@@ -52,12 +54,14 @@ public final class SkinConfig {
             icon = section.getString("icon", id);
             tooltipStyleRaw = section.getString("tooltip_style", null);
             color = section.getString("color", null);
+            lore = section.isList("lore") ? section.getStringList("lore") : List.of();
         } else {
             itemModelRaw = root.getString(id, "");
             display = null;
             icon = id;
             tooltipStyleRaw = null;
             color = null;
+            lore = List.of();
         }
 
         if (itemModelRaw.isEmpty()) {
@@ -79,7 +83,7 @@ public final class SkinConfig {
             }
         }
 
-        return new SkinDefinition(id, modelKey, display, icon, tooltipKey, color);
+        return new SkinDefinition(id, modelKey, display, icon, tooltipKey, color, lore);
     }
 
     public Optional<SkinDefinition> get(String id) {

@@ -9,7 +9,7 @@
 # attributes and other persistent data are preserved.
 
 # Internal version — do not edit. Bump = new keys were added.
-config-version: 2
+config-version: 3
 
 # Language file to use from the lang/ folder (without .yml)
 # Available: en_US, es_ES (or create your own)
@@ -18,6 +18,24 @@ lang: 'en_US'
 defaults:
   # Maximum number of skin slots a single item can hold.
   max-slots: 6
+
+# Toggles for which fields a skin can override when its slot is active.
+# All toggles are independent — disabling one keeps the rest working.
+#
+#   switch-name: when true, a skin's `display` (skins.yml) is applied as
+#                the item's custom_name while that slot is active. When
+#                false, the item keeps the custom_name it had before any
+#                slot was added.
+#   switch-lore: when true, a skin's `lore` (skins.yml) replaces the
+#                item's original lore as the base for the slot row. When
+#                false, the item keeps its original lore regardless of
+#                what each skin defines.
+#
+# item_model always switches (that's the point of a skin slot).
+# tooltip_style is governed by the separate tooltip-token system.
+features:
+  switch-name: true
+  switch-lore: true
 
 # Token item used to add a skin slot to a held item.
 # Players right-click the token (in the cursor) onto a target item in

@@ -8,13 +8,16 @@ import java.util.logging.Logger;
 
 public final class PluginConfig {
 
-    public static final int CURRENT_VERSION = 2;
+    public static final int CURRENT_VERSION = 3;
 
     public record TokenConfig(String material, String customName, List<String> lore) {}
+
+    public record Features(boolean switchName, boolean switchLore) {}
 
     private final int defaultMaxSlots;
     private final TokenConfig token;
     private final TokenConfig tooltipToken;
+    private final Features features;
 
     public PluginConfig(ConfigurationSection root, Logger logger) {
         ConfigurationSection defaults = root.getConfigurationSection("defaults");
@@ -22,6 +25,11 @@ public final class PluginConfig {
 
         this.token = readToken(root.getConfigurationSection("token"), "NAME_TAG");
         this.tooltipToken = readToken(root.getConfigurationSection("tooltip-token"), "PAPER");
+
+        ConfigurationSection featuresSection = root.getConfigurationSection("features");
+        boolean switchName = featuresSection == null || featuresSection.getBoolean("switch-name", true);
+        boolean switchLore = featuresSection == null || featuresSection.getBoolean("switch-lore", true);
+        this.features = new Features(switchName, switchLore);
     }
 
     private TokenConfig readToken(ConfigurationSection section, String defaultMaterial) {
@@ -36,4 +44,5 @@ public final class PluginConfig {
     public int getDefaultMaxSlots() { return defaultMaxSlots; }
     public TokenConfig getToken() { return token; }
     public TokenConfig getTooltipToken() { return tooltipToken; }
+    public Features getFeatures() { return features; }
 }

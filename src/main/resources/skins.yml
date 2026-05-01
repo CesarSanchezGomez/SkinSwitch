@@ -15,10 +15,17 @@
 #       display:       '<#FCBDE3>Spring Pickaxe</#FCBDE3>' # custom_name when active
 #       tooltip_style: 'minecraft:spring'                  # only applied via tooltip token
 #       color:         '#FCBDE3'                           # bracket color when active
+#       lore:                                              # base lore when active
+#         - '<gray>Bloomed in the meadow.</gray>'
+#         - '<gray>Petals everywhere.</gray>'
 #
 # All extended fields are optional. Behavior:
 #   * If 'icon'    is omitted, the skin id is used (in the lore brackets).
 #   * If 'display' is omitted, the item's original custom_name is restored.
+#     Globally controlled by features.switch-name in config.yml.
+#   * If 'lore'    is omitted, the item's original lore is used as the
+#     base for the slot row. Globally controlled by features.switch-lore
+#     in config.yml.
 #   * If 'color'   is omitted, slot-colors.active is used (per-skin override).
 #   * 'tooltip_style' is NOT applied by the skin slot. Each slot has its
 #     own tooltip flag (per-slot list). Give the player a tooltip token

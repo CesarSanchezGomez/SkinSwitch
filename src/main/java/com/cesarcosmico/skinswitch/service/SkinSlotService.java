@@ -334,7 +334,7 @@ public final class SkinSlotService {
     private void applySkinAppearance(ItemMeta meta, PersistentDataContainer pdc, SkinDefinition skin) {
         meta.setItemModel(skin.itemModel());
 
-        if (skin.hasDisplay()) {
+        if (pluginSupplier.get().getFeatures().switchName() && skin.hasDisplay()) {
             meta.displayName(MINI.deserialize(skin.display())
                     .decoration(TextDecoration.ITALIC, false));
             return;
@@ -366,16 +366,28 @@ public final class SkinSlotService {
 
     private void applyLore(ItemMeta meta, PersistentDataContainer pdc,
                            List<String> slots, int currentIndex) {
-        List<Component> originalLore;
+        List<Component> baseLore = resolveBaseLore(pdc, slots, currentIndex);
+        List<String> tooltipSlots = readList(pdc, keys.tooltipSlots());
+        meta.lore(loreRenderer.render(baseLore, slots, currentIndex, tooltipSlots));
+    }
+
+    private List<Component> resolveBaseLore(PersistentDataContainer pdc,
+                                            List<String> slots, int currentIndex) {
+        if (pluginSupplier.get().getFeatures().switchLore()
+                && currentIndex >= 0 && currentIndex < slots.size()) {
+            SkinDefinition active = skinSupplier.get().get(slots.get(currentIndex)).orElse(null);
+            if (active != null && active.hasLore()) {
+                return active.lore().stream()
+                        .<Component>map(s -> MINI.deserialize(s).decoration(TextDecoration.ITALIC, false))
+                        .toList();
+            }
+        }
         if (pdc.has(keys.originalLore(), PersistentDataType.LIST.strings())) {
             List<String> serialized = pdc.get(keys.originalLore(), PersistentDataType.LIST.strings());
-            originalLore = serialized == null
+            return serialized == null
                     ? Collections.emptyList()
                     : serialized.stream().map(GSON::deserialize).toList();
-        } else {
-            originalLore = Collections.emptyList();
         }
-        List<String> tooltipSlots = readList(pdc, keys.tooltipSlots());
-        meta.lore(loreRenderer.render(originalLore, slots, currentIndex, tooltipSlots));
+        return Collections.emptyList();
     }
 }
