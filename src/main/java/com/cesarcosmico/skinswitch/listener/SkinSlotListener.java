@@ -57,7 +57,7 @@ public final class SkinSlotListener implements Listener {
             return;
         }
 
-        SkinSlotService.CycleResult result = skinSlotService.cycleNext(item, player);
+        SkinSlotService.CycleResult result = skinSlotService.cycleNext(item);
         if (result == SkinSlotService.CycleResult.CYCLED) {
             player.getInventory().setItemInMainHand(item);
             event.setCancelled(true);
@@ -121,7 +121,7 @@ public final class SkinSlotListener implements Listener {
         String skinId = tooltipTokenFactory.readSkinId(cursor).orElse(null);
         if (skinId == null) return;
 
-        SkinSlotService.TooltipApplyResult result = skinSlotService.applyTooltip(target, skinId, player);
+        SkinSlotService.TooltipApplyResult result = skinSlotService.applyTooltip(target, skinId);
         SkinDefinition def = skinSupplier.get().get(skinId).orElse(null);
         String display = def == null ? skinId : def.nameOrId();
         switch (result) {

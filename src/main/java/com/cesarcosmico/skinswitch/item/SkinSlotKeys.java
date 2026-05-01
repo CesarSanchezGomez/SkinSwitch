@@ -13,6 +13,7 @@ public final class SkinSlotKeys {
     private final NamespacedKey tokenTooltip;
     private final NamespacedKey tooltipSlots;
     private final NamespacedKey originalTooltipStyle;
+    private final NamespacedKey ownerUuid;
 
     public SkinSlotKeys(JavaPlugin plugin) {
         this.slots = new NamespacedKey(plugin, "slots");
@@ -23,6 +24,7 @@ public final class SkinSlotKeys {
         this.tokenTooltip = new NamespacedKey(plugin, "token_tooltip");
         this.tooltipSlots = new NamespacedKey(plugin, "tooltip_slots");
         this.originalTooltipStyle = new NamespacedKey(plugin, "original_tooltip_style");
+        this.ownerUuid = new NamespacedKey(plugin, "owner_uuid");
     }
 
     public NamespacedKey slots() { return slots; }
@@ -33,4 +35,5 @@ public final class SkinSlotKeys {
     public NamespacedKey tokenTooltip() { return tokenTooltip; }
     public NamespacedKey tooltipSlots() { return tooltipSlots; }
     public NamespacedKey originalTooltipStyle() { return originalTooltipStyle; }
+    public NamespacedKey ownerUuid() { return ownerUuid; }
 }

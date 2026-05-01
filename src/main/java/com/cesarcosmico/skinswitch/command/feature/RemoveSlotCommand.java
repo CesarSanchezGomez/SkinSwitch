@@ -50,7 +50,7 @@ public final class RemoveSlotCommand {
         List<String> slots = service.getSlots(item);
         String removedDisplay = (index >= 0 && index < slots.size()) ? slots.get(index) : "?";
 
-        SkinSlotService.RemoveResult result = service.removeSlot(item, index, player);
+        SkinSlotService.RemoveResult result = service.removeSlot(item, index);
         switch (result) {
             case REMOVED -> langSupplier.get().send(player, "command.slot-removed",
                     "{skin}", removedDisplay);

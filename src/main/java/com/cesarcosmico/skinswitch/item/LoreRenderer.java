@@ -7,7 +7,7 @@ import com.cesarcosmico.skinswitch.placeholder.PlaceholderResolver;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.entity.Player;
+import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -56,23 +56,23 @@ public final class LoreRenderer {
                                   List<String> skinIds,
                                   int currentIndex,
                                   Collection<String> tooltipSkinIds,
-                                  @Nullable Player player) {
+                                  @Nullable OfflinePlayer owner) {
         if (skinIds.isEmpty()) {
             return originalLore == null ? List.of() : new ArrayList<>(originalLore);
         }
 
         LangConfig lang = langSupplier.get();
         PlaceholderResolver resolver = placeholderSupplier.get();
-        Component slotRow = buildSlotRow(lang, resolver, player, skinIds, currentIndex, tooltipSkinIds);
+        Component slotRow = buildSlotRow(lang, resolver, owner, skinIds, currentIndex, tooltipSkinIds);
         boolean above = "above".equalsIgnoreCase(lang.getRaw("lore.position"));
 
         List<Component> block = new ArrayList<>();
         for (String line : lang.getRawList("lore.lines-before")) {
-            block.add(asLoreLine(resolver.resolve(player, line)));
+            block.add(asLoreLine(resolver.resolve(owner, line)));
         }
         block.add(slotRow);
         for (String line : lang.getRawList("lore.lines-after")) {
-            block.add(asLoreLine(resolver.resolve(player, line)));
+            block.add(asLoreLine(resolver.resolve(owner, line)));
         }
 
         List<Component> out = new ArrayList<>();
@@ -88,15 +88,15 @@ public final class LoreRenderer {
 
     private Component buildSlotRow(LangConfig lang,
                                    PlaceholderResolver resolver,
-                                   @Nullable Player player,
+                                   @Nullable OfflinePlayer owner,
                                    List<String> skinIds,
                                    int currentIndex,
                                    Collection<String> tooltipSkinIds) {
         SkinConfig skinConfig = skinSupplier.get();
         String defaultColor = skinConfig.getDefaultBracketColor();
-        String prefix = resolver.resolve(player, lang.getRaw("lore.prefix"));
-        String separator = resolver.resolve(player, lang.getRaw("lore.separator"));
-        String suffix = resolver.resolve(player, lang.getRaw("lore.suffix"));
+        String prefix = resolver.resolve(owner, lang.getRaw("lore.prefix"));
+        String separator = resolver.resolve(owner, lang.getRaw("lore.separator"));
+        String suffix = resolver.resolve(owner, lang.getRaw("lore.suffix"));
         Set<String> tooltipSet = new HashSet<>(tooltipSkinIds);
 
         StringBuilder middle = new StringBuilder();

@@ -1,13 +1,13 @@
 package com.cesarcosmico.skinswitch.placeholder;
 
 import me.clip.placeholderapi.PlaceholderAPI;
-import org.bukkit.entity.Player;
+import org.bukkit.OfflinePlayer;
 
 public final class PlaceholderApiResolver implements PlaceholderResolver {
 
     @Override
-    public String resolve(Player player, String input) {
+    public String resolve(OfflinePlayer owner, String input) {
         if (input == null || input.isEmpty()) return input;
-        return PlaceholderAPI.setPlaceholders(player, input);
+        return PlaceholderAPI.setPlaceholders(owner, input);
     }
 }

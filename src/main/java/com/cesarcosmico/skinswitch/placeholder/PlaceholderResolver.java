@@ -1,6 +1,6 @@
 package com.cesarcosmico.skinswitch.placeholder;
 
-import org.bukkit.entity.Player;
+import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -10,8 +10,13 @@ import org.jetbrains.annotations.Nullable;
  * Implementations are chosen at plugin enable: if PlaceholderAPI is
  * present {@link PlaceholderApiResolver} is used, otherwise
  * {@link NoopPlaceholderResolver} acts as a transparent pass-through.
+ *
+ * The resolver is invoked with the item's bound owner (captured the
+ * first time a slot is added), not with whoever happens to interact
+ * with the item later — that way trades and lookups don't rewrite the
+ * lore with another player's data.
  */
 public interface PlaceholderResolver {
 
-    String resolve(@Nullable Player player, String input);
+    String resolve(@Nullable OfflinePlayer owner, String input);
 }

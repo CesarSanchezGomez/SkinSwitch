@@ -42,7 +42,7 @@ public final class RemoveTooltipCommand {
             return Command.SINGLE_SUCCESS;
         }
 
-        SkinSlotService.TooltipRemoveResult result = serviceSupplier.get().removeTooltip(item, player);
+        SkinSlotService.TooltipRemoveResult result = serviceSupplier.get().removeTooltip(item);
         switch (result) {
             case REMOVED -> langSupplier.get().send(player, "command.tooltip-removed");
             case NOT_APPLIED -> langSupplier.get().send(player, "command.tooltip-not-applied");
