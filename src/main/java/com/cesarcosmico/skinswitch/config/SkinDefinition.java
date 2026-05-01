@@ -10,6 +10,10 @@ import java.util.List;
  * Only {@code id} and {@code itemModel} are required. Other fields are
  * optional; when null/empty the service falls back to the item's
  * captured original values (or the skin id, for {@code icon}).
+ *
+ * Icons can be specialised per state via {@code iconActive} and
+ * {@code iconInactive}. Either one falls back to {@code icon} when not
+ * defined, so simple skins can keep using a single {@code icon} field.
  */
 public record SkinDefinition(
         String id,
@@ -17,6 +21,8 @@ public record SkinDefinition(
         String name,
         List<String> lore,
         String icon,
+        String iconActive,
+        String iconInactive,
         String color,
         NamespacedKey tooltipStyle
 ) {
@@ -38,5 +44,13 @@ public record SkinDefinition(
 
     public boolean hasColor() {
         return color != null && !color.isEmpty();
+    }
+
+    public String activeIcon() {
+        return (iconActive != null && !iconActive.isEmpty()) ? iconActive : icon;
+    }
+
+    public String inactiveIcon() {
+        return (iconInactive != null && !iconInactive.isEmpty()) ? iconInactive : icon;
     }
 }

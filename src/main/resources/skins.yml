@@ -15,7 +15,9 @@
 #       name:          '<#FCBDE3>Summer Pickaxe</#FCBDE3>'           # custom_name when active
 #       lore:                                                        # base lore when active
 #         - '<gray>Sun-soaked.</gray>'
-#       icon:          '🍦'                                          # one slot = one icon (lore row)
+#       icon:          '🍦'                                          # default slot-row icon
+#       icon-active:   '<gradient:#FFB347:#FFCC33>⊰ 🍦 ⊱</gradient>'  # optional override when active
+#       icon-inactive: '<white>⊰ 🍦 ⊱</white>'                        # optional override when inactive
 #       color:         '#FCBDE3'                                     # bracket color when its tooltip is applied
 #       tooltip_style: 'minecraft:summer'                            # only applied via tooltip token
 #
@@ -27,7 +29,18 @@
 #   * 'lore'         when present, replaces the item's lore as the base
 #                    for the slot row. Globally toggled by
 #                    features.switch-lore in config.yml.
-#   * 'icon'         when omitted, the skin id is used in the slot row.
+#   * 'icon'         the slot-row glyph. When omitted, the skin id is
+#                    used. If you want the lang template's {icon-color}
+#                    to drive its colour, keep this a plain character
+#                    (no MiniMessage tags) — colour tags inside the icon
+#                    take precedence over outer wrappers.
+#   * 'icon-active'  optional override for the active slot. Use this
+#                    when you want fancy MiniMessage decoration on the
+#                    active icon (gradients, extra glyphs, …) — those
+#                    won't combine well with {icon-color}, so this lets
+#                    you opt out and own the styling per state.
+#   * 'icon-inactive' optional override for the inactive slot. Same idea
+#                    as icon-active. Falls back to 'icon' when omitted.
 #   * 'color'        when omitted, default-bracket-color is used.
 #   * 'tooltip_style' is NOT applied by the skin slot. Each slot has its
 #                    own tooltip flag. Give the player a tooltip token

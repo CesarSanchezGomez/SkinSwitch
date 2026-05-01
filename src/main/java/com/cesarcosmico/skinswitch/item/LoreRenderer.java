@@ -115,9 +115,11 @@ public final class LoreRenderer {
 
             String id = skinIds.get(i);
             Optional<SkinDefinition> skin = skinConfig.get(id);
-            String icon = skin.map(SkinDefinition::icon).orElse(id);
             boolean active = i == currentIndex;
             boolean hasTooltip = tooltipSet.contains(id);
+            String icon = skin
+                    .map(s -> active ? s.activeIcon() : s.inactiveIcon())
+                    .orElse(id);
 
             String skinColor = skin.filter(SkinDefinition::hasColor)
                     .map(SkinDefinition::color)

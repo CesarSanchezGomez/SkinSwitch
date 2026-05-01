@@ -39,6 +39,8 @@ public final class SkinConfig {
         String name;
         List<String> lore;
         String icon;
+        String iconActive;
+        String iconInactive;
         String color;
         String tooltipStyleRaw;
 
@@ -48,6 +50,8 @@ public final class SkinConfig {
             name = section.getString("name", null);
             lore = section.isList("lore") ? section.getStringList("lore") : List.of();
             icon = section.getString("icon", id);
+            iconActive = section.getString("icon-active", null);
+            iconInactive = section.getString("icon-inactive", null);
             color = section.getString("color", null);
             tooltipStyleRaw = section.getString("tooltip_style", null);
         } else {
@@ -55,6 +59,8 @@ public final class SkinConfig {
             name = null;
             lore = List.of();
             icon = id;
+            iconActive = null;
+            iconInactive = null;
             color = null;
             tooltipStyleRaw = null;
         }
@@ -78,7 +84,7 @@ public final class SkinConfig {
             }
         }
 
-        return new SkinDefinition(id, modelKey, name, lore, icon, color, tooltipKey);
+        return new SkinDefinition(id, modelKey, name, lore, icon, iconActive, iconInactive, color, tooltipKey);
     }
 
     public Optional<SkinDefinition> get(String id) {
