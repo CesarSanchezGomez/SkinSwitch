@@ -18,10 +18,15 @@ repositories {
         name = "papermc-repo"
         setUrl("https://repo.papermc.io/repository/maven-public/")
     }
+    maven {
+        name = "extendedclip-repo"
+        setUrl("https://repo.extendedclip.com/content/repositories/placeholderapi/")
+    }
 }
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
+    compileOnly("me.clip:placeholderapi:2.12.2")
 
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")

@@ -64,7 +64,7 @@ public final class AddSlotCommand {
 
         String skinId = StringArgumentType.getString(ctx, "skin");
         SkinSlotService service = serviceSupplier.get();
-        SkinSlotService.AddResult result = service.addSlot(item, skinId);
+        SkinSlotService.AddResult result = service.addSlot(item, skinId, player);
         SkinDefinition def = skinSupplier.get().get(skinId).orElse(null);
         String display = def == null ? skinId : def.nameOrId();
 

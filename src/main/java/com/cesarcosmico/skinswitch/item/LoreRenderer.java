@@ -3,9 +3,12 @@ package com.cesarcosmico.skinswitch.item;
 import com.cesarcosmico.skinswitch.config.LangConfig;
 import com.cesarcosmico.skinswitch.config.SkinConfig;
 import com.cesarcosmico.skinswitch.config.SkinDefinition;
+import com.cesarcosmico.skinswitch.placeholder.PlaceholderResolver;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,6 +31,10 @@ import java.util.function.Supplier;
  *   lore.prefix        text before the first slot in the row
  *   lore.separator     text between slots
  *   lore.suffix        text after the last slot in the row
+ *
+ * Every user-supplied string is run through the {@link PlaceholderResolver}
+ * before MiniMessage parsing so PlaceholderAPI tokens are resolved when
+ * that plugin is installed.
  */
 public final class LoreRenderer {
 
@@ -35,32 +42,37 @@ public final class LoreRenderer {
 
     private final Supplier<LangConfig> langSupplier;
     private final Supplier<SkinConfig> skinSupplier;
+    private final Supplier<PlaceholderResolver> placeholderSupplier;
 
     public LoreRenderer(Supplier<LangConfig> langSupplier,
-                        Supplier<SkinConfig> skinSupplier) {
+                        Supplier<SkinConfig> skinSupplier,
+                        Supplier<PlaceholderResolver> placeholderSupplier) {
         this.langSupplier = langSupplier;
         this.skinSupplier = skinSupplier;
+        this.placeholderSupplier = placeholderSupplier;
     }
 
     public List<Component> render(List<Component> originalLore,
                                   List<String> skinIds,
                                   int currentIndex,
-                                  Collection<String> tooltipSkinIds) {
+                                  Collection<String> tooltipSkinIds,
+                                  @Nullable Player player) {
         if (skinIds.isEmpty()) {
             return originalLore == null ? List.of() : new ArrayList<>(originalLore);
         }
 
         LangConfig lang = langSupplier.get();
-        Component slotRow = buildSlotRow(lang, skinIds, currentIndex, tooltipSkinIds);
+        PlaceholderResolver resolver = placeholderSupplier.get();
+        Component slotRow = buildSlotRow(lang, resolver, player, skinIds, currentIndex, tooltipSkinIds);
         boolean above = "above".equalsIgnoreCase(lang.getRaw("lore.position"));
 
         List<Component> block = new ArrayList<>();
         for (String line : lang.getRawList("lore.lines-before")) {
-            block.add(asLoreLine(line));
+            block.add(asLoreLine(resolver.resolve(player, line)));
         }
         block.add(slotRow);
         for (String line : lang.getRawList("lore.lines-after")) {
-            block.add(asLoreLine(line));
+            block.add(asLoreLine(resolver.resolve(player, line)));
         }
 
         List<Component> out = new ArrayList<>();
@@ -75,14 +87,16 @@ public final class LoreRenderer {
     }
 
     private Component buildSlotRow(LangConfig lang,
+                                   PlaceholderResolver resolver,
+                                   @Nullable Player player,
                                    List<String> skinIds,
                                    int currentIndex,
                                    Collection<String> tooltipSkinIds) {
         SkinConfig skinConfig = skinSupplier.get();
         String defaultColor = skinConfig.getDefaultBracketColor();
-        String prefix = lang.getRaw("lore.prefix");
-        String separator = lang.getRaw("lore.separator");
-        String suffix = lang.getRaw("lore.suffix");
+        String prefix = resolver.resolve(player, lang.getRaw("lore.prefix"));
+        String separator = resolver.resolve(player, lang.getRaw("lore.separator"));
+        String suffix = resolver.resolve(player, lang.getRaw("lore.suffix"));
         Set<String> tooltipSet = new HashSet<>(tooltipSkinIds);
 
         StringBuilder middle = new StringBuilder();

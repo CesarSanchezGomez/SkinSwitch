@@ -9,6 +9,9 @@ import com.cesarcosmico.skinswitch.item.LoreRenderer;
 import com.cesarcosmico.skinswitch.item.SkinSlotKeys;
 import com.cesarcosmico.skinswitch.item.TokenFactory;
 import com.cesarcosmico.skinswitch.listener.SkinSlotListener;
+import com.cesarcosmico.skinswitch.placeholder.NoopPlaceholderResolver;
+import com.cesarcosmico.skinswitch.placeholder.PlaceholderApiResolver;
+import com.cesarcosmico.skinswitch.placeholder.PlaceholderResolver;
 import com.cesarcosmico.skinswitch.service.SkinSlotService;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.Material;
@@ -26,6 +29,7 @@ public final class SkinSwitchPlugin extends JavaPlugin {
     private SkinSlotService skinSlotService;
     private TokenFactory skinTokenFactory;
     private TokenFactory tooltipTokenFactory;
+    private PlaceholderResolver placeholderResolver;
 
     @Override
     public void onEnable() {
@@ -42,11 +46,13 @@ public final class SkinSwitchPlugin extends JavaPlugin {
         this.langConfig = new LangConfig(this);
         this.pluginConfig = new PluginConfig(getConfig(), getLogger());
         this.skinConfig = new SkinConfig(skinsYml, getLogger());
+        this.placeholderResolver = resolveDetected();
 
         SkinSlotKeys keys = new SkinSlotKeys(this);
-        LoreRenderer loreRenderer = new LoreRenderer(this::getLangConfig, this::getSkinConfig);
+        LoreRenderer loreRenderer = new LoreRenderer(
+                this::getLangConfig, this::getSkinConfig, this::getPlaceholderResolver);
         this.skinSlotService = new SkinSlotService(keys, loreRenderer,
-                this::getSkinConfig, this::getPluginConfig);
+                this::getSkinConfig, this::getPluginConfig, this::getPlaceholderResolver);
         this.skinTokenFactory = new TokenFactory(keys.tokenSkin(),
                 () -> getPluginConfig().getToken(), this::getSkinConfig, Material.NAME_TAG);
         this.tooltipTokenFactory = new TokenFactory(keys.tokenTooltip(),
@@ -58,6 +64,14 @@ public final class SkinSwitchPlugin extends JavaPlugin {
                         this::getLangConfig, this::getSkinConfig), this);
 
         getLogger().info("SkinSwitch enabled.");
+    }
+
+    private PlaceholderResolver resolveDetected() {
+        if (getServer().getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+            getLogger().info("PlaceholderAPI detected — placeholders will be resolved in skin name/lore.");
+            return new PlaceholderApiResolver();
+        }
+        return new NoopPlaceholderResolver();
     }
 
     @Override
@@ -110,4 +124,5 @@ public final class SkinSwitchPlugin extends JavaPlugin {
     public SkinSlotService getSkinSlotService() { return skinSlotService; }
     public TokenFactory getSkinTokenFactory() { return skinTokenFactory; }
     public TokenFactory getTooltipTokenFactory() { return tooltipTokenFactory; }
+    public PlaceholderResolver getPlaceholderResolver() { return placeholderResolver; }
 }

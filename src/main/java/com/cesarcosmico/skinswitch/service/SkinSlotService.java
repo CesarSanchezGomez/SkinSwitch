@@ -5,15 +5,18 @@ import com.cesarcosmico.skinswitch.config.SkinConfig;
 import com.cesarcosmico.skinswitch.config.SkinDefinition;
 import com.cesarcosmico.skinswitch.item.LoreRenderer;
 import com.cesarcosmico.skinswitch.item.SkinSlotKeys;
+import com.cesarcosmico.skinswitch.placeholder.PlaceholderResolver;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,6 +31,9 @@ import java.util.function.Supplier;
  * tracked per-slot via the tooltip_slots list; the active slot's tooltip
  * (if any) is what's actually applied to the item, otherwise the item's
  * captured original tooltip is restored.
+ *
+ * The optional {@link Player} argument on every public mutator is used
+ * as the context for PlaceholderAPI resolution when building name/lore.
  */
 public final class SkinSlotService {
 
@@ -44,14 +50,17 @@ public final class SkinSlotService {
     private final LoreRenderer loreRenderer;
     private final Supplier<SkinConfig> skinSupplier;
     private final Supplier<PluginConfig> pluginSupplier;
+    private final Supplier<PlaceholderResolver> placeholderSupplier;
 
     public SkinSlotService(SkinSlotKeys keys, LoreRenderer loreRenderer,
                            Supplier<SkinConfig> skinSupplier,
-                           Supplier<PluginConfig> pluginSupplier) {
+                           Supplier<PluginConfig> pluginSupplier,
+                           Supplier<PlaceholderResolver> placeholderSupplier) {
         this.keys = keys;
         this.loreRenderer = loreRenderer;
         this.skinSupplier = skinSupplier;
         this.pluginSupplier = pluginSupplier;
+        this.placeholderSupplier = placeholderSupplier;
     }
 
     public boolean hasSlots(ItemStack item) {
@@ -86,7 +95,7 @@ public final class SkinSlotService {
         return skinSupplier.get().get(slots.get(idx));
     }
 
-    public AddResult addSlot(ItemStack item, String skinId) {
+    public AddResult addSlot(ItemStack item, String skinId, @Nullable Player player) {
         if (item == null) return AddResult.NO_META;
         Optional<SkinDefinition> skinOpt = skinSupplier.get().get(skinId);
         if (skinOpt.isEmpty()) return AddResult.UNKNOWN_SKIN;
@@ -113,15 +122,15 @@ public final class SkinSlotService {
         if (firstSlot) {
             currentIndex = 0;
             pdc.set(keys.currentIndex(), PersistentDataType.INTEGER, 0);
-            applySkinAppearance(meta, pdc, skin);
+            applySkinAppearance(meta, pdc, skin, player);
         }
 
-        applyLore(meta, pdc, current, currentIndex);
+        applyLore(meta, pdc, current, currentIndex, player);
         item.setItemMeta(meta);
         return AddResult.ADDED;
     }
 
-    public RemoveResult removeSlot(ItemStack item, int index) {
+    public RemoveResult removeSlot(ItemStack item, int index, @Nullable Player player) {
         if (item == null) return RemoveResult.NO_META;
         ItemMeta meta = item.getItemMeta();
         if (meta == null) return RemoveResult.NO_META;
@@ -151,15 +160,15 @@ public final class SkinSlotService {
 
             String activeId = current.get(currentIndex);
             skinSupplier.get().get(activeId)
-                    .ifPresent(s -> applySkinAppearance(meta, pdc, s));
+                    .ifPresent(s -> applySkinAppearance(meta, pdc, s, player));
             applyTooltipForActive(meta, pdc, activeId, tooltips);
-            applyLore(meta, pdc, current, currentIndex);
+            applyLore(meta, pdc, current, currentIndex, player);
         }
         item.setItemMeta(meta);
         return RemoveResult.REMOVED;
     }
 
-    public CycleResult cycleNext(ItemStack item) {
+    public CycleResult cycleNext(ItemStack item, @Nullable Player player) {
         if (item == null) return CycleResult.NO_META;
         ItemMeta meta = item.getItemMeta();
         if (meta == null) return CycleResult.NO_META;
@@ -176,14 +185,14 @@ public final class SkinSlotService {
 
         String activeId = current.get(next);
         skinSupplier.get().get(activeId)
-                .ifPresent(s -> applySkinAppearance(meta, pdc, s));
+                .ifPresent(s -> applySkinAppearance(meta, pdc, s, player));
         applyTooltipForActive(meta, pdc, activeId, readList(pdc, keys.tooltipSlots()));
-        applyLore(meta, pdc, current, next);
+        applyLore(meta, pdc, current, next, player);
         item.setItemMeta(meta);
         return CycleResult.CYCLED;
     }
 
-    public TooltipApplyResult applyTooltip(ItemStack item, String skinId) {
+    public TooltipApplyResult applyTooltip(ItemStack item, String skinId, @Nullable Player player) {
         if (item == null) return TooltipApplyResult.NO_META;
         Optional<SkinDefinition> skinOpt = skinSupplier.get().get(skinId);
         if (skinOpt.isEmpty()) return TooltipApplyResult.UNKNOWN_SKIN;
@@ -206,12 +215,12 @@ public final class SkinSlotService {
         int idx = readIndex(pdc);
         String activeId = (idx >= 0 && idx < slots.size()) ? slots.get(idx) : null;
         applyTooltipForActive(meta, pdc, activeId, tooltips);
-        applyLore(meta, pdc, slots, idx);
+        applyLore(meta, pdc, slots, idx, player);
         item.setItemMeta(meta);
         return TooltipApplyResult.APPLIED;
     }
 
-    public TooltipRemoveResult removeTooltip(ItemStack item) {
+    public TooltipRemoveResult removeTooltip(ItemStack item, @Nullable Player player) {
         if (item == null) return TooltipRemoveResult.NO_META;
         ItemMeta meta = item.getItemMeta();
         if (meta == null) return TooltipRemoveResult.NO_META;
@@ -229,7 +238,7 @@ public final class SkinSlotService {
 
         writeTooltipSlots(pdc, tooltips);
         applyTooltipForActive(meta, pdc, activeId, tooltips);
-        applyLore(meta, pdc, slots, idx);
+        applyLore(meta, pdc, slots, idx, player);
         item.setItemMeta(meta);
         return TooltipRemoveResult.REMOVED;
     }
@@ -331,11 +340,13 @@ public final class SkinSlotService {
 
     // ---------- apply ----------
 
-    private void applySkinAppearance(ItemMeta meta, PersistentDataContainer pdc, SkinDefinition skin) {
+    private void applySkinAppearance(ItemMeta meta, PersistentDataContainer pdc,
+                                     SkinDefinition skin, @Nullable Player player) {
         meta.setItemModel(skin.itemModel());
 
         if (pluginSupplier.get().getFeatures().switchName() && skin.hasName()) {
-            meta.displayName(MINI.deserialize(skin.name())
+            String resolved = placeholderSupplier.get().resolve(player, skin.name());
+            meta.displayName(MINI.deserialize(resolved)
                     .decoration(TextDecoration.ITALIC, false));
             return;
         }
@@ -365,19 +376,22 @@ public final class SkinSlotService {
     }
 
     private void applyLore(ItemMeta meta, PersistentDataContainer pdc,
-                           List<String> slots, int currentIndex) {
-        List<Component> baseLore = resolveBaseLore(pdc, slots, currentIndex);
+                           List<String> slots, int currentIndex, @Nullable Player player) {
+        List<Component> baseLore = resolveBaseLore(pdc, slots, currentIndex, player);
         List<String> tooltipSlots = readList(pdc, keys.tooltipSlots());
-        meta.lore(loreRenderer.render(baseLore, slots, currentIndex, tooltipSlots));
+        meta.lore(loreRenderer.render(baseLore, slots, currentIndex, tooltipSlots, player));
     }
 
     private List<Component> resolveBaseLore(PersistentDataContainer pdc,
-                                            List<String> slots, int currentIndex) {
+                                            List<String> slots, int currentIndex,
+                                            @Nullable Player player) {
         if (pluginSupplier.get().getFeatures().switchLore()
                 && currentIndex >= 0 && currentIndex < slots.size()) {
             SkinDefinition active = skinSupplier.get().get(slots.get(currentIndex)).orElse(null);
             if (active != null && active.hasLore()) {
+                PlaceholderResolver resolver = placeholderSupplier.get();
                 return active.lore().stream()
+                        .map(s -> resolver.resolve(player, s))
                         .<Component>map(s -> MINI.deserialize(s).decoration(TextDecoration.ITALIC, false))
                         .toList();
             }
