@@ -15,9 +15,9 @@
 #       name:          '<#FCBDE3>Summer Pickaxe</#FCBDE3>'           # custom_name when active
 #       lore:                                                        # base lore when active
 #         - '<gray>Sun-soaked.</gray>'
-#       icon:          '🍦'                                          # default slot-row icon
-#       icon-active:   '<gradient:#FFB347:#FFCC33>⊰ 🍦 ⊱</gradient>'  # optional override when active
-#       icon-inactive: '<white>⊰ 🍦 ⊱</white>'                        # optional override when inactive
+#       icon:          '🍦'                                          # default slot-row glyph
+#       icon-active:   '<gradient:#FFB347:#FFCC33>⊰ 🍦 ⊱</gradient>'  # optional, used when active
+#       icon-inactive: '<white>⊰ 🍦 ⊱</white>'                        # optional, used when inactive
 #       color:         '#FCBDE3'                                     # bracket color when its tooltip is applied
 #       tooltip_style: 'minecraft:summer'                            # only applied via tooltip token
 #
@@ -69,7 +69,9 @@ default-bracket-color: 'gray'
 
 # Icon color used in inactive slots when the lang template uses the
 # {icon-color} placeholder. Active slots automatically use their skin's
-# colour, so this is only the "everything else" colour.
+# colour, so this is only the "everything else" colour. Ignored for
+# slots whose skin defines icon-active / icon-inactive (those own their
+# styling).
 inactive-icon-color: 'white'
 
 skins:
@@ -78,17 +80,33 @@ skins:
     name: '<#FCBDE3>Summer Pickaxe</#FCBDE3>'
     icon: '🍦'
     color: '#FCBDE3'
+
   autum_skin:
     item_model: edoween:bone_set/bone_pickaxe
-    name: '<gold>Autumn Pickaxe</gold>'
+    name: '<white>🎃</white> <gradient:#FFFFFF:#BDBDBD>MegaPico de hueso</gradient> <white>🎃</white>'
+    lore:
+      - ''
+      - ' <white>[</white> <#FFFFFF>⊰ <#F4F4F4>🦴 <#E9E9E9>⊱ <white>] Conseguido en #R.I.P. [</white> <#DEDEDE>⊰ <#D3D3D3>🦴 <#C8C8C8>⊱ <white>]</white> '
+      - ''
+      - ' <gradient:#FFFFFF:#BDBDBD><b>-= EDOXMAS =-</b></gradient> <gray>Propietari@</gray><white>:</white> <gradient:#FFFFFF:#BDBDBD>%player_name%</gradient><white>.</white> '
+      - ''
     icon: '🎃'
-    color: 'gold'
-    tooltip_style: 'minecraft:halloween_2'
+    icon-active: ' <gradient:#FFFFFF:#BDBDBD>⊰ 🎃 ⊱</gradient> '
+    icon-inactive: ' <white>⊰ 🎃 ⊱</white> '
+    color: '#414345'
+    tooltip_style: 'minecraft:white'
+
   winter_skin:
     item_model: edoxmas:glacial_set/glacial_pickaxe
-    name: '<gradient:#A6F6FF:#0ED2F7>Pico glacial</gradient>'
+    name: '<white>❊</white> <gradient:#A6F6FF:#0ED2F7>MegaPico glacial</gradient> <white>❊</white>'
     lore:
-      - 'Hola'
+      - ''
+      - ' <white>[</white> <#A6F6FF>⊰ <#88EFFD>⛄ <#69E8FC>⊱ <white>] Conseguido en #Un''ED''neathTheTree [</white> <#4BE0FA>⊰ <#2CD9F9>⛄ <#0ED2F7>⊱ <white>]</white> '
+      - ''
+      - ' <gradient:#A6F6FF:#0ED2F7><b>-= EDOXMAS =-</b></gradient> <gray>Propietari@</gray><white>:</white> <gradient:#A6F6FF:#0ED2F7>%player_name%</gradient><white>.</white> '
+      - ''
     icon: '❊'
+    icon-active: ' <gradient:#A6F6FF:#0ED2F7>⊰ ❊ ⊱</gradient> '
+    icon-inactive: ' <white>⊰ ❊ ⊱</white> '
     color: '#0ED2F7'
-    tooltip_style: 'minecraft:winter'
+    tooltip_style: 'minecraft:aqua'
