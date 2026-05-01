@@ -21,8 +21,14 @@ import java.util.function.Supplier;
 /**
  * Renders the skin-slot row appended to the item lore.
  *
- * Bracket color comes from the skin's `color` when its tooltip is
- * applied, otherwise falls back to skins.yml `default-bracket-color`.
+ * Per-slot placeholders inside slot-active / slot-inactive templates:
+ *   {color}       bracket color — the skin's `color` if its tooltip
+ *                 token has been applied, otherwise default-bracket-color.
+ *   {skin-color}  the skin's defined `color` (or default-bracket-color
+ *                 as fallback) regardless of tooltip state. Use this on
+ *                 the active template's icon to make the active slot
+ *                 stand out with its skin colour.
+ *   {icon}        the per-skin icon configured in skins.yml.
  *
  * Layout knobs (lang):
  *   lore.position      'above' or 'below' the original lore
@@ -109,19 +115,15 @@ public final class LoreRenderer {
             boolean active = i == currentIndex;
             boolean hasTooltip = tooltipSet.contains(id);
 
-            String color;
-            if (hasTooltip) {
-                String skinColor = skin.filter(SkinDefinition::hasColor)
-                        .map(SkinDefinition::color)
-                        .orElse(null);
-                color = skinColor != null ? skinColor : defaultColor;
-            } else {
-                color = defaultColor;
-            }
+            String skinColor = skin.filter(SkinDefinition::hasColor)
+                    .map(SkinDefinition::color)
+                    .orElse(defaultColor);
+            String bracketColor = hasTooltip ? skinColor : defaultColor;
 
             String key = active ? "lore.slot-active" : "lore.slot-inactive";
             middle.append(lang.getRaw(key)
-                    .replace("{color}", color)
+                    .replace("{color}", bracketColor)
+                    .replace("{skin-color}", skinColor)
                     .replace("{icon}", icon)
                     .replace("{skin}", icon));
         }

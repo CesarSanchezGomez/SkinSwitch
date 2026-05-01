@@ -47,11 +47,17 @@ skin:
 #                 Defaults to []. Use [''] for one blank line, etc.
 #   lines-after   list of MiniMessage lines inserted AFTER the row.
 #
-# Templates ({color} and {icon} are placeholders):
-#   slot-active   how the active slot is rendered.
-#   slot-inactive how every other slot is rendered.
-#   The defaults wrap only the brackets in {color} so the icon stays
-#   white regardless of the bracket color.
+# Templates ({color}, {skin-color} and {icon} are placeholders):
+#   slot-active   how the active slot is rendered. The default uses
+#                 {skin-color} for the icon so the active slot is tinted
+#                 with its skin's colour, even if its tooltip token isn't
+#                 applied.
+#   slot-inactive how every other slot is rendered. The default keeps
+#                 the icon white so only the active one stands out.
+#   {color}       bracket colour — skin colour if the tooltip token is
+#                 applied to that slot, default-bracket-color otherwise.
+#   {skin-color}  the skin's defined colour (or default-bracket-color).
+#                 Independent of tooltip token state.
 lore:
   position: 'below'
   lines-before: []
@@ -59,5 +65,5 @@ lore:
   prefix: ' '
   separator: ' '
   suffix: ' '
-  slot-active: '<color:{color}>[</color><white><b>{icon}</b></white><color:{color}>]</color>'
+  slot-active: '<color:{color}>[</color><color:{skin-color}><b>{icon}</b></color><color:{color}>]</color>'
   slot-inactive: '<color:{color}>[</color><white>{icon}</white><color:{color}>]</color>'

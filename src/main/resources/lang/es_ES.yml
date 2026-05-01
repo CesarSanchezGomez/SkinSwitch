@@ -47,11 +47,18 @@ skin:
 #                 Por defecto []. Usa [''] para una línea en blanco, etc.
 #   lines-after   lista de líneas MiniMessage DESPUÉS de la fila.
 #
-# Plantillas ({color} y {icon} son placeholders):
-#   slot-active   cómo se renderiza el slot activo.
-#   slot-inactive cómo se renderizan los demás slots.
-#   Las plantillas por defecto envuelven SOLO los corchetes en {color}
-#   para que el icono no se tinte con el color de los corchetes.
+# Plantillas ({color}, {skin-color} y {icon} son placeholders):
+#   slot-active   cómo se renderiza el slot activo. La plantilla por
+#                 defecto usa {skin-color} en el icono para que el
+#                 activo siempre se tinte con el color de su skin,
+#                 aunque no tenga su tooltip token aplicado.
+#   slot-inactive cómo se renderizan los demás slots. Por defecto el
+#                 icono queda blanco, así solo el activo destaca.
+#   {color}       color de los corchetes — color de la skin si su
+#                 tooltip token está aplicado a ese slot,
+#                 default-bracket-color en caso contrario.
+#   {skin-color}  el color definido de la skin (o default-bracket-color).
+#                 Independiente del estado del tooltip token.
 lore:
   position: 'below'
   lines-before: []
@@ -59,5 +66,5 @@ lore:
   prefix: ' '
   separator: ' '
   suffix: ' '
-  slot-active: '<color:{color}>[</color><white><b>{icon}</b></white><color:{color}>]</color>'
+  slot-active: '<color:{color}>[</color><color:{skin-color}><b>{icon}</b></color><color:{color}>]</color>'
   slot-inactive: '<color:{color}>[</color><white>{icon}</white><color:{color}>]</color>'
