@@ -9,7 +9,7 @@
 # attributes and other persistent data are preserved.
 
 # Internal version — do not edit. Bump = new keys were added.
-config-version: 3
+config-version: 1
 
 # Language file to use from the lang/ folder (without .yml)
 # Available: en_US, es_ES (or create your own)

@@ -8,7 +8,7 @@ import java.util.logging.Logger;
 
 public final class PluginConfig {
 
-    public static final int CURRENT_VERSION = 3;
+    public static final int CURRENT_VERSION = 1;
 
     public record TokenConfig(String material, String customName, List<String> lore) {}
 

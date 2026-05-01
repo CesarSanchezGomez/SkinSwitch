@@ -62,7 +62,7 @@ public final class SkinSlotListener implements Listener {
             player.getInventory().setItemInMainHand(item);
             event.setCancelled(true);
             skinSlotService.getActiveSkin(item).ifPresent(s ->
-                    langSupplier.get().send(player, "skin.switched", "{skin}", s.displayOrId()));
+                    langSupplier.get().send(player, "skin.switched", "{skin}", s.nameOrId()));
         }
     }
 
@@ -103,7 +103,7 @@ public final class SkinSlotListener implements Listener {
             case ADDED -> {
                 consumeOne(player, cursor);
                 SkinDefinition def = skinSupplier.get().get(skinId).orElse(null);
-                String display = def == null ? skinId : def.displayOrId();
+                String display = def == null ? skinId : def.nameOrId();
                 langSupplier.get().send(player, "command.slot-added",
                         "{skin}", display,
                         "{count}", String.valueOf(skinSlotService.getSlots(target).size()));
@@ -123,7 +123,7 @@ public final class SkinSlotListener implements Listener {
 
         SkinSlotService.TooltipApplyResult result = skinSlotService.applyTooltip(target, skinId);
         SkinDefinition def = skinSupplier.get().get(skinId).orElse(null);
-        String display = def == null ? skinId : def.displayOrId();
+        String display = def == null ? skinId : def.nameOrId();
         switch (result) {
             case APPLIED -> {
                 consumeOne(player, cursor);

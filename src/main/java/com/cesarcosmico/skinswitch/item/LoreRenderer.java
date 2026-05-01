@@ -18,15 +18,16 @@ import java.util.function.Supplier;
 /**
  * Renders the skin-slot row appended to the item lore.
  *
- * Bracket color follows the per-slot tooltip token: a slot with its
- * tooltip applied uses the skin's color (or slot-colors.active), one
- * without uses slot-colors.inactive. Active vs inactive is conveyed via
- * the lang templates (default: bold icon for active).
+ * Bracket color comes from the skin's `color` when its tooltip is
+ * applied, otherwise falls back to skins.yml `default-bracket-color`.
  *
- * Placement of the slot row is fully driven by lang config:
- *   lore.position      — 'above' or 'below' the original lore
- *   lore.lines-before  — list of MiniMessage lines inserted before the row
- *   lore.lines-after   — list of MiniMessage lines inserted after the row
+ * Layout knobs (lang):
+ *   lore.position      'above' or 'below' the original lore
+ *   lore.lines-before  list of lines inserted before the slot row
+ *   lore.lines-after   list of lines inserted after the slot row
+ *   lore.prefix        text before the first slot in the row
+ *   lore.separator     text between slots
+ *   lore.suffix        text after the last slot in the row
  */
 public final class LoreRenderer {
 
@@ -78,11 +79,14 @@ public final class LoreRenderer {
                                    int currentIndex,
                                    Collection<String> tooltipSkinIds) {
         SkinConfig skinConfig = skinSupplier.get();
-        SkinConfig.SlotColors colors = skinConfig.getSlotColors();
+        String defaultColor = skinConfig.getDefaultBracketColor();
+        String prefix = lang.getRaw("lore.prefix");
         String separator = lang.getRaw("lore.separator");
+        String suffix = lang.getRaw("lore.suffix");
         Set<String> tooltipSet = new HashSet<>(tooltipSkinIds);
 
         StringBuilder line = new StringBuilder();
+        line.append(prefix);
         for (int i = 0; i < skinIds.size(); i++) {
             if (i > 0) line.append(separator);
 
@@ -97,9 +101,9 @@ public final class LoreRenderer {
                 String skinColor = skin.filter(SkinDefinition::hasColor)
                         .map(SkinDefinition::color)
                         .orElse(null);
-                color = skinColor != null ? skinColor : colors.active();
+                color = skinColor != null ? skinColor : defaultColor;
             } else {
-                color = colors.inactive();
+                color = defaultColor;
             }
 
             String key = active ? "lore.slot-active" : "lore.slot-inactive";
@@ -108,6 +112,7 @@ public final class LoreRenderer {
                     .replace("{icon}", icon)
                     .replace("{skin}", icon));
         }
+        line.append(suffix);
         return deserialize(line.toString());
     }
 

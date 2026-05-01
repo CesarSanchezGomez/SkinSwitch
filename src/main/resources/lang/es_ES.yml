@@ -2,7 +2,7 @@
 # Soporta formato MiniMessage.
 # Usa {prefix} para insertar el prefijo del plugin.
 # Versión interna — no editar. Cambio = nuevos mensajes añadidos.
-config-version: 7
+config-version: 1
 
 prefix: '<white>[<gradient:#C173FF:#950DFF>SkinSwitch</gradient>]</white>'
 
@@ -33,31 +33,31 @@ command:
 skin:
   switched: '{prefix} <white>Cambiaste a <#C173FF>{skin}</#C173FF>.</white>'
 
-# -- Sección añadida al lore de ítems con slots --
-# Se renderiza como una sola línea, ej: "[🌷] [🎃] [❄]".
+# -- Layout de la fila de slots ----------------
+# La fila se construye como:
+#   prefix + slot[0] + separator + slot[1] + ... + suffix
+# Cada slot usa slot-active o slot-inactive según sea o no el activo.
+# Edita prefix/separator/suffix para controlar el espaciado por separado
+# — meter un espacio dentro de slot-active duplicaría el espacio entre
+# slots, por eso el padding está separado aquí.
 #
-# Placeholders en slot-active / slot-inactive:
-#   {color}  color de los corchetes (resuelto desde skins.yml)
-#   {icon}   icono por skin configurado en skins.yml
-#
-# Las plantillas por defecto envuelven SOLO los corchetes con {color},
-# así el icono nunca se tinta con el color del corchete.
-#
-# Layout — totalmente explícito, no se añade nada que no esté aquí:
+# Posicionamiento vertical (alrededor de la fila):
 #   position      'above' (encima) o 'below' (debajo) del lore original.
-#   lines-before  lista de líneas MiniMessage insertadas ANTES de la fila.
-#                 Por defecto []. Pon '' para una línea en blanco, '' ''
-#                 para dos, o cualquier MiniMessage para cabeceras.
-#   lines-after   lista de líneas MiniMessage insertadas DESPUÉS de la
-#                 fila. Misma semántica que lines-before.
+#   lines-before  lista de líneas MiniMessage ANTES de la fila.
+#                 Por defecto []. Usa [''] para una línea en blanco, etc.
+#   lines-after   lista de líneas MiniMessage DESPUÉS de la fila.
 #
-# Ejemplo: una línea en blanco arriba + un pie debajo de la fila de slots.
-#   lines-before: ['']
-#   lines-after: ['', '<dark_gray>—————————</dark_gray>']
+# Plantillas ({color} y {icon} son placeholders):
+#   slot-active   cómo se renderiza el slot activo.
+#   slot-inactive cómo se renderizan los demás slots.
+#   Las plantillas por defecto envuelven SOLO los corchetes en {color}
+#   para que el icono no se tinte con el color de los corchetes.
 lore:
   position: 'below'
   lines-before: []
   lines-after: []
+  prefix: ' '
   separator: ' '
+  suffix: ' '
   slot-active: '<color:{color}>[</color><white><b>{icon}</b></white><color:{color}>]</color>'
   slot-inactive: '<color:{color}>[</color><white>{icon}</white><color:{color}>]</color>'

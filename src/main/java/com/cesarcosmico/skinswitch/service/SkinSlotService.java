@@ -334,8 +334,8 @@ public final class SkinSlotService {
     private void applySkinAppearance(ItemMeta meta, PersistentDataContainer pdc, SkinDefinition skin) {
         meta.setItemModel(skin.itemModel());
 
-        if (pluginSupplier.get().getFeatures().switchName() && skin.hasDisplay()) {
-            meta.displayName(MINI.deserialize(skin.display())
+        if (pluginSupplier.get().getFeatures().switchName() && skin.hasName()) {
+            meta.displayName(MINI.deserialize(skin.name())
                     .decoration(TextDecoration.ITALIC, false));
             return;
         }

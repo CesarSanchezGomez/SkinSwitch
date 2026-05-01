@@ -14,29 +14,29 @@ import java.util.List;
 public record SkinDefinition(
         String id,
         NamespacedKey itemModel,
-        String display,
+        String name,
+        List<String> lore,
         String icon,
-        NamespacedKey tooltipStyle,
         String color,
-        List<String> lore
+        NamespacedKey tooltipStyle
 ) {
     public SkinDefinition {
         lore = lore == null ? List.of() : List.copyOf(lore);
     }
 
-    public String displayOrId() {
-        return (display != null && !display.isEmpty()) ? display : id;
+    public String nameOrId() {
+        return (name != null && !name.isEmpty()) ? name : id;
     }
 
-    public boolean hasDisplay() {
-        return display != null && !display.isEmpty();
-    }
-
-    public boolean hasColor() {
-        return color != null && !color.isEmpty();
+    public boolean hasName() {
+        return name != null && !name.isEmpty();
     }
 
     public boolean hasLore() {
         return !lore.isEmpty();
+    }
+
+    public boolean hasColor() {
+        return color != null && !color.isEmpty();
     }
 }

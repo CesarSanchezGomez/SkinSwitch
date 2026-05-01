@@ -51,7 +51,7 @@ public final class TokenFactory {
         ItemMeta meta = item.getItemMeta();
         if (meta == null) return item;
 
-        String label = def.displayOrId();
+        String label = def.nameOrId();
         if (!token.customName().isEmpty()) {
             meta.displayName(deserialize(token.customName().replace("{skin}", label)));
         }

@@ -12,13 +12,10 @@ import java.util.logging.Logger;
 
 public final class SkinConfig {
 
-    public static final int CURRENT_VERSION = 3;
-
-    /** Default bracket colors for the slot row in lore (per-skin colors override 'active'). */
-    public record SlotColors(String active, String inactive) {}
+    public static final int CURRENT_VERSION = 1;
 
     private final Map<String, SkinDefinition> skins;
-    private final SlotColors slotColors;
+    private final String defaultBracketColor;
 
     public SkinConfig(ConfigurationSection root, Logger logger) {
         Map<String, SkinDefinition> map = new LinkedHashMap<>();
@@ -32,36 +29,32 @@ public final class SkinConfig {
             }
         }
         this.skins = Collections.unmodifiableMap(map);
-
-        ConfigurationSection colorsSection = root.getConfigurationSection("slot-colors");
-        String active = colorsSection != null ? colorsSection.getString("active", "aqua") : "aqua";
-        String inactive = colorsSection != null ? colorsSection.getString("inactive", "gray") : "gray";
-        this.slotColors = new SlotColors(active, inactive);
+        this.defaultBracketColor = root.getString("default-bracket-color", "gray");
     }
 
     private SkinDefinition parseSkin(String id, ConfigurationSection root, Logger logger) {
         String itemModelRaw;
-        String display;
-        String icon;
-        String tooltipStyleRaw;
-        String color;
+        String name;
         List<String> lore;
+        String icon;
+        String color;
+        String tooltipStyleRaw;
 
         if (root.isConfigurationSection(id)) {
             ConfigurationSection section = root.getConfigurationSection(id);
             itemModelRaw = section.getString("item_model", "");
-            display = section.getString("display", null);
-            icon = section.getString("icon", id);
-            tooltipStyleRaw = section.getString("tooltip_style", null);
-            color = section.getString("color", null);
+            name = section.getString("name", null);
             lore = section.isList("lore") ? section.getStringList("lore") : List.of();
+            icon = section.getString("icon", id);
+            color = section.getString("color", null);
+            tooltipStyleRaw = section.getString("tooltip_style", null);
         } else {
             itemModelRaw = root.getString(id, "");
-            display = null;
-            icon = id;
-            tooltipStyleRaw = null;
-            color = null;
+            name = null;
             lore = List.of();
+            icon = id;
+            color = null;
+            tooltipStyleRaw = null;
         }
 
         if (itemModelRaw.isEmpty()) {
@@ -83,7 +76,7 @@ public final class SkinConfig {
             }
         }
 
-        return new SkinDefinition(id, modelKey, display, icon, tooltipKey, color, lore);
+        return new SkinDefinition(id, modelKey, name, lore, icon, color, tooltipKey);
     }
 
     public Optional<SkinDefinition> get(String id) {
@@ -98,7 +91,7 @@ public final class SkinConfig {
         return skins;
     }
 
-    public SlotColors getSlotColors() {
-        return slotColors;
+    public String getDefaultBracketColor() {
+        return defaultBracketColor;
     }
 }

@@ -16,7 +16,7 @@ import java.util.Map;
 
 public final class LangConfig {
 
-    public static final int CURRENT_VERSION = 7;
+    public static final int CURRENT_VERSION = 1;
 
     private static final MiniMessage MINI = MiniMessage.miniMessage();
 

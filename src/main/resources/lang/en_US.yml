@@ -2,7 +2,7 @@
 # Supports MiniMessage formatting.
 # Use {prefix} to insert the plugin prefix.
 # Internal version — do not edit. Bump = new messages were added.
-config-version: 7
+config-version: 1
 
 prefix: '<white>[<gradient:#C173FF:#950DFF>SkinSwitch</gradient>]</white>'
 
@@ -33,31 +33,31 @@ command:
 skin:
   switched: '{prefix} <white>Switched to <#C173FF>{skin}</#C173FF>.</white>'
 
-# -- Lore section appended to items with slots --
-# Rendered as a single inline row, e.g. "[🌷] [🎃] [❄]".
+# -- Slot row layout ---------------------------
+# The slot row is built as:
+#   prefix + slot[0] + separator + slot[1] + ... + suffix
+# Each slot uses slot-active or slot-inactive depending on whether it's
+# the currently selected one. Edit prefix/separator/suffix to control
+# the spacing independently — adding a space to slot-active alone would
+# double up between slots, which is why the padding is split out here.
 #
-# Placeholders for slot-active / slot-inactive:
-#   {color}  bracket color (resolved from skins.yml: slot-colors / per-skin)
-#   {icon}   per-skin icon configured in skins.yml
-#
-# The default templates wrap only the brackets in {color} so the icon
-# itself is never tinted by the bracket color.
-#
-# Layout — fully explicit, nothing is added that you don't see here:
+# Vertical layout (around the row):
 #   position      'above' or 'below' the item's original lore.
-#   lines-before  list of MiniMessage lines inserted BEFORE the slot row.
-#                 Defaults to []. Add '' for one blank line, '' '' for two,
-#                 or any MiniMessage strings for headers/decoration.
-#   lines-after   list of MiniMessage lines inserted AFTER the slot row.
-#                 Same semantics as lines-before.
+#   lines-before  list of MiniMessage lines inserted BEFORE the row.
+#                 Defaults to []. Use [''] for one blank line, etc.
+#   lines-after   list of MiniMessage lines inserted AFTER the row.
 #
-# Example: blank line above the slot row + custom footer underneath.
-#   lines-before: ['']
-#   lines-after: ['', '<dark_gray>—————————</dark_gray>']
+# Templates ({color} and {icon} are placeholders):
+#   slot-active   how the active slot is rendered.
+#   slot-inactive how every other slot is rendered.
+#   The defaults wrap only the brackets in {color} so the icon stays
+#   white regardless of the bracket color.
 lore:
   position: 'below'
   lines-before: []
   lines-after: []
+  prefix: ' '
   separator: ' '
+  suffix: ' '
   slot-active: '<color:{color}>[</color><white><b>{icon}</b></white><color:{color}>]</color>'
   slot-inactive: '<color:{color}>[</color><white>{icon}</white><color:{color}>]</color>'
