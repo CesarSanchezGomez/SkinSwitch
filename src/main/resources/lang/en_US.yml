@@ -2,7 +2,7 @@
 # Supports MiniMessage formatting.
 # Use {prefix} to insert the plugin prefix.
 # Internal version — do not edit. Bump = new messages were added.
-config-version: 6
+config-version: 7
 
 prefix: '<white>[<gradient:#C173FF:#950DFF>SkinSwitch</gradient>]</white>'
 
@@ -43,17 +43,20 @@ skin:
 # The default templates wrap only the brackets in {color} so the icon
 # itself is never tinted by the bracket color.
 #
-# Layout:
-#   position      — 'above' or 'below' the item's original lore.
-#   lines-before  — extra MiniMessage lines inserted BEFORE the slot row.
-#   lines-after   — extra MiniMessage lines inserted AFTER the slot row.
-# Both lists are rendered verbatim (each entry is one tooltip line); use
-# them for padding/headers/footers regardless of whether the item has
-# original lore. Empty list = no extra lines.
+# Layout — fully explicit, nothing is added that you don't see here:
+#   position      'above' or 'below' the item's original lore.
+#   lines-before  list of MiniMessage lines inserted BEFORE the slot row.
+#                 Defaults to []. Add '' for one blank line, '' '' for two,
+#                 or any MiniMessage strings for headers/decoration.
+#   lines-after   list of MiniMessage lines inserted AFTER the slot row.
+#                 Same semantics as lines-before.
+#
+# Example: blank line above the slot row + custom footer underneath.
+#   lines-before: ['']
+#   lines-after: ['', '<dark_gray>—————————</dark_gray>']
 lore:
   position: 'below'
-  lines-before:
-    - ''
+  lines-before: []
   lines-after: []
   separator: ' '
   slot-active: '<color:{color}>[</color><white><b>{icon}</b></white><color:{color}>]</color>'
