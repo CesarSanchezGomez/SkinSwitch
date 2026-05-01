@@ -22,16 +22,12 @@ import java.util.function.Supplier;
  * Renders the skin-slot row appended to the item lore.
  *
  * Per-slot placeholders inside slot-active / slot-inactive templates:
- *   {color}       bracket color — the skin's `color` if its tooltip
- *                 token has been applied, otherwise default-bracket-color.
- *   {icon-color}  smart icon color: the skin's color when the slot is
- *                 active, inactive-icon-color (default white) when it
- *                 isn't. Use this in BOTH templates and the active slot
- *                 will stand out automatically.
- *   {skin-color}  the skin's defined `color` (or default-bracket-color)
- *                 regardless of active or tooltip state. Useful only if
- *                 you want all icons tinted with their skin colour.
- *   {icon}        the per-skin icon configured in skins.yml.
+ *   {color}  bracket colour — the skin's bracket-color when its tooltip
+ *            token has been applied, the skin's bracket-color-default
+ *            otherwise. Each falls back to the global
+ *            default-bracket-color from skins.yml when not defined.
+ *   {icon}   the icon glyph for that slot (icon-active / icon-inactive
+ *            override the plain icon when present).
  *
  * Layout knobs (lang):
  *   lore.position      'above' or 'below' the original lore
@@ -102,8 +98,7 @@ public final class LoreRenderer {
                                    int currentIndex,
                                    Collection<String> tooltipSkinIds) {
         SkinConfig skinConfig = skinSupplier.get();
-        String defaultColor = skinConfig.getDefaultBracketColor();
-        String inactiveIconColor = skinConfig.getInactiveIconColor();
+        String globalDefault = skinConfig.getDefaultBracketColor();
         String prefix = resolver.resolve(owner, lang.getRaw("lore.prefix"));
         String separator = resolver.resolve(owner, lang.getRaw("lore.separator"));
         String suffix = resolver.resolve(owner, lang.getRaw("lore.suffix"));
@@ -117,21 +112,15 @@ public final class LoreRenderer {
             Optional<SkinDefinition> skin = skinConfig.get(id);
             boolean active = i == currentIndex;
             boolean hasTooltip = tooltipSet.contains(id);
+
             String icon = skin
                     .map(s -> active ? s.activeIcon() : s.inactiveIcon())
                     .orElse(id);
-
-            String skinColor = skin.filter(SkinDefinition::hasColor)
-                    .map(SkinDefinition::color)
-                    .orElse(defaultColor);
-            String bracketColor = hasTooltip ? skinColor : defaultColor;
-            String iconColor = active ? skinColor : inactiveIconColor;
+            String bracketColor = resolveBracketColor(skin.orElse(null), hasTooltip, globalDefault);
 
             String key = active ? "lore.slot-active" : "lore.slot-inactive";
             middle.append(lang.getRaw(key)
                     .replace("{color}", bracketColor)
-                    .replace("{icon-color}", iconColor)
-                    .replace("{skin-color}", skinColor)
                     .replace("{icon}", icon)
                     .replace("{skin}", icon));
         }
@@ -145,6 +134,15 @@ public final class LoreRenderer {
                 .append(literal(prefix))
                 .append(deserialize(middle.toString()))
                 .append(literal(suffix));
+    }
+
+    private static String resolveBracketColor(@Nullable SkinDefinition skin,
+                                              boolean hasTooltip, String globalDefault) {
+        if (skin == null) return globalDefault;
+        if (hasTooltip) {
+            return skin.hasBracketColor() ? skin.bracketColor() : globalDefault;
+        }
+        return skin.hasBracketColorDefault() ? skin.bracketColorDefault() : globalDefault;
     }
 
     private static Component literal(String raw) {

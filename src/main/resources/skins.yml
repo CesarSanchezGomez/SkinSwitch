@@ -11,48 +11,46 @@
 #
 #   section (recommended):
 #     summer_skin:
-#       item_model:    edosummer:ice_cream_pickaxe                  # required
-#       name:          '<#FCBDE3>Summer Pickaxe</#FCBDE3>'           # custom_name when active
-#       lore:                                                        # base lore when active
+#       item_model:            edosummer:ice_cream_pickaxe                  # required
+#       name:                  '<#FCBDE3>Summer Pickaxe</#FCBDE3>'           # custom_name when active
+#       lore:                                                                # base lore when active
 #         - '<gray>Sun-soaked.</gray>'
-#       icon:          '🍦'                                          # default slot-row glyph
-#       icon-active:   '<gradient:#FFB347:#FFCC33>⊰ 🍦 ⊱</gradient>'  # optional, used when active
-#       icon-inactive: '<white>⊰ 🍦 ⊱</white>'                        # optional, used when inactive
-#       color:         '#FCBDE3'                                     # bracket color when its tooltip is applied
-#       tooltip_style: 'minecraft:summer'                            # only applied via tooltip token
+#       icon:                  '🍦'                                          # default slot-row glyph
+#       icon-active:           '<gradient:#FFB347:#FFCC33>⊰ 🍦 ⊱</gradient>'  # optional, used when active
+#       icon-inactive:         '<white>⊰ 🍦 ⊱</white>'                        # optional, used when inactive
+#       bracket-color:         '#FCBDE3'                                     # bracket colour when its tooltip token is applied
+#       bracket-color-default: '#888888'                                     # bracket colour when no tooltip is applied
+#       tooltip_style:         'minecraft:summer'                            # only applied via tooltip token
 #
 # All extended fields are optional. Behavior:
-#   * 'item_model'   is required.
-#   * 'name'         when present, replaces the item's custom_name while
-#                    this slot is active. Globally toggled by
-#                    features.switch-name in config.yml.
-#   * 'lore'         when present, replaces the item's lore as the base
-#                    for the slot row. Globally toggled by
-#                    features.switch-lore in config.yml.
-#   * 'icon'         the slot-row glyph. When omitted, the skin id is
-#                    used. If you want the lang template's {icon-color}
-#                    to drive its colour, keep this a plain character
-#                    (no MiniMessage tags) — colour tags inside the icon
-#                    take precedence over outer wrappers.
-#   * 'icon-active'  optional override for the active slot. Use this
-#                    when you want fancy MiniMessage decoration on the
-#                    active icon (gradients, extra glyphs, …) — those
-#                    won't combine well with {icon-color}, so this lets
-#                    you opt out and own the styling per state.
-#   * 'icon-inactive' optional override for the inactive slot. Same idea
-#                    as icon-active. Falls back to 'icon' when omitted.
-#   * 'color'        when omitted, default-bracket-color is used.
-#   * 'tooltip_style' is NOT applied by the skin slot. Each slot has its
-#                    own tooltip flag. Give the player a tooltip token
-#                    (/ss givetooltip <player> <skin>) and have them
-#                    right-click it onto the target item — the skin slot
-#                    must already exist on that item, or the application
-#                    is rejected. Remove the active slot's tooltip with
-#                    /ss removetooltip while holding the item.
-#
-# Bracket color: a slot's bracket uses the skin's `color` only when its
-# tooltip token has been applied; otherwise the bracket uses
-# default-bracket-color (regardless of which slot is active).
+#   * 'item_model'           is required.
+#   * 'name'                 when present, replaces the item's custom_name
+#                            while this slot is active. Globally toggled by
+#                            features.switch-name in config.yml.
+#   * 'lore'                 when present, replaces the item's lore as the
+#                            base for the slot row. Globally toggled by
+#                            features.switch-lore in config.yml.
+#   * 'icon'                 the slot-row glyph. When omitted, the skin id
+#                            is used. Keep it as a plain character if you
+#                            want lang templates to drive its colour;
+#                            colour tags inside the icon will always win
+#                            against any outer wrapper.
+#   * 'icon-active'          optional override for the active slot. Use it
+#                            when you want fancy MiniMessage decoration
+#                            (gradients, extra glyphs) on the active slot.
+#                            Falls back to 'icon'.
+#   * 'icon-inactive'        same idea for inactive slots.
+#   * 'bracket-color'        bracket colour while this slot's tooltip token
+#                            is applied. Falls back to default-bracket-color.
+#   * 'bracket-color-default' bracket colour while this slot has no tooltip
+#                            token applied. Falls back to default-bracket-color.
+#   * 'tooltip_style'        is NOT applied by the skin slot. Each slot has
+#                            its own tooltip flag — give the player a
+#                            tooltip token (/ss givetooltip <player> <skin>)
+#                            and have them right-click it onto the target
+#                            item. The skin slot must already exist on the
+#                            item. Remove the active slot's tooltip with
+#                            /ss removetooltip while holding the item.
 #
 # Item data (durability, enchants, attributes, other PDC) is preserved
 # when switching; only item_model + custom_name + lore are touched by
@@ -61,25 +59,19 @@
 # Internal version — do not edit. Bump = new keys were added.
 config-version: 1
 
-# Bracket color used when a slot has no tooltip applied, or when its
-# skin doesn't define `color`. Any MiniMessage color value: a named
-# color (gray, gold, aqua, ...) or a hex code like '#FCBDE3'. Wrap-tags
-# like '<gray>' are NOT accepted here — just the value.
+# Bracket colour fallback. Used whenever a slot's skin doesn't define
+# bracket-color (when its tooltip is on) or bracket-color-default (when
+# its tooltip is off). Any MiniMessage colour value: a named colour
+# (gray, gold, aqua, …) or a hex code like '#FCBDE3'. Wrap-tags like
+# '<gray>' are NOT accepted here — just the value.
 default-bracket-color: 'gray'
-
-# Icon color used in inactive slots when the lang template uses the
-# {icon-color} placeholder. Active slots automatically use their skin's
-# colour, so this is only the "everything else" colour. Ignored for
-# slots whose skin defines icon-active / icon-inactive (those own their
-# styling).
-inactive-icon-color: 'white'
 
 skins:
   summer_skin:
     item_model: edosummer:ice_cream_pickaxe
     name: '<#FCBDE3>Summer Pickaxe</#FCBDE3>'
     icon: '🍦'
-    color: '#FCBDE3'
+    bracket-color: '#FCBDE3'
 
   autum_skin:
     item_model: edoween:bone_set/bone_pickaxe
@@ -93,7 +85,7 @@ skins:
     icon: '🎃'
     icon-active: ' <gradient:#FFFFFF:#BDBDBD>⊰ 🎃 ⊱</gradient> '
     icon-inactive: ' <white>⊰ 🎃 ⊱</white> '
-    color: '#414345'
+    bracket-color: '#414345'
     tooltip_style: 'minecraft:white'
 
   winter_skin:
@@ -108,5 +100,5 @@ skins:
     icon: '❊'
     icon-active: ' <gradient:#A6F6FF:#0ED2F7>⊰ ❊ ⊱</gradient> '
     icon-inactive: ' <white>⊰ ❊ ⊱</white> '
-    color: '#0ED2F7'
+    bracket-color: '#0ED2F7'
     tooltip_style: 'minecraft:aqua'

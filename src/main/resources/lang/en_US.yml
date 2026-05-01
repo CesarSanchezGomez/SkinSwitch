@@ -47,23 +47,21 @@ skin:
 #                 Defaults to []. Use [''] for one blank line, etc.
 #   lines-after   list of MiniMessage lines inserted AFTER the row.
 #
-# Templates ({color}, {icon-color}, {skin-color} and {icon} are placeholders):
+# Templates ({color} and {icon} are placeholders):
 #   slot-active   how the active slot is rendered.
 #   slot-inactive how every other slot is rendered.
-#   The defaults are intentionally identical and rely on {icon-color}
-#   to differentiate active vs inactive automatically — keep them
-#   identical unless you actively want different layouts (extra
-#   markup, separators, decoration, etc.).
 #
-# Colour placeholders:
-#   {color}       bracket colour — skin colour if the tooltip token is
-#                 applied to that slot, default-bracket-color otherwise.
-#   {icon-color}  smart icon colour: the skin's colour when the slot is
-#                 active, inactive-icon-color (default white) otherwise.
-#                 Use this and the active slot stands out automatically.
-#   {skin-color}  the skin's defined colour (or default-bracket-color)
-#                 regardless of active/tooltip state. For advanced cases
-#                 where you want every icon tinted with its skin colour.
+# Placeholders:
+#   {color}  bracket colour — resolved per slot from skins.yml:
+#            bracket-color when the slot's tooltip token is applied,
+#            bracket-color-default otherwise. Each falls back to the
+#            global default-bracket-color when not defined.
+#   {icon}   the icon glyph for that slot. The skin's icon-active /
+#            icon-inactive (when defined) own the styling per state;
+#            otherwise the plain `icon` field is used. If you want
+#            different colours per state and your skin doesn't use
+#            those overrides, just hardcode the colour around {icon}
+#            in the template (e.g. <white>{icon}</white>).
 lore:
   position: 'below'
   lines-before: []
@@ -71,5 +69,5 @@ lore:
   prefix: ' '
   separator: ' '
   suffix: ' '
-  slot-active: '<color:{color}>[</color><color:{icon-color}>{icon}</color><color:{color}>]</color>'
-  slot-inactive: '<color:{color}>[</color><color:{icon-color}>{icon}</color><color:{color}>]</color>'
+  slot-active: '<color:{color}>[</color>{icon}<color:{color}>]</color>'
+  slot-inactive: '<color:{color}>[</color>{icon}<color:{color}>]</color>'

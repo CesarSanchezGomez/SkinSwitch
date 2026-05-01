@@ -16,7 +16,6 @@ public final class SkinConfig {
 
     private final Map<String, SkinDefinition> skins;
     private final String defaultBracketColor;
-    private final String inactiveIconColor;
 
     public SkinConfig(ConfigurationSection root, Logger logger) {
         Map<String, SkinDefinition> map = new LinkedHashMap<>();
@@ -31,7 +30,6 @@ public final class SkinConfig {
         }
         this.skins = Collections.unmodifiableMap(map);
         this.defaultBracketColor = root.getString("default-bracket-color", "gray");
-        this.inactiveIconColor = root.getString("inactive-icon-color", "white");
     }
 
     private SkinDefinition parseSkin(String id, ConfigurationSection root, Logger logger) {
@@ -41,7 +39,8 @@ public final class SkinConfig {
         String icon;
         String iconActive;
         String iconInactive;
-        String color;
+        String bracketColor;
+        String bracketColorDefault;
         String tooltipStyleRaw;
 
         if (root.isConfigurationSection(id)) {
@@ -52,7 +51,8 @@ public final class SkinConfig {
             icon = section.getString("icon", id);
             iconActive = section.getString("icon-active", null);
             iconInactive = section.getString("icon-inactive", null);
-            color = section.getString("color", null);
+            bracketColor = section.getString("bracket-color", null);
+            bracketColorDefault = section.getString("bracket-color-default", null);
             tooltipStyleRaw = section.getString("tooltip_style", null);
         } else {
             itemModelRaw = root.getString(id, "");
@@ -61,7 +61,8 @@ public final class SkinConfig {
             icon = id;
             iconActive = null;
             iconInactive = null;
-            color = null;
+            bracketColor = null;
+            bracketColorDefault = null;
             tooltipStyleRaw = null;
         }
 
@@ -84,7 +85,8 @@ public final class SkinConfig {
             }
         }
 
-        return new SkinDefinition(id, modelKey, name, lore, icon, iconActive, iconInactive, color, tooltipKey);
+        return new SkinDefinition(id, modelKey, name, lore, icon, iconActive, iconInactive,
+                bracketColor, bracketColorDefault, tooltipKey);
     }
 
     public Optional<SkinDefinition> get(String id) {
@@ -101,9 +103,5 @@ public final class SkinConfig {
 
     public String getDefaultBracketColor() {
         return defaultBracketColor;
-    }
-
-    public String getInactiveIconColor() {
-        return inactiveIconColor;
     }
 }

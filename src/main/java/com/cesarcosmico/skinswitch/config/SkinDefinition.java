@@ -14,6 +14,10 @@ import java.util.List;
  * Icons can be specialised per state via {@code iconActive} and
  * {@code iconInactive}. Either one falls back to {@code icon} when not
  * defined, so simple skins can keep using a single {@code icon} field.
+ *
+ * Bracket colours have two slots: {@code bracketColor} when the slot's
+ * tooltip token has been applied, {@code bracketColorDefault} when it
+ * hasn't. Both fall back to the global {@code default-bracket-color}.
  */
 public record SkinDefinition(
         String id,
@@ -23,7 +27,8 @@ public record SkinDefinition(
         String icon,
         String iconActive,
         String iconInactive,
-        String color,
+        String bracketColor,
+        String bracketColorDefault,
         NamespacedKey tooltipStyle
 ) {
     public SkinDefinition {
@@ -42,8 +47,12 @@ public record SkinDefinition(
         return !lore.isEmpty();
     }
 
-    public boolean hasColor() {
-        return color != null && !color.isEmpty();
+    public boolean hasBracketColor() {
+        return bracketColor != null && !bracketColor.isEmpty();
+    }
+
+    public boolean hasBracketColorDefault() {
+        return bracketColorDefault != null && !bracketColorDefault.isEmpty();
     }
 
     public String activeIcon() {
