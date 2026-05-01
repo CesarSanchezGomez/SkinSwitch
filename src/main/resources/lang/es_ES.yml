@@ -26,29 +26,15 @@ command:
   tooltip-duplicate: '{prefix} <white>El tooltip de <#7DD031>{skin}</#7DD031> ya está aplicado.</white>'
   player-not-found: '{prefix} <red>Jugador no encontrado: <white>{player}</white>.</red>'
   cooldown: '{prefix} <white>Espera <#7DD031>{seconds}s</#7DD031> antes de cambiar de nuevo.</white>'
-  switch-locked: '{prefix} <white>El cambio está bloqueado. Usa <#7DD031>/ss lock</#7DD031> para desbloquearlo.</white>'
-  lock-enabled: '{prefix} <white>Cambio de skin <#7DD031>bloqueado</#7DD031>.</white>'
-  lock-disabled: '{prefix} <white>Cambio de skin <#7DD031>desbloqueado</#7DD031>.</white>'
   single-slot: '{prefix} <white>Este ítem solo tiene un slot de skin.</white>'
   already-active: '{prefix} <white>La skin <#7DD031>{skin}</#7DD031> ya está activa.</white>'
+  already-vanilla: '{prefix} <white>El ítem ya está mostrando su aspecto vanilla.</white>'
   skin-not-on-item: '{prefix} <red>La skin <white>{skin}</white> no está instalada en este ítem.</red>'
 
 # -- Cambio de skin ---------------------------
 skin:
   switched: '<white>Cambiaste a <gradient:#B4E488:#7DD031>{skin}</gradient></white>'
-
-# -- Menú de cambio (/ss menu) ----------------
-menu:
-  entry-active-name: '<gradient:#B4E488:#7DD031><b>{skin}</b></gradient>'
-  entry-active-lore:
-    - ''
-    - ' <#B4E488>► Skin activa</#B4E488> '
-    - ''
-  entry-inactive-name: '<white>{skin}</white>'
-  entry-inactive-lore:
-    - ''
-    - ' <gray>Click para cambiar a esta skin.</gray> '
-    - ''
+  switched-vanilla: '<white>Restaurado el aspecto <red>vanilla</red></white>'
 
 # -- Layout de la fila de slots ----------------
 lore:

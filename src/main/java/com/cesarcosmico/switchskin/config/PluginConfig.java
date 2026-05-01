@@ -26,8 +26,6 @@ public final class PluginConfig {
         public boolean isActionBar() { return "actionbar".equalsIgnoreCase(mode); }
     }
 
-    public record MenuConfig(int rows, String title) {}
-
     private final int defaultMaxSlots;
     private final TokenConfig token;
     private final TokenConfig tooltipToken;
@@ -55,12 +53,7 @@ public final class PluginConfig {
         this.switchFeedback = new FeedbackConfig(
                 switchSection != null ? switchSection.getString("feedback", "actionbar") : "actionbar");
 
-        final ConfigurationSection menuSection = root.getConfigurationSection("menu");
-        final int rows = Math.clamp(menuSection != null ? menuSection.getInt("rows", 3) : 3, 1, 6);
-        final String title = menuSection != null
-                ? menuSection.getString("title", "<white><gradient:#B4E488:#7DD031><b>Switch Skin</b></gradient></white>")
-                : "<white><gradient:#B4E488:#7DD031><b>Switch Skin</b></gradient></white>";
-        this.menu = new MenuConfig(rows, title);
+        this.menu = new MenuConfig(root.getConfigurationSection("menu"), logger);
     }
 
     private TokenConfig readToken(ConfigurationSection section, String defaultMaterial) {

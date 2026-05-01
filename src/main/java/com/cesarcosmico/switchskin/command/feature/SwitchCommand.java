@@ -4,7 +4,6 @@ import com.cesarcosmico.switchskin.config.LangConfig;
 import com.cesarcosmico.switchskin.config.SkinConfig;
 import com.cesarcosmico.switchskin.config.SkinDefinition;
 import com.cesarcosmico.switchskin.service.CooldownService;
-import com.cesarcosmico.switchskin.service.PlayerLockService;
 import com.cesarcosmico.switchskin.service.SkinSlotService;
 import com.cesarcosmico.switchskin.service.SwitchAnnouncer;
 import com.mojang.brigadier.Command;
@@ -24,24 +23,23 @@ import java.util.function.Supplier;
 
 public final class SwitchCommand {
 
+    private static final String VANILLA_LITERAL = "vanilla";
+
     private final Supplier<LangConfig> langSupplier;
     private final Supplier<SkinConfig> skinSupplier;
     private final Supplier<SkinSlotService> serviceSupplier;
     private final Supplier<CooldownService> cooldownSupplier;
-    private final Supplier<PlayerLockService> lockSupplier;
     private final Supplier<SwitchAnnouncer> announcerSupplier;
 
     public SwitchCommand(Supplier<LangConfig> langSupplier,
                          Supplier<SkinConfig> skinSupplier,
                          Supplier<SkinSlotService> serviceSupplier,
                          Supplier<CooldownService> cooldownSupplier,
-                         Supplier<PlayerLockService> lockSupplier,
                          Supplier<SwitchAnnouncer> announcerSupplier) {
         this.langSupplier = langSupplier;
         this.skinSupplier = skinSupplier;
         this.serviceSupplier = serviceSupplier;
         this.cooldownSupplier = cooldownSupplier;
-        this.lockSupplier = lockSupplier;
         this.announcerSupplier = announcerSupplier;
     }
 
@@ -50,7 +48,7 @@ public final class SwitchCommand {
                 .requires(source -> source.getSender().hasPermission("switchskin.use"))
                 .executes(this::cycle)
                 .then(Commands.argument("skin", StringArgumentType.word())
-                        .suggests(this::suggestHeldItemSlots)
+                        .suggests(this::suggestTargets)
                         .executes(this::selectByName))
                 .build();
     }
@@ -69,8 +67,7 @@ public final class SwitchCommand {
             return Command.SINGLE_SUCCESS;
         }
 
-        final SkinSlotService.CycleResult result = service.cycleNext(item);
-        switch (result) {
+        switch (service.cycleNext(item)) {
             case CYCLED -> {
                 player.getInventory().setItemInMainHand(item);
                 cooldownSupplier.get().mark(player);
@@ -89,6 +86,11 @@ public final class SwitchCommand {
         }
         if (!checkCommonPreconditions(player)) return Command.SINGLE_SUCCESS;
 
+        final String requested = StringArgumentType.getString(ctx, "skin");
+        if (VANILLA_LITERAL.equalsIgnoreCase(requested)) {
+            return selectVanilla(player);
+        }
+
         final ItemStack item = player.getInventory().getItemInMainHand();
         final SkinSlotService service = serviceSupplier.get();
         final List<String> slots = service.getSlots(item);
@@ -97,7 +99,6 @@ public final class SwitchCommand {
             return Command.SINGLE_SUCCESS;
         }
 
-        final String requested = StringArgumentType.getString(ctx, "skin");
         final int index = slots.indexOf(requested);
         if (index < 0) {
             langSupplier.get().send(player, "command.skin-not-on-item", "{skin}", requested);
@@ -120,11 +121,22 @@ public final class SwitchCommand {
         return Command.SINGLE_SUCCESS;
     }
 
-    private boolean checkCommonPreconditions(Player player) {
-        if (lockSupplier.get().isLocked(player)) {
-            langSupplier.get().send(player, "command.switch-locked");
-            return false;
+    private int selectVanilla(Player player) {
+        final ItemStack item = player.getInventory().getItemInMainHand();
+        switch (serviceSupplier.get().selectVanilla(item)) {
+            case APPLIED -> {
+                player.getInventory().setItemInMainHand(item);
+                cooldownSupplier.get().mark(player);
+                announcerSupplier.get().announceVanilla(player);
+            }
+            case ALREADY_VANILLA -> langSupplier.get().send(player, "command.already-vanilla");
+            case NO_SLOTS -> langSupplier.get().send(player, "command.no-slots");
+            case NO_META -> langSupplier.get().send(player, "command.no-item-in-hand");
         }
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private boolean checkCommonPreconditions(Player player) {
         final CooldownService cooldown = cooldownSupplier.get();
         if (!cooldown.isReady(player)) {
             langSupplier.get().send(player, "command.cooldown",
@@ -139,15 +151,16 @@ public final class SwitchCommand {
         return true;
     }
 
-    private CompletableFuture<Suggestions> suggestHeldItemSlots(
+    private CompletableFuture<Suggestions> suggestTargets(
             CommandContext<CommandSourceStack> ctx, SuggestionsBuilder builder) {
         if (!(ctx.getSource().getSender() instanceof Player player)) {
             return builder.buildFuture();
         }
-        final ItemStack item = player.getInventory().getItemInMainHand();
-        final List<String> slots = serviceSupplier.get().getSlots(item);
         final String input = builder.getRemaining().toLowerCase();
-        for (String id : slots) {
+        if (VANILLA_LITERAL.startsWith(input)) builder.suggest(VANILLA_LITERAL);
+
+        final ItemStack item = player.getInventory().getItemInMainHand();
+        for (String id : serviceSupplier.get().getSlots(item)) {
             if (id.toLowerCase().startsWith(input)) builder.suggest(id);
         }
         return builder.buildFuture();

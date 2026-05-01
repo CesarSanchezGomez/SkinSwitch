@@ -29,10 +29,13 @@ import java.util.function.Supplier;
 
 public final class SkinSlotService {
 
+    public static final int VANILLA_INDEX = -1;
+
     public enum AddResult { ADDED, UNKNOWN_SKIN, FULL, DUPLICATE, NO_META }
     public enum RemoveResult { REMOVED, INVALID_INDEX, NO_SLOTS, NO_META }
     public enum CycleResult { CYCLED, NO_SLOTS, NO_META, SINGLE_SLOT }
     public enum SelectResult { SELECTED, NO_SLOTS, NO_META, INVALID_INDEX, ALREADY_ACTIVE }
+    public enum VanillaResult { APPLIED, ALREADY_VANILLA, NO_SLOTS, NO_META }
     public enum TooltipApplyResult { APPLIED, UNKNOWN_SKIN, NO_TOOLTIP, NO_SKIN_SLOT, ALREADY_APPLIED, NO_META }
     public enum TooltipRemoveResult { REMOVED, NO_SLOTS, NOT_APPLIED, NO_META }
 
@@ -86,6 +89,11 @@ public final class SkinSlotService {
         final int idx = getCurrentIndex(item);
         if (idx < 0 || idx >= slots.size()) return Optional.empty();
         return skinSupplier.get().get(slots.get(idx));
+    }
+
+    public boolean isVanillaActive(ItemStack item) {
+        if (!hasSlots(item)) return false;
+        return getCurrentIndex(item) == VANILLA_INDEX;
     }
 
     public AddResult addSlot(ItemStack item, String skinId, @Nullable Player firstOwner) {
@@ -173,9 +181,11 @@ public final class SkinSlotService {
 
         final List<String> current = readList(pdc, keys.slots());
         if (current.isEmpty()) return CycleResult.NO_SLOTS;
-        if (current.size() == 1) return CycleResult.SINGLE_SLOT;
 
-        final int next = (readIndex(pdc) + 1) % current.size();
+        final int currentIdx = readIndex(pdc);
+        final int next = currentIdx == VANILLA_INDEX ? 0 : (currentIdx + 1) % current.size();
+        if (next == currentIdx) return CycleResult.SINGLE_SLOT;
+
         switchTo(meta, pdc, current, next);
         item.setItemMeta(meta);
         return CycleResult.CYCLED;
@@ -197,6 +207,27 @@ public final class SkinSlotService {
         switchTo(meta, pdc, current, index);
         item.setItemMeta(meta);
         return SelectResult.SELECTED;
+    }
+
+    public VanillaResult selectVanilla(ItemStack item) {
+        if (item == null) return VanillaResult.NO_META;
+        final ItemMeta meta = item.getItemMeta();
+        if (meta == null) return VanillaResult.NO_META;
+
+        final PersistentDataContainer pdc = meta.getPersistentDataContainer();
+        if (!pdc.has(keys.slots(), PersistentDataType.LIST.strings())) return VanillaResult.NO_SLOTS;
+
+        final List<String> current = readList(pdc, keys.slots());
+        if (current.isEmpty()) return VanillaResult.NO_SLOTS;
+        if (readIndex(pdc) == VANILLA_INDEX) return VanillaResult.ALREADY_VANILLA;
+
+        pdc.set(keys.currentIndex(), PersistentDataType.INTEGER, VANILLA_INDEX);
+        meta.setItemModel(null);
+        applyOriginalName(meta, pdc);
+        applyTooltipForActive(meta, pdc, null, readList(pdc, keys.tooltipSlots()));
+        applyLore(meta, pdc, current, VANILLA_INDEX);
+        item.setItemMeta(meta);
+        return VanillaResult.APPLIED;
     }
 
     public TooltipApplyResult applyTooltip(ItemStack item, String skinId) {

@@ -34,10 +34,69 @@ switch:
     volume: 1.0
     pitch: 1.2
 
-# Skin selection menu (/ss menu) layout.
+# Skin selection menu (/ss menu).
+# The layout uses single-character symbols. Each character maps to a role:
+#   skin-slot.symbol      -> one slot per character; populated in order
+#   vanilla-button.symbol -> reverts the held item to its original look
+#   close-button.symbol   -> closes the menu
+#   any other character   -> looked up in decorative-icons
 menu:
-  rows: 3
   title: '<white><gradient:#B4E488:#7DD031><b>Switch Skin</b></gradient></white>'
+  layout:
+    - 'XXXXXXXXX'
+    - 'XSSSSSSSX'
+    - 'XVXXXXXCX'
+
+  skin-slot:
+    symbol: 'S'
+    entry-active:
+      material: 'NAME_TAG'
+      custom_name: '<gradient:#B4E488:#7DD031><b>{skin}</b></gradient>'
+      lore:
+        - ''
+        - ' <#B4E488>► Active skin</#B4E488> '
+        - ''
+    entry-inactive:
+      material: 'NAME_TAG'
+      custom_name: '<white>{skin}</white>'
+      lore:
+        - ''
+        - ' <gray>Click to switch to this skin.</gray> '
+        - ''
+
+  vanilla-button:
+    symbol: 'V'
+    active:
+      material: 'BARRIER'
+      custom_name: '<red><b>Vanilla</b></red> <gray>(active)</gray>'
+      lore:
+        - ''
+        - ' <gray>The original look is showing.</gray> '
+        - ' <gray>Click any skin to reapply it.</gray> '
+        - ''
+    inactive:
+      material: 'BARRIER'
+      custom_name: '<red><b>Vanilla</b></red>'
+      lore:
+        - ''
+        - ' <gray>Restore the original look</gray> '
+        - ' <gray>without losing your tokens.</gray> '
+        - ''
+
+  close-button:
+    symbol: 'C'
+    material: 'OAK_DOOR'
+    custom_name: '<red><b>Close</b></red>'
+    lore:
+      - ''
+      - ' <gray>Closes this menu.</gray> '
+      - ''
+
+  decorative-icons:
+    border:
+      symbol: 'X'
+      material: 'GRAY_STAINED_GLASS_PANE'
+      custom_name: ' '
 
 # Token item used to add a skin slot to a held item.
 token:

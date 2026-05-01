@@ -1,55 +1,50 @@
 package com.cesarcosmico.switchskin.gui;
 
-import com.cesarcosmico.switchskin.config.LangConfig;
-import com.cesarcosmico.switchskin.config.PluginConfig;
+import com.cesarcosmico.switchskin.config.IconConfig;
+import com.cesarcosmico.switchskin.config.MenuConfig;
 import com.cesarcosmico.switchskin.config.SkinConfig;
 import com.cesarcosmico.switchskin.config.SkinDefinition;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.text.minimessage.MiniMessage;
+import com.cesarcosmico.switchskin.item.IconFactory;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public final class SkinMenuGUI implements InventoryHolder {
 
-    private static final MiniMessage MINI = MiniMessage.miniMessage();
+    public sealed interface MenuAction
+            permits MenuAction.SelectSkin, MenuAction.SelectVanilla, MenuAction.Close {
+        record SelectSkin(String skinId) implements MenuAction {}
+        record SelectVanilla() implements MenuAction {}
+        record Close() implements MenuAction {}
+    }
 
     private final Inventory inventory;
-    private final List<String> skinIds;
-    private final int activeIndex;
+    private final MenuAction[] actionBySlot;
 
-    public SkinMenuGUI(LangConfig lang, SkinConfig skinConfig, PluginConfig pluginConfig,
+    public SkinMenuGUI(MenuConfig menuConfig, SkinConfig skinConfig,
                        List<String> skinIds, int activeIndex) {
-        this.skinIds = List.copyOf(skinIds);
-        this.activeIndex = activeIndex;
+        final int size = menuConfig.getInventorySize();
+        this.inventory = Bukkit.createInventory(this, size, menuConfig.getTitle());
+        this.actionBySlot = new MenuAction[size];
 
-        final PluginConfig.MenuConfig cfg = pluginConfig.getMenu();
-        final int size = cfg.rows() * 9;
-        final Component title = MINI.deserialize(cfg.title());
-        this.inventory = Bukkit.createInventory(this, size, title);
-
-        populate(lang, skinConfig);
+        populate(menuConfig, skinConfig, skinIds, activeIndex);
     }
 
     public void open(Player player) {
         player.openInventory(inventory);
     }
 
-    public List<String> getSkinIds() {
-        return skinIds;
-    }
-
-    public int getActiveIndex() {
-        return activeIndex;
+    public MenuAction actionAt(int slot) {
+        if (slot < 0 || slot >= actionBySlot.length) return null;
+        return actionBySlot[slot];
     }
 
     @Override
@@ -57,41 +52,62 @@ public final class SkinMenuGUI implements InventoryHolder {
         return inventory;
     }
 
-    private void populate(LangConfig lang, SkinConfig skinConfig) {
-        for (int i = 0; i < skinIds.size() && i < inventory.getSize(); i++) {
-            final String id = skinIds.get(i);
-            final SkinDefinition def = skinConfig.get(id).orElse(null);
-            inventory.setItem(i, buildEntry(lang, id, def, i == activeIndex));
+    private void populate(MenuConfig menu, SkinConfig skinConfig,
+                          List<String> skinIds, int activeIndex) {
+        fillDecoration(menu);
+        fillSkinSlots(menu, skinConfig, skinIds, activeIndex);
+        fillVanillaButton(menu, activeIndex);
+        fillCloseButton(menu);
+    }
+
+    private void fillDecoration(MenuConfig menu) {
+        for (int slot = 0; slot < inventory.getSize(); slot++) {
+            final char symbol = menu.getLayout().getSymbolAt(slot);
+            final ItemStack icon = menu.getDecorativeIcons().get(symbol);
+            if (icon != null) inventory.setItem(slot, icon.clone());
         }
     }
 
-    private ItemStack buildEntry(LangConfig lang, String skinId, SkinDefinition def, boolean active) {
-        final ItemStack item = new ItemStack(Material.NAME_TAG);
-        final ItemMeta meta = item.getItemMeta();
-        if (meta == null) return item;
+    private void fillSkinSlots(MenuConfig menu, SkinConfig skinConfig,
+                               List<String> skinIds, int activeIndex) {
+        final IconFactory factory = menu.getIconFactory();
+        final int[] slots = sortedSlots(menu.getSkinSlotPositions());
+        final Iterator<String> ids = skinIds.iterator();
 
-        final String displayName = def != null ? def.nameOrId() : skinId;
-        final String nameKey = active ? "menu.entry-active-name" : "menu.entry-inactive-name";
-        meta.displayName(deserialize(lang.getRaw(nameKey).replace("{skin}", displayName)));
-
-        final String loreKey = active ? "menu.entry-active-lore" : "menu.entry-inactive-lore";
-        final List<String> rawLore = lang.getRawList(loreKey);
-        if (!rawLore.isEmpty()) {
-            final List<Component> lore = new ArrayList<>(rawLore.size());
-            for (String line : rawLore) {
-                lore.add(deserialize(line.replace("{skin}", displayName)));
-            }
-            meta.lore(lore);
+        for (int i = 0; i < slots.length && ids.hasNext(); i++) {
+            final String skinId = ids.next();
+            final SkinDefinition def = skinConfig.get(skinId).orElse(null);
+            final boolean active = i == activeIndex;
+            final IconConfig template = active ? menu.getSkinSlotActive() : menu.getSkinSlotInactive();
+            final String displayName = def != null ? def.nameOrId() : skinId;
+            final ItemStack item = factory.build(template,
+                    Map.of("{skin}", displayName),
+                    def != null ? def.itemModel() : null);
+            inventory.setItem(slots[i], item);
+            actionBySlot[slots[i]] = new MenuAction.SelectSkin(skinId);
         }
-
-        if (def != null) {
-            meta.setItemModel(def.itemModel());
-        }
-        item.setItemMeta(meta);
-        return item;
     }
 
-    private static Component deserialize(String raw) {
-        return MINI.deserialize(raw).decoration(TextDecoration.ITALIC, false);
+    private void fillVanillaButton(MenuConfig menu, int activeIndex) {
+        final IconConfig template = activeIndex < 0 ? menu.getVanillaActive() : menu.getVanillaInactive();
+        final ItemStack item = menu.getIconFactory().build(template);
+        for (int slot : menu.getVanillaPositions()) {
+            inventory.setItem(slot, item.clone());
+            actionBySlot[slot] = new MenuAction.SelectVanilla();
+        }
+    }
+
+    private void fillCloseButton(MenuConfig menu) {
+        final ItemStack item = menu.getIconFactory().build(menu.getCloseIcon());
+        for (int slot : menu.getClosePositions()) {
+            inventory.setItem(slot, item.clone());
+            actionBySlot[slot] = new MenuAction.Close();
+        }
+    }
+
+    private static int[] sortedSlots(java.util.Set<Integer> slots) {
+        final int[] arr = slots.stream().mapToInt(Integer::intValue).toArray();
+        Arrays.sort(arr);
+        return arr;
     }
 }

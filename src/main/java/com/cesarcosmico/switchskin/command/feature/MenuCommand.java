@@ -60,7 +60,7 @@ public final class MenuCommand {
         }
 
         final int activeIndex = service.getCurrentIndex(item);
-        new SkinMenuGUI(langSupplier.get(), skinSupplier.get(), pluginSupplier.get(),
+        new SkinMenuGUI(pluginSupplier.get().getMenu(), skinSupplier.get(),
                 slots, activeIndex).open(player);
         return Command.SINGLE_SUCCESS;
     }

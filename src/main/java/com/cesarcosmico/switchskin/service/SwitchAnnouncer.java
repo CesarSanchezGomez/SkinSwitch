@@ -9,6 +9,9 @@ import java.util.function.Supplier;
 
 public final class SwitchAnnouncer {
 
+    private static final String VANILLA_KEY = "skin.switched-vanilla";
+    private static final String SKIN_KEY = "skin.switched";
+
     private final Supplier<LangConfig> langSupplier;
     private final Supplier<PluginConfig> pluginSupplier;
 
@@ -19,12 +22,19 @@ public final class SwitchAnnouncer {
     }
 
     public void announceSwitch(Player player, SkinDefinition skin) {
+        announce(player, SKIN_KEY, "{skin}", skin.nameOrId());
+    }
+
+    public void announceVanilla(Player player) {
+        announce(player, VANILLA_KEY);
+    }
+
+    private void announce(Player player, String key, String... placeholders) {
         final LangConfig lang = langSupplier.get();
-        final PluginConfig.FeedbackConfig feedback = pluginSupplier.get().getSwitchFeedback();
-        if (feedback.isActionBar()) {
-            lang.sendActionBar(player, "skin.switched", "{skin}", skin.nameOrId());
+        if (pluginSupplier.get().getSwitchFeedback().isActionBar()) {
+            lang.sendActionBar(player, key, placeholders);
         } else {
-            lang.send(player, "skin.switched", "{skin}", skin.nameOrId());
+            lang.send(player, key, placeholders);
         }
         playSwitchSound(player);
     }

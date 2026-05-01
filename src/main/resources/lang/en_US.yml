@@ -26,30 +26,16 @@ command:
   tooltip-duplicate: '{prefix} <white>The <#7DD031>{skin}</#7DD031> tooltip is already applied.</white>'
   player-not-found: '{prefix} <red>Player not found: <white>{player}</white>.</red>'
   cooldown: '{prefix} <white>Wait <#7DD031>{seconds}s</#7DD031> before switching again.</white>'
-  switch-locked: '{prefix} <white>Switching is locked. Use <#7DD031>/ss lock</#7DD031> to unlock.</white>'
-  lock-enabled: '{prefix} <white>Skin switching <#7DD031>locked</#7DD031>.</white>'
-  lock-disabled: '{prefix} <white>Skin switching <#7DD031>unlocked</#7DD031>.</white>'
   single-slot: '{prefix} <white>This item only has one skin slot.</white>'
   already-active: '{prefix} <white>Skin <#7DD031>{skin}</#7DD031> is already active.</white>'
+  already-vanilla: '{prefix} <white>The item is already showing its vanilla look.</white>'
   skin-not-on-item: '{prefix} <red>Skin <white>{skin}</white> is not installed on this item.</red>'
 
 # -- Skin switching ---------------------------
 # Sent as an action bar entry by default (controlled by config.yml -> switch.feedback).
 skin:
   switched: '<white>Switched to <gradient:#B4E488:#7DD031>{skin}</gradient></white>'
-
-# -- Switch menu (/ss menu) -------------------
-menu:
-  entry-active-name: '<gradient:#B4E488:#7DD031><b>{skin}</b></gradient>'
-  entry-active-lore:
-    - ''
-    - ' <#B4E488>► Active skin</#B4E488> '
-    - ''
-  entry-inactive-name: '<white>{skin}</white>'
-  entry-inactive-lore:
-    - ''
-    - ' <gray>Click to switch to this skin.</gray> '
-    - ''
+  switched-vanilla: '<white>Restored <red>vanilla</red> look</white>'
 
 # -- Slot row layout ---------------------------
 lore:

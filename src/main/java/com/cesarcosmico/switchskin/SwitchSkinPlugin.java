@@ -14,7 +14,6 @@ import com.cesarcosmico.switchskin.placeholder.NoopPlaceholderResolver;
 import com.cesarcosmico.switchskin.placeholder.PlaceholderApiResolver;
 import com.cesarcosmico.switchskin.placeholder.PlaceholderResolver;
 import com.cesarcosmico.switchskin.service.CooldownService;
-import com.cesarcosmico.switchskin.service.PlayerLockService;
 import com.cesarcosmico.switchskin.service.SkinSlotService;
 import com.cesarcosmico.switchskin.service.SwitchAnnouncer;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
@@ -35,7 +34,6 @@ public final class SwitchSkinPlugin extends JavaPlugin {
     private TokenFactory tooltipTokenFactory;
     private PlaceholderResolver placeholderResolver;
     private CooldownService cooldownService;
-    private PlayerLockService playerLockService;
     private SwitchAnnouncer switchAnnouncer;
 
     @Override
@@ -44,7 +42,6 @@ public final class SwitchSkinPlugin extends JavaPlugin {
 
         this.placeholderResolver = resolvePlaceholderBackend();
         this.cooldownService = new CooldownService(this::getPluginConfig);
-        this.playerLockService = new PlayerLockService();
         this.switchAnnouncer = new SwitchAnnouncer(this::getLangConfig, this::getPluginConfig);
 
         final SkinSlotKeys keys = new SkinSlotKeys(this);
@@ -110,9 +107,7 @@ public final class SwitchSkinPlugin extends JavaPlugin {
                 this::getSkinTokenFactory,
                 this::getTooltipTokenFactory,
                 this::getCooldownService,
-                this::getPlayerLockService,
                 this::getSwitchAnnouncer,
-                this,
                 this::reload
         );
 
@@ -129,8 +124,7 @@ public final class SwitchSkinPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(
                 new SkinMenuListener(this::getLangConfig, this::getSkinConfig,
                         this::getSkinSlotService, this::getCooldownService,
-                        this::getPlayerLockService, this::getSwitchAnnouncer), this);
-        getServer().getPluginManager().registerEvents(playerLockService, this);
+                        this::getSwitchAnnouncer), this);
     }
 
     private void saveDefaultIfMissing(String name) {
@@ -148,6 +142,5 @@ public final class SwitchSkinPlugin extends JavaPlugin {
     public TokenFactory getTooltipTokenFactory() { return tooltipTokenFactory; }
     public PlaceholderResolver getPlaceholderResolver() { return placeholderResolver; }
     public CooldownService getCooldownService() { return cooldownService; }
-    public PlayerLockService getPlayerLockService() { return playerLockService; }
     public SwitchAnnouncer getSwitchAnnouncer() { return switchAnnouncer; }
 }

@@ -2,7 +2,6 @@ package com.cesarcosmico.switchskin.command;
 
 import com.cesarcosmico.switchskin.command.feature.AddSlotCommand;
 import com.cesarcosmico.switchskin.command.feature.GiveTokenCommand;
-import com.cesarcosmico.switchskin.command.feature.LockCommand;
 import com.cesarcosmico.switchskin.command.feature.MenuCommand;
 import com.cesarcosmico.switchskin.command.feature.ReloadCommand;
 import com.cesarcosmico.switchskin.command.feature.RemoveSlotCommand;
@@ -14,13 +13,11 @@ import com.cesarcosmico.switchskin.config.SkinConfig;
 import com.cesarcosmico.switchskin.config.SkinDefinition;
 import com.cesarcosmico.switchskin.item.TokenFactory;
 import com.cesarcosmico.switchskin.service.CooldownService;
-import com.cesarcosmico.switchskin.service.PlayerLockService;
 import com.cesarcosmico.switchskin.service.SkinSlotService;
 import com.cesarcosmico.switchskin.service.SwitchAnnouncer;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.function.Supplier;
 
@@ -34,7 +31,6 @@ public final class CommandManager {
     private final RemoveTooltipCommand removeTooltipCommand;
     private final MenuCommand menuCommand;
     private final SwitchCommand switchCommand;
-    private final LockCommand lockCommand;
 
     public CommandManager(Supplier<LangConfig> langSupplier,
                           Supplier<SkinConfig> skinSupplier,
@@ -43,9 +39,7 @@ public final class CommandManager {
                           Supplier<TokenFactory> skinTokenSupplier,
                           Supplier<TokenFactory> tooltipTokenSupplier,
                           Supplier<CooldownService> cooldownSupplier,
-                          Supplier<PlayerLockService> lockSupplier,
                           Supplier<SwitchAnnouncer> announcerSupplier,
-                          JavaPlugin plugin,
                           Runnable reloadAction) {
         this.reloadCommand = new ReloadCommand(langSupplier, reloadAction);
         this.addSlotCommand = new AddSlotCommand(langSupplier, skinSupplier, serviceSupplier);
@@ -58,8 +52,7 @@ public final class CommandManager {
         this.removeTooltipCommand = new RemoveTooltipCommand(langSupplier, serviceSupplier);
         this.menuCommand = new MenuCommand(langSupplier, skinSupplier, pluginSupplier, serviceSupplier);
         this.switchCommand = new SwitchCommand(langSupplier, skinSupplier, serviceSupplier,
-                cooldownSupplier, lockSupplier, announcerSupplier);
-        this.lockCommand = new LockCommand(langSupplier, lockSupplier);
+                cooldownSupplier, announcerSupplier);
     }
 
     public LiteralCommandNode<CommandSourceStack> createCommand() {
@@ -82,7 +75,6 @@ public final class CommandManager {
                 .then(removeTooltipCommand.create())
                 .then(menuCommand.create())
                 .then(switchCommand.create())
-                .then(lockCommand.create())
                 .build();
     }
 }
