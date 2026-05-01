@@ -8,27 +8,45 @@
 #   flat:
 #     spring_skin: edospring:flower_set/flower_pickaxe
 #
-#   section (recommended — lets you set icon + display name):
+#   section (recommended):
 #     spring_skin:
-#       item_model: edospring:flower_set/flower_pickaxe
-#       icon: '🌷'              # shown in the item's lore (one slot = one icon)
-#       display: 'Spring Pickaxe' # shown in chat ("Switched to ...")
+#       item_model:    edospring:flower_set/flower_pickaxe
+#       icon:          '🌷'                            # one slot = one icon (lore)
+#       display:       '<#FCBDE3>Spring Pickaxe</#FCBDE3>' # custom_name when active
+#       tooltip_style: 'minecraft:spring'                  # tooltip_style when active
+#       color:         '#FCBDE3'                           # bracket color when active
 #
-# Both fields support MiniMessage. If 'icon' is omitted, the skin id is used.
-# If 'display' is omitted, the skin id is used.
+# All extended fields are optional. Behavior:
+#   * If 'icon'    is omitted, the skin id is used (in the lore brackets).
+#   * If 'display' is omitted, the item's original custom_name is restored.
+#   * If 'tooltip_style' is omitted, the item's original tooltip_style is restored.
+#   * If 'color'   is omitted, slot-colors.active is used (per-skin override).
 #
 # Item data (durability, enchants, attributes, other PDC) is preserved
-# when switching; only the item_model component is changed.
+# when switching; only item_model + custom_name + tooltip_style + lore are
+# touched. The original values are captured the first time a slot is added
+# and restored verbatim when the last slot is removed.
 
 # Internal version — do not edit. Bump = new keys were added.
-config-version: 2
+config-version: 3
+
+# Default bracket colors for the slot row in lore (e.g. [🌷] [🎃] [❄]).
+# Accepts any MiniMessage color: a named color (aqua, gray, gold, ...)
+# or a hex code like '#FCBDE3'. Wrap-tags like '<aqua>' are NOT accepted
+# here — just the color value.
+slot-colors:
+  active: 'aqua'
+  inactive: 'gray'
 
 skins:
   spring_skin:
     item_model: edospring:flower_set/flower_pickaxe
     icon: '🌷'
-    display: 'Spring Pickaxe'
+    display: '<#FCBDE3>Spring Pickaxe</#FCBDE3>'
+    color: '#FCBDE3'
   autum_skin:
     item_model: edoween:bone_set/bone_pickaxe
     icon: '🎃'
-    display: 'Autumn Pickaxe'
+    display: '<gold>Autumn Pickaxe</gold>'
+    tooltip_style: 'minecraft:autumn'
+    color: 'gold'

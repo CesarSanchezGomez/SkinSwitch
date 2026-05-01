@@ -6,7 +6,10 @@ import com.cesarcosmico.skinswitch.config.SkinDefinition;
 import com.cesarcosmico.skinswitch.item.LoreRenderer;
 import com.cesarcosmico.skinswitch.item.SkinSlotKeys;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -21,10 +24,11 @@ import java.util.function.Supplier;
 /**
  * Single source of truth for skin-slot mutations on items.
  *
- * Only the item_model component and lore are touched; durability,
- * enchantments, attribute modifiers and any other PDC are preserved.
- * The item's pre-existing lore is captured into PDC the first time a
- * slot is added and restored verbatim when the last slot is removed.
+ * Only the item_model component, custom_name, tooltip_style and lore are
+ * touched; durability, enchantments, attribute modifiers and any other PDC
+ * are preserved. The item's pre-existing name, tooltip style and lore are
+ * captured into PDC the first time a slot is added and restored verbatim
+ * when the last slot is removed.
  */
 public final class SkinSlotService {
 
@@ -33,6 +37,7 @@ public final class SkinSlotService {
     public enum CycleResult { CYCLED, NO_SLOTS, NO_META, SINGLE_SLOT }
 
     private static final GsonComponentSerializer GSON = GsonComponentSerializer.gson();
+    private static final MiniMessage MINI = MiniMessage.miniMessage();
 
     private final SkinSlotKeys keys;
     private final LoreRenderer loreRenderer;
@@ -82,8 +87,8 @@ public final class SkinSlotService {
 
     public AddResult addSlot(ItemStack item, String skinId) {
         if (item == null) return AddResult.NO_META;
-        Optional<SkinDefinition> skin = skinSupplier.get().get(skinId);
-        if (skin.isEmpty()) return AddResult.UNKNOWN_SKIN;
+        Optional<SkinDefinition> skinOpt = skinSupplier.get().get(skinId);
+        if (skinOpt.isEmpty()) return AddResult.UNKNOWN_SKIN;
 
         ItemMeta meta = item.getItemMeta();
         if (meta == null) return AddResult.NO_META;
@@ -96,9 +101,10 @@ public final class SkinSlotService {
 
         boolean firstSlot = current.isEmpty();
         if (firstSlot) {
-            captureOriginalLore(meta, pdc);
+            captureOriginalAppearance(meta, pdc);
         }
 
+        SkinDefinition skin = skinOpt.get();
         current.add(skinId);
         pdc.set(keys.slots(), PersistentDataType.LIST.strings(), current);
 
@@ -106,7 +112,7 @@ public final class SkinSlotService {
         if (firstSlot) {
             currentIndex = 0;
             pdc.set(keys.currentIndex(), PersistentDataType.INTEGER, 0);
-            applyItemModel(meta, skin.get());
+            applySkinAppearance(meta, pdc, skin);
         }
 
         applyLore(meta, current, currentIndex);
@@ -129,8 +135,7 @@ public final class SkinSlotService {
         int currentIndex = readIndex(pdc);
 
         if (current.isEmpty()) {
-            restoreOriginalLore(meta, pdc);
-            meta.setItemModel(null);
+            restoreOriginalAppearance(meta, pdc);
             pdc.remove(keys.slots());
             pdc.remove(keys.currentIndex());
         } else {
@@ -138,7 +143,8 @@ public final class SkinSlotService {
             pdc.set(keys.slots(), PersistentDataType.LIST.strings(), current);
             pdc.set(keys.currentIndex(), PersistentDataType.INTEGER, currentIndex);
             int finalIndex = currentIndex;
-            skinSupplier.get().get(current.get(finalIndex)).ifPresent(s -> applyItemModel(meta, s));
+            skinSupplier.get().get(current.get(finalIndex))
+                    .ifPresent(s -> applySkinAppearance(meta, pdc, s));
             applyLore(meta, current, currentIndex);
         }
         item.setItemMeta(meta);
@@ -159,7 +165,8 @@ public final class SkinSlotService {
 
         int next = (readIndex(pdc) + 1) % current.size();
         pdc.set(keys.currentIndex(), PersistentDataType.INTEGER, next);
-        skinSupplier.get().get(current.get(next)).ifPresent(s -> applyItemModel(meta, s));
+        skinSupplier.get().get(current.get(next))
+                .ifPresent(s -> applySkinAppearance(meta, pdc, s));
         applyLore(meta, current, next);
         item.setItemMeta(meta);
         return CycleResult.CYCLED;
@@ -176,6 +183,21 @@ public final class SkinSlotService {
     private int readIndex(PersistentDataContainer pdc) {
         Integer idx = pdc.get(keys.currentIndex(), PersistentDataType.INTEGER);
         return idx == null ? 0 : idx;
+    }
+
+    // ---------- capture / restore ----------
+
+    private void captureOriginalAppearance(ItemMeta meta, PersistentDataContainer pdc) {
+        captureOriginalLore(meta, pdc);
+        captureOriginalName(meta, pdc);
+        captureOriginalTooltipStyle(meta, pdc);
+    }
+
+    private void restoreOriginalAppearance(ItemMeta meta, PersistentDataContainer pdc) {
+        restoreOriginalLore(meta, pdc);
+        restoreOriginalName(meta, pdc);
+        restoreOriginalTooltipStyle(meta, pdc);
+        meta.setItemModel(null);
     }
 
     private void captureOriginalLore(ItemMeta meta, PersistentDataContainer pdc) {
@@ -201,6 +223,76 @@ public final class SkinSlotService {
         pdc.remove(keys.originalLore());
     }
 
+    private void captureOriginalName(ItemMeta meta, PersistentDataContainer pdc) {
+        if (pdc.has(keys.originalName(), PersistentDataType.STRING)) return;
+        if (!meta.hasDisplayName()) return;
+        Component name = meta.displayName();
+        if (name != null) {
+            pdc.set(keys.originalName(), PersistentDataType.STRING, GSON.serialize(name));
+        }
+    }
+
+    private void restoreOriginalName(ItemMeta meta, PersistentDataContainer pdc) {
+        if (pdc.has(keys.originalName(), PersistentDataType.STRING)) {
+            String json = pdc.get(keys.originalName(), PersistentDataType.STRING);
+            meta.displayName(json != null ? GSON.deserialize(json) : null);
+            pdc.remove(keys.originalName());
+        } else {
+            meta.displayName(null);
+        }
+    }
+
+    private void captureOriginalTooltipStyle(ItemMeta meta, PersistentDataContainer pdc) {
+        if (pdc.has(keys.originalTooltipStyle(), PersistentDataType.STRING)) return;
+        NamespacedKey style = meta.getTooltipStyle();
+        if (style != null) {
+            pdc.set(keys.originalTooltipStyle(), PersistentDataType.STRING, style.toString());
+        }
+    }
+
+    private void restoreOriginalTooltipStyle(ItemMeta meta, PersistentDataContainer pdc) {
+        if (pdc.has(keys.originalTooltipStyle(), PersistentDataType.STRING)) {
+            String s = pdc.get(keys.originalTooltipStyle(), PersistentDataType.STRING);
+            NamespacedKey key = (s != null && !s.isEmpty()) ? NamespacedKey.fromString(s) : null;
+            meta.setTooltipStyle(key);
+            pdc.remove(keys.originalTooltipStyle());
+        } else {
+            meta.setTooltipStyle(null);
+        }
+    }
+
+    // ---------- apply ----------
+
+    private void applySkinAppearance(ItemMeta meta, PersistentDataContainer pdc, SkinDefinition skin) {
+        meta.setItemModel(skin.itemModel());
+
+        if (skin.hasDisplay()) {
+            meta.displayName(MINI.deserialize(skin.display())
+                    .decoration(TextDecoration.ITALIC, false));
+        } else {
+            // Skin doesn't override the name — fall back to whatever the item
+            // had before any slot was added.
+            if (pdc.has(keys.originalName(), PersistentDataType.STRING)) {
+                String json = pdc.get(keys.originalName(), PersistentDataType.STRING);
+                meta.displayName(json != null ? GSON.deserialize(json) : null);
+            } else {
+                meta.displayName(null);
+            }
+        }
+
+        if (skin.tooltipStyle() != null) {
+            meta.setTooltipStyle(skin.tooltipStyle());
+        } else {
+            if (pdc.has(keys.originalTooltipStyle(), PersistentDataType.STRING)) {
+                String s = pdc.get(keys.originalTooltipStyle(), PersistentDataType.STRING);
+                NamespacedKey key = (s != null && !s.isEmpty()) ? NamespacedKey.fromString(s) : null;
+                meta.setTooltipStyle(key);
+            } else {
+                meta.setTooltipStyle(null);
+            }
+        }
+    }
+
     private void applyLore(ItemMeta meta, List<String> slots, int currentIndex) {
         PersistentDataContainer pdc = meta.getPersistentDataContainer();
         List<Component> originalLore;
@@ -213,9 +305,5 @@ public final class SkinSlotService {
             originalLore = Collections.emptyList();
         }
         meta.lore(loreRenderer.render(originalLore, slots, currentIndex));
-    }
-
-    private void applyItemModel(ItemMeta meta, SkinDefinition skin) {
-        meta.setItemModel(skin.itemModel());
     }
 }

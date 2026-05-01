@@ -2,7 +2,7 @@
 # Soporta formato MiniMessage.
 # Usa {prefix} para insertar el prefijo del plugin.
 # Versión interna — no editar. Cambio = nuevos mensajes añadidos.
-config-version: 2
+config-version: 3
 
 prefix: '<white>[<gradient:#C173FF:#950DFF>SkinSwitch</gradient>]</white>'
 
@@ -27,9 +27,11 @@ skin:
   switched: '{prefix} <white>Cambiaste a <#C173FF>{skin}</#C173FF>.</white>'
 
 # -- Sección añadida al lore de ítems con slots --
-# Se renderiza como una sola línea, ej: "[🌷] [🎃]".
-# {icon} es el icono por skin configurado en skins.yml.
+# Se renderiza como una sola línea, ej: "[🌷] [🎃] [❄]".
+# Placeholders:
+#   {color}  color de los corchetes (resuelto desde skins.yml)
+#   {icon}   icono por skin configurado en skins.yml
 lore:
   separator: ' '
-  slot-active: '<#C173FF>[</#C173FF><white>{icon}</white><#C173FF>]</#C173FF>'
-  slot-inactive: '<dark_gray>[<gray>{icon}</gray>]</dark_gray>'
+  slot-active: '<color:{color}>[<white>{icon}</white>]</color>'
+  slot-inactive: '<color:{color}>[{icon}]</color>'

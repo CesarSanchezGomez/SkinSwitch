@@ -101,7 +101,7 @@ public final class GiveTokenCommand {
 
         langSupplier.get().send(ctx.getSource().getSender(), "command.token-given",
                 "{count}", String.valueOf(amount),
-                "{skin}", def.display(),
+                "{skin}", def.displayOrId(),
                 "{player}", target.getName());
 
         return Command.SINGLE_SUCCESS;

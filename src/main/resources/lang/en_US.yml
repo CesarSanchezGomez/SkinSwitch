@@ -2,7 +2,7 @@
 # Supports MiniMessage formatting.
 # Use {prefix} to insert the plugin prefix.
 # Internal version — do not edit. Bump = new messages were added.
-config-version: 2
+config-version: 3
 
 prefix: '<white>[<gradient:#C173FF:#950DFF>SkinSwitch</gradient>]</white>'
 
@@ -27,9 +27,11 @@ skin:
   switched: '{prefix} <white>Switched to <#C173FF>{skin}</#C173FF>.</white>'
 
 # -- Lore section appended to items with slots --
-# Rendered as a single inline row, e.g. "[🌷] [🎃]".
-# {icon} is the per-skin icon configured in skins.yml.
+# Rendered as a single inline row, e.g. "[🌷] [🎃] [❄]".
+# Placeholders:
+#   {color}  bracket color (resolved from skins.yml: slot-colors / per-skin)
+#   {icon}   per-skin icon configured in skins.yml
 lore:
   separator: ' '
-  slot-active: '<#C173FF>[</#C173FF><white>{icon}</white><#C173FF>]</#C173FF>'
-  slot-inactive: '<dark_gray>[<gray>{icon}</gray>]</dark_gray>'
+  slot-active: '<color:{color}>[<white>{icon}</white>]</color>'
+  slot-inactive: '<color:{color}>[{icon}]</color>'

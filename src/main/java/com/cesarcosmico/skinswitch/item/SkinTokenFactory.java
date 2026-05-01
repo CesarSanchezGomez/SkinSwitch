@@ -42,12 +42,13 @@ public final class SkinTokenFactory {
         ItemMeta meta = item.getItemMeta();
         if (meta == null) return item;
 
+        String label = def.displayOrId();
         if (!token.customName().isEmpty()) {
-            meta.displayName(deserialize(token.customName().replace("{skin}", def.display())));
+            meta.displayName(deserialize(token.customName().replace("{skin}", label)));
         }
         if (!token.lore().isEmpty()) {
             meta.lore(token.lore().stream()
-                    .map(line -> line.replace("{skin}", def.display()))
+                    .map(line -> line.replace("{skin}", label))
                     .map(SkinTokenFactory::deserialize)
                     .toList());
         }

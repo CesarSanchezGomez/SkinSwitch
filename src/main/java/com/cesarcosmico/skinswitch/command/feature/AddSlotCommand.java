@@ -66,7 +66,7 @@ public final class AddSlotCommand {
         SkinSlotService service = serviceSupplier.get();
         SkinSlotService.AddResult result = service.addSlot(item, skinId);
         SkinDefinition def = skinSupplier.get().get(skinId).orElse(null);
-        String display = def == null ? skinId : def.display();
+        String display = def == null ? skinId : def.displayOrId();
 
         switch (result) {
             case ADDED -> langSupplier.get().send(player, "command.slot-added",
