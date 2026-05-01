@@ -16,6 +16,7 @@ public final class SkinConfig {
 
     private final Map<String, SkinDefinition> skins;
     private final String defaultBracketColor;
+    private final String inactiveIconColor;
 
     public SkinConfig(ConfigurationSection root, Logger logger) {
         Map<String, SkinDefinition> map = new LinkedHashMap<>();
@@ -30,6 +31,7 @@ public final class SkinConfig {
         }
         this.skins = Collections.unmodifiableMap(map);
         this.defaultBracketColor = root.getString("default-bracket-color", "gray");
+        this.inactiveIconColor = root.getString("inactive-icon-color", "white");
     }
 
     private SkinDefinition parseSkin(String id, ConfigurationSection root, Logger logger) {
@@ -93,5 +95,9 @@ public final class SkinConfig {
 
     public String getDefaultBracketColor() {
         return defaultBracketColor;
+    }
+
+    public String getInactiveIconColor() {
+        return inactiveIconColor;
     }
 }

@@ -47,17 +47,23 @@ skin:
 #                 Defaults to []. Use [''] for one blank line, etc.
 #   lines-after   list of MiniMessage lines inserted AFTER the row.
 #
-# Templates ({color}, {skin-color} and {icon} are placeholders):
-#   slot-active   how the active slot is rendered. The default uses
-#                 {skin-color} for the icon so the active slot is tinted
-#                 with its skin's colour, even if its tooltip token isn't
-#                 applied.
-#   slot-inactive how every other slot is rendered. The default keeps
-#                 the icon white so only the active one stands out.
+# Templates ({color}, {icon-color}, {skin-color} and {icon} are placeholders):
+#   slot-active   how the active slot is rendered.
+#   slot-inactive how every other slot is rendered.
+#   The defaults are intentionally identical and rely on {icon-color}
+#   to differentiate active vs inactive automatically — keep them
+#   identical unless you actively want different layouts (extra
+#   markup, separators, decoration, etc.).
+#
+# Colour placeholders:
 #   {color}       bracket colour — skin colour if the tooltip token is
 #                 applied to that slot, default-bracket-color otherwise.
-#   {skin-color}  the skin's defined colour (or default-bracket-color).
-#                 Independent of tooltip token state.
+#   {icon-color}  smart icon colour: the skin's colour when the slot is
+#                 active, inactive-icon-color (default white) otherwise.
+#                 Use this and the active slot stands out automatically.
+#   {skin-color}  the skin's defined colour (or default-bracket-color)
+#                 regardless of active/tooltip state. For advanced cases
+#                 where you want every icon tinted with its skin colour.
 lore:
   position: 'below'
   lines-before: []
@@ -65,5 +71,5 @@ lore:
   prefix: ' '
   separator: ' '
   suffix: ' '
-  slot-active: '<color:{color}>[</color><color:{skin-color}><b>{icon}</b></color><color:{color}>]</color>'
-  slot-inactive: '<color:{color}>[</color><white>{icon}</white><color:{color}>]</color>'
+  slot-active: '<color:{color}>[</color><color:{icon-color}>{icon}</color><color:{color}>]</color>'
+  slot-inactive: '<color:{color}>[</color><color:{icon-color}>{icon}</color><color:{color}>]</color>'

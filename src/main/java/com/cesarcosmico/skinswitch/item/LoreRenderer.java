@@ -24,10 +24,13 @@ import java.util.function.Supplier;
  * Per-slot placeholders inside slot-active / slot-inactive templates:
  *   {color}       bracket color — the skin's `color` if its tooltip
  *                 token has been applied, otherwise default-bracket-color.
- *   {skin-color}  the skin's defined `color` (or default-bracket-color
- *                 as fallback) regardless of tooltip state. Use this on
- *                 the active template's icon to make the active slot
- *                 stand out with its skin colour.
+ *   {icon-color}  smart icon color: the skin's color when the slot is
+ *                 active, inactive-icon-color (default white) when it
+ *                 isn't. Use this in BOTH templates and the active slot
+ *                 will stand out automatically.
+ *   {skin-color}  the skin's defined `color` (or default-bracket-color)
+ *                 regardless of active or tooltip state. Useful only if
+ *                 you want all icons tinted with their skin colour.
  *   {icon}        the per-skin icon configured in skins.yml.
  *
  * Layout knobs (lang):
@@ -100,6 +103,7 @@ public final class LoreRenderer {
                                    Collection<String> tooltipSkinIds) {
         SkinConfig skinConfig = skinSupplier.get();
         String defaultColor = skinConfig.getDefaultBracketColor();
+        String inactiveIconColor = skinConfig.getInactiveIconColor();
         String prefix = resolver.resolve(owner, lang.getRaw("lore.prefix"));
         String separator = resolver.resolve(owner, lang.getRaw("lore.separator"));
         String suffix = resolver.resolve(owner, lang.getRaw("lore.suffix"));
@@ -119,10 +123,12 @@ public final class LoreRenderer {
                     .map(SkinDefinition::color)
                     .orElse(defaultColor);
             String bracketColor = hasTooltip ? skinColor : defaultColor;
+            String iconColor = active ? skinColor : inactiveIconColor;
 
             String key = active ? "lore.slot-active" : "lore.slot-inactive";
             middle.append(lang.getRaw(key)
                     .replace("{color}", bracketColor)
+                    .replace("{icon-color}", iconColor)
                     .replace("{skin-color}", skinColor)
                     .replace("{icon}", icon)
                     .replace("{skin}", icon));

@@ -54,6 +54,11 @@ config-version: 1
 # like '<gray>' are NOT accepted here — just the value.
 default-bracket-color: 'gray'
 
+# Icon color used in inactive slots when the lang template uses the
+# {icon-color} placeholder. Active slots automatically use their skin's
+# colour, so this is only the "everything else" colour.
+inactive-icon-color: 'white'
+
 skins:
   summer_skin:
     item_model: edosummer:ice_cream_pickaxe
