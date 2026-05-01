@@ -1,10 +1,7 @@
-# SkinSwitch - English Language File (US)
-# Supports MiniMessage formatting.
-# Use {prefix} to insert the plugin prefix.
-# Internal version — do not edit. Bump = new messages were added.
+# SwitchSkin - English Language File (US)
 config-version: 1
 
-prefix: '<white>[<gradient:#C173FF:#950DFF>SkinSwitch</gradient>]</white>'
+prefix: '<white>[<gradient:#B4E488:#7DD031>SwitchSkin</gradient>]</white>'
 
 # -- Commands ---------------------------------
 command:
@@ -13,55 +10,48 @@ command:
   reload-success: '{prefix} <white>Configuration reloaded successfully.</white>'
   no-item-in-hand: '{prefix} <red>You must hold an item in your main hand.</red>'
   unknown-skin: '{prefix} <red>Unknown skin: <white>{skin}</white>.</red>'
-  slot-added: '{prefix} <white>Slot <#C173FF>{skin}</#C173FF> added. Total: <#C173FF>{count}</#C173FF>.</white>'
-  slot-removed: '{prefix} <white>Slot <#C173FF>{skin}</#C173FF> removed.</white>'
+  slot-added: '{prefix} <white>Slot <#7DD031>{skin}</#7DD031> added. Total: <#7DD031>{count}</#7DD031>.</white>'
+  slot-removed: '{prefix} <white>Slot <#7DD031>{skin}</#7DD031> removed.</white>'
   invalid-slot: '{prefix} <red>Invalid slot index.</red>'
   no-slots: '{prefix} <white>This item has no skin slots.</white>'
   slots-full: '{prefix} <white>This item has reached the maximum slot capacity ({max}).</white>'
   duplicate-slot: '{prefix} <white>That skin is already installed on this item.</white>'
-  token-given: '{prefix} <white>Gave <#C173FF>{count}</#C173FF> token(s) of <#C173FF>{skin}</#C173FF> to <#C173FF>{player}</#C173FF>.</white>'
-  tooltip-token-given: '{prefix} <white>Gave <#C173FF>{count}</#C173FF> tooltip token(s) of <#C173FF>{skin}</#C173FF> to <#C173FF>{player}</#C173FF>.</white>'
-  tooltip-applied: '{prefix} <white>Tooltip <#C173FF>{skin}</#C173FF> applied.</white>'
+  token-given: '{prefix} <white>Gave <#7DD031>{count}</#7DD031> token(s) of <#7DD031>{skin}</#7DD031> to <#7DD031>{player}</#7DD031>.</white>'
+  tooltip-token-given: '{prefix} <white>Gave <#7DD031>{count}</#7DD031> tooltip token(s) of <#7DD031>{skin}</#7DD031> to <#7DD031>{player}</#7DD031>.</white>'
+  tooltip-applied: '{prefix} <white>Tooltip <#7DD031>{skin}</#7DD031> applied.</white>'
   tooltip-removed: '{prefix} <white>Tooltip removed from the active slot.</white>'
   tooltip-not-applied: '{prefix} <white>The active slot has no tooltip applied.</white>'
   tooltip-missing: '{prefix} <red>Skin <white>{skin}</white> has no tooltip_style defined.</red>'
   tooltip-needs-slot: '{prefix} <red>You must add the <white>{skin}</white> skin slot before applying its tooltip.</red>'
-  tooltip-duplicate: '{prefix} <white>The <#C173FF>{skin}</#C173FF> tooltip is already applied.</white>'
+  tooltip-duplicate: '{prefix} <white>The <#7DD031>{skin}</#7DD031> tooltip is already applied.</white>'
   player-not-found: '{prefix} <red>Player not found: <white>{player}</white>.</red>'
+  cooldown: '{prefix} <white>Wait <#7DD031>{seconds}s</#7DD031> before switching again.</white>'
+  switch-locked: '{prefix} <white>Switching is locked. Use <#7DD031>/ss lock</#7DD031> to unlock.</white>'
+  lock-enabled: '{prefix} <white>Skin switching <#7DD031>locked</#7DD031>.</white>'
+  lock-disabled: '{prefix} <white>Skin switching <#7DD031>unlocked</#7DD031>.</white>'
+  single-slot: '{prefix} <white>This item only has one skin slot.</white>'
+  already-active: '{prefix} <white>Skin <#7DD031>{skin}</#7DD031> is already active.</white>'
+  skin-not-on-item: '{prefix} <red>Skin <white>{skin}</white> is not installed on this item.</red>'
 
 # -- Skin switching ---------------------------
+# Sent as an action bar entry by default (controlled by config.yml -> switch.feedback).
 skin:
-  switched: '{prefix} <white>Switched to <#C173FF>{skin}</#C173FF>.</white>'
+  switched: '<white>Switched to <gradient:#B4E488:#7DD031>{skin}</gradient></white>'
+
+# -- Switch menu (/ss menu) -------------------
+menu:
+  entry-active-name: '<gradient:#B4E488:#7DD031><b>{skin}</b></gradient>'
+  entry-active-lore:
+    - ''
+    - ' <#B4E488>► Active skin</#B4E488> '
+    - ''
+  entry-inactive-name: '<white>{skin}</white>'
+  entry-inactive-lore:
+    - ''
+    - ' <gray>Click to switch to this skin.</gray> '
+    - ''
 
 # -- Slot row layout ---------------------------
-# The slot row is built as:
-#   prefix + slot[0] + separator + slot[1] + ... + suffix
-# Each slot uses slot-active or slot-inactive depending on whether it's
-# the currently selected one. Edit prefix/separator/suffix to control
-# the spacing independently — adding a space to slot-active alone would
-# double up between slots, which is why the padding is split out here.
-#
-# Vertical layout (around the row):
-#   position      'above' or 'below' the item's original lore.
-#   lines-before  list of MiniMessage lines inserted BEFORE the row.
-#                 Defaults to []. Use [''] for one blank line, etc.
-#   lines-after   list of MiniMessage lines inserted AFTER the row.
-#
-# Templates ({color} and {icon} are placeholders):
-#   slot-active   how the active slot is rendered.
-#   slot-inactive how every other slot is rendered.
-#
-# Placeholders:
-#   {color}  bracket colour — resolved per slot from skins.yml:
-#            bracket-color when the slot's tooltip token is applied,
-#            bracket-color-default otherwise. Each falls back to the
-#            global default-bracket-color when not defined.
-#   {icon}   the icon glyph for that slot. The skin's icon-active /
-#            icon-inactive (when defined) own the styling per state;
-#            otherwise the plain `icon` field is used. If you want
-#            different colours per state and your skin doesn't use
-#            those overrides, just hardcode the colour around {icon}
-#            in the template (e.g. <white>{icon}</white>).
 lore:
   position: 'below'
   lines-before: []

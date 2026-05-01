@@ -1,1 +1,1 @@
-rootProject.name = "SkinSwitch"
+rootProject.name = "SwitchSkin"

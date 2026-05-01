@@ -1,14 +1,8 @@
 # =============================================
-#              SkinSwitch Configuration
+#              SwitchSkin Configuration
 # =============================================
 # Supports MiniMessage format for all text fields.
-#
-# Skins are defined in skins.yml. Adding a slot to an item stores the
-# skin id in its persistent data and rebuilds the lore. Switching slots
-# only changes the item_model component — durability, enchantments,
-# attributes and other persistent data are preserved.
 
-# Internal version — do not edit. Bump = new keys were added.
 config-version: 1
 
 # Language file to use from the lang/ folder (without .yml)
@@ -19,48 +13,50 @@ defaults:
   # Maximum number of skin slots a single item can hold.
   max-slots: 6
 
-# Toggles for which fields a skin can override when its slot is active.
-# All toggles are independent — disabling one keeps the rest working.
-#
-#   switch-name: when true, a skin's `display` (skins.yml) is applied as
-#                the item's custom_name while that slot is active. When
-#                false, the item keeps the custom_name it had before any
-#                slot was added.
-#   switch-lore: when true, a skin's `lore` (skins.yml) replaces the
-#                item's original lore as the base for the slot row. When
-#                false, the item keeps its original lore regardless of
-#                what each skin defines.
-#
-# item_model always switches (that's the point of a skin slot).
-# tooltip_style is governed by the separate tooltip-token system.
+# Per-feature switches for what a skin can override on the held item.
 features:
   switch-name: true
   switch-lore: true
 
+# Behaviour of the skin switch action (menu, /ss switch, etc.)
+switch:
+  # 'actionbar' shows the message above the hotbar.
+  # 'chat' falls back to a regular chat message.
+  feedback: 'actionbar'
+
+  cooldown:
+    enabled: true
+    millis: 500
+
+  sound:
+    enabled: true
+    key: 'minecraft:ui.button.click'
+    volume: 1.0
+    pitch: 1.2
+
+# Skin selection menu (/ss menu) layout.
+menu:
+  rows: 3
+  title: '<white><gradient:#B4E488:#7DD031><b>Switch Skin</b></gradient></white>'
+
 # Token item used to add a skin slot to a held item.
-# Players right-click the token (in the cursor) onto a target item in
-# their inventory; the token is consumed and the slot is added.
-# Use {skin} in the name/lore to insert the bound skin's display name.
 token:
   material: 'NAME_TAG'
-  custom_name: '<gradient:#C173FF:#950DFF><b>Skin Slot Token</b></gradient> <gray>—</gray> <white>{skin}</white>'
+  custom_name: '<gradient:#B4E488:#7DD031><b>Skin Slot Token</b></gradient> <gray>—</gray> <white>{skin}</white>'
   lore:
     - ''
     - ' <white>Right-click this token onto an</white> '
     - ' <white>item in your inventory to add</white> '
-    - ' <white>the <#C173FF>{skin}</#C173FF> skin slot.</white> '
+    - ' <white>the <#7DD031>{skin}</#7DD031> skin slot.</white> '
     - ''
 
-# Tooltip token: separate item from the skin token. Applies the bound
-# skin's tooltip_style to a target item without touching the skin slot
-# row. Players right-click the token onto an item to apply it; only one
-# tooltip can be active per item (re-applying replaces it).
+# Tooltip token: applies a skin's tooltip_style without touching the slot row.
 tooltip-token:
   material: 'PAPER'
-  custom_name: '<gradient:#C173FF:#950DFF><b>Tooltip Token</b></gradient> <gray>—</gray> <white>{skin}</white>'
+  custom_name: '<gradient:#B4E488:#7DD031><b>Tooltip Token</b></gradient> <gray>—</gray> <white>{skin}</white>'
   lore:
     - ''
     - ' <white>Right-click this token onto an</white> '
     - ' <white>item in your inventory to apply</white> '
-    - ' <white>the <#C173FF>{skin}</#C173FF> tooltip style.</white> '
+    - ' <white>the <#7DD031>{skin}</#7DD031> tooltip style.</white> '
     - ''
