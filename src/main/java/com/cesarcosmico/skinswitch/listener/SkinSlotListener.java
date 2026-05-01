@@ -3,7 +3,7 @@ package com.cesarcosmico.skinswitch.listener;
 import com.cesarcosmico.skinswitch.config.LangConfig;
 import com.cesarcosmico.skinswitch.config.SkinConfig;
 import com.cesarcosmico.skinswitch.config.SkinDefinition;
-import com.cesarcosmico.skinswitch.item.SkinTokenFactory;
+import com.cesarcosmico.skinswitch.item.TokenFactory;
 import com.cesarcosmico.skinswitch.service.SkinSlotService;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -21,16 +21,19 @@ import java.util.function.Supplier;
 public final class SkinSlotListener implements Listener {
 
     private final SkinSlotService skinSlotService;
-    private final SkinTokenFactory tokenFactory;
+    private final TokenFactory skinTokenFactory;
+    private final TokenFactory tooltipTokenFactory;
     private final Supplier<LangConfig> langSupplier;
     private final Supplier<SkinConfig> skinSupplier;
 
     public SkinSlotListener(SkinSlotService skinSlotService,
-                            SkinTokenFactory tokenFactory,
+                            TokenFactory skinTokenFactory,
+                            TokenFactory tooltipTokenFactory,
                             Supplier<LangConfig> langSupplier,
                             Supplier<SkinConfig> skinSupplier) {
         this.skinSlotService = skinSlotService;
-        this.tokenFactory = tokenFactory;
+        this.skinTokenFactory = skinTokenFactory;
+        this.tooltipTokenFactory = tooltipTokenFactory;
         this.langSupplier = langSupplier;
         this.skinSupplier = skinSupplier;
     }
@@ -75,15 +78,25 @@ public final class SkinSlotListener implements Listener {
 
         ItemStack cursor = event.getCursor();
         ItemStack target = event.getCurrentItem();
-        if (!tokenFactory.isToken(cursor)) return;
         if (target == null || target.getType().isAir()) return;
-        if (tokenFactory.isToken(target)) return;
         if (!(event.getWhoClicked() instanceof Player player)) return;
 
-        String skinId = tokenFactory.readSkinId(cursor).orElse(null);
-        if (skinId == null) return;
+        if (skinTokenFactory.is(cursor)) {
+            if (skinTokenFactory.is(target) || tooltipTokenFactory.is(target)) return;
+            event.setCancelled(true);
+            handleSkinToken(player, cursor, target);
+            return;
+        }
+        if (tooltipTokenFactory.is(cursor)) {
+            if (skinTokenFactory.is(target) || tooltipTokenFactory.is(target)) return;
+            event.setCancelled(true);
+            handleTooltipToken(player, cursor, target);
+        }
+    }
 
-        event.setCancelled(true);
+    private void handleSkinToken(Player player, ItemStack cursor, ItemStack target) {
+        String skinId = skinTokenFactory.readSkinId(cursor).orElse(null);
+        if (skinId == null) return;
 
         SkinSlotService.AddResult result = skinSlotService.addSlot(target, skinId);
         switch (result) {
@@ -98,6 +111,27 @@ public final class SkinSlotListener implements Listener {
             case DUPLICATE -> langSupplier.get().send(player, "command.duplicate-slot");
             case FULL -> langSupplier.get().send(player, "command.slots-full",
                     "{max}", String.valueOf(skinSlotService.getSlots(target).size()));
+            case UNKNOWN_SKIN -> langSupplier.get().send(player, "command.unknown-skin",
+                    "{skin}", skinId);
+            case NO_META -> {}
+        }
+    }
+
+    private void handleTooltipToken(Player player, ItemStack cursor, ItemStack target) {
+        String skinId = tooltipTokenFactory.readSkinId(cursor).orElse(null);
+        if (skinId == null) return;
+
+        SkinSlotService.TooltipApplyResult result = skinSlotService.applyTooltip(target, skinId);
+        switch (result) {
+            case APPLIED -> {
+                consumeOne(player, cursor);
+                SkinDefinition def = skinSupplier.get().get(skinId).orElse(null);
+                String display = def == null ? skinId : def.displayOrId();
+                langSupplier.get().send(player, "command.tooltip-applied",
+                        "{skin}", display);
+            }
+            case NO_TOOLTIP -> langSupplier.get().send(player, "command.tooltip-missing",
+                    "{skin}", skinId);
             case UNKNOWN_SKIN -> langSupplier.get().send(player, "command.unknown-skin",
                     "{skin}", skinId);
             case NO_META -> {}

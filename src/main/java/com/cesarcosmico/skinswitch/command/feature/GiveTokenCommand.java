@@ -3,7 +3,7 @@ package com.cesarcosmico.skinswitch.command.feature;
 import com.cesarcosmico.skinswitch.config.LangConfig;
 import com.cesarcosmico.skinswitch.config.SkinConfig;
 import com.cesarcosmico.skinswitch.config.SkinDefinition;
-import com.cesarcosmico.skinswitch.item.SkinTokenFactory;
+import com.cesarcosmico.skinswitch.item.TokenFactory;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -19,24 +19,39 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+/**
+ * Generic /givetoken-style command. Reused for both the skin token
+ * (literal "givetoken") and the tooltip token (literal "givetooltip");
+ * only the literal name, factory and skin filter differ.
+ */
 public final class GiveTokenCommand {
 
+    private final String literal;
+    private final String successKey;
     private final Supplier<LangConfig> langSupplier;
     private final Supplier<SkinConfig> skinSupplier;
-    private final Supplier<SkinTokenFactory> tokenSupplier;
+    private final Supplier<TokenFactory> tokenSupplier;
+    private final Predicate<SkinDefinition> skinFilter;
 
-    public GiveTokenCommand(Supplier<LangConfig> langSupplier,
+    public GiveTokenCommand(String literal,
+                            String successKey,
+                            Supplier<LangConfig> langSupplier,
                             Supplier<SkinConfig> skinSupplier,
-                            Supplier<SkinTokenFactory> tokenSupplier) {
+                            Supplier<TokenFactory> tokenSupplier,
+                            Predicate<SkinDefinition> skinFilter) {
+        this.literal = literal;
+        this.successKey = successKey;
         this.langSupplier = langSupplier;
         this.skinSupplier = skinSupplier;
         this.tokenSupplier = tokenSupplier;
+        this.skinFilter = skinFilter;
     }
 
     public LiteralCommandNode<CommandSourceStack> create() {
-        return Commands.literal("givetoken")
+        return Commands.literal(literal)
                 .requires(source -> source.getSender().hasPermission("skinswitch.admin"))
                 .then(Commands.argument("player", StringArgumentType.word())
                         .suggests(this::suggestPlayers)
@@ -63,8 +78,9 @@ public final class GiveTokenCommand {
     private CompletableFuture<Suggestions> suggestSkins(
             CommandContext<CommandSourceStack> ctx, SuggestionsBuilder builder) {
         String input = builder.getRemaining().toLowerCase();
-        for (String id : skinSupplier.get().all().keySet()) {
-            if (id.toLowerCase().startsWith(input)) builder.suggest(id);
+        for (SkinDefinition def : skinSupplier.get().all().values()) {
+            if (!skinFilter.test(def)) continue;
+            if (def.id().toLowerCase().startsWith(input)) builder.suggest(def.id());
         }
         return builder.buildFuture();
     }
@@ -81,7 +97,7 @@ public final class GiveTokenCommand {
         }
 
         SkinDefinition def = skinSupplier.get().get(skinId).orElse(null);
-        if (def == null) {
+        if (def == null || !skinFilter.test(def)) {
             langSupplier.get().send(ctx.getSource().getSender(), "command.unknown-skin",
                     "{skin}", skinId);
             return Command.SINGLE_SUCCESS;
@@ -99,7 +115,7 @@ public final class GiveTokenCommand {
             target.getWorld().dropItemNaturally(target.getLocation(), overflow);
         }
 
-        langSupplier.get().send(ctx.getSource().getSender(), "command.token-given",
+        langSupplier.get().send(ctx.getSource().getSender(), successKey,
                 "{count}", String.valueOf(amount),
                 "{skin}", def.displayOrId(),
                 "{player}", target.getName());

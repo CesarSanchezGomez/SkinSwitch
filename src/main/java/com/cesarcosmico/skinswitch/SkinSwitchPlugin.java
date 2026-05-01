@@ -7,10 +7,11 @@ import com.cesarcosmico.skinswitch.config.PluginConfig;
 import com.cesarcosmico.skinswitch.config.SkinConfig;
 import com.cesarcosmico.skinswitch.item.LoreRenderer;
 import com.cesarcosmico.skinswitch.item.SkinSlotKeys;
-import com.cesarcosmico.skinswitch.item.SkinTokenFactory;
+import com.cesarcosmico.skinswitch.item.TokenFactory;
 import com.cesarcosmico.skinswitch.listener.SkinSlotListener;
 import com.cesarcosmico.skinswitch.service.SkinSlotService;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -23,7 +24,8 @@ public final class SkinSwitchPlugin extends JavaPlugin {
     private PluginConfig pluginConfig;
     private SkinConfig skinConfig;
     private SkinSlotService skinSlotService;
-    private SkinTokenFactory skinTokenFactory;
+    private TokenFactory skinTokenFactory;
+    private TokenFactory tooltipTokenFactory;
 
     @Override
     public void onEnable() {
@@ -45,11 +47,14 @@ public final class SkinSwitchPlugin extends JavaPlugin {
         LoreRenderer loreRenderer = new LoreRenderer(this::getLangConfig, this::getSkinConfig);
         this.skinSlotService = new SkinSlotService(keys, loreRenderer,
                 this::getSkinConfig, this::getPluginConfig);
-        this.skinTokenFactory = new SkinTokenFactory(keys, this::getPluginConfig, this::getSkinConfig);
+        this.skinTokenFactory = new TokenFactory(keys.tokenSkin(),
+                () -> getPluginConfig().getToken(), this::getSkinConfig, Material.NAME_TAG);
+        this.tooltipTokenFactory = new TokenFactory(keys.tokenTooltip(),
+                () -> getPluginConfig().getTooltipToken(), this::getSkinConfig, Material.PAPER);
 
         registerCommands();
         getServer().getPluginManager().registerEvents(
-                new SkinSlotListener(skinSlotService, skinTokenFactory,
+                new SkinSlotListener(skinSlotService, skinTokenFactory, tooltipTokenFactory,
                         this::getLangConfig, this::getSkinConfig), this);
 
         getLogger().info("SkinSwitch enabled.");
@@ -82,6 +87,7 @@ public final class SkinSwitchPlugin extends JavaPlugin {
                 this::getPluginConfig,
                 this::getSkinSlotService,
                 this::getSkinTokenFactory,
+                this::getTooltipTokenFactory,
                 this::reload
         );
 
@@ -102,5 +108,6 @@ public final class SkinSwitchPlugin extends JavaPlugin {
     public PluginConfig getPluginConfig() { return pluginConfig; }
     public SkinConfig getSkinConfig() { return skinConfig; }
     public SkinSlotService getSkinSlotService() { return skinSlotService; }
-    public SkinTokenFactory getSkinTokenFactory() { return skinTokenFactory; }
+    public TokenFactory getSkinTokenFactory() { return skinTokenFactory; }
+    public TokenFactory getTooltipTokenFactory() { return tooltipTokenFactory; }
 }

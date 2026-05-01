@@ -9,7 +9,7 @@
 # attributes and other persistent data are preserved.
 
 # Internal version — do not edit. Bump = new keys were added.
-config-version: 1
+config-version: 2
 
 # Language file to use from the lang/ folder (without .yml)
 # Available: en_US, es_ES (or create your own)
@@ -31,4 +31,18 @@ token:
     - ' <white>Right-click this token onto an</white> '
     - ' <white>item in your inventory to add</white> '
     - ' <white>the <#C173FF>{skin}</#C173FF> skin slot.</white> '
+    - ''
+
+# Tooltip token: separate item from the skin token. Applies the bound
+# skin's tooltip_style to a target item without touching the skin slot
+# row. Players right-click the token onto an item to apply it; only one
+# tooltip can be active per item (re-applying replaces it).
+tooltip-token:
+  material: 'PAPER'
+  custom_name: '<gradient:#C173FF:#950DFF><b>Tooltip Token</b></gradient> <gray>—</gray> <white>{skin}</white>'
+  lore:
+    - ''
+    - ' <white>Right-click this token onto an</white> '
+    - ' <white>item in your inventory to apply</white> '
+    - ' <white>the <#C173FF>{skin}</#C173FF> tooltip style.</white> '
     - ''

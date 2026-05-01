@@ -24,17 +24,17 @@ import java.util.function.Supplier;
 /**
  * Single source of truth for skin-slot mutations on items.
  *
- * Only the item_model component, custom_name, tooltip_style and lore are
- * touched; durability, enchantments, attribute modifiers and any other PDC
- * are preserved. The item's pre-existing name, tooltip style and lore are
- * captured into PDC the first time a slot is added and restored verbatim
- * when the last slot is removed.
+ * The skin-slot system manages item_model + custom_name + lore. The
+ * tooltip_style is tracked independently via the tooltip-token system
+ * so that applying/removing skins never touches the tooltip.
  */
 public final class SkinSlotService {
 
     public enum AddResult { ADDED, UNKNOWN_SKIN, FULL, DUPLICATE, NO_META }
     public enum RemoveResult { REMOVED, INVALID_INDEX, NO_SLOTS, NO_META }
     public enum CycleResult { CYCLED, NO_SLOTS, NO_META, SINGLE_SLOT }
+    public enum TooltipApplyResult { APPLIED, UNKNOWN_SKIN, NO_TOOLTIP, NO_META }
+    public enum TooltipRemoveResult { REMOVED, NOT_APPLIED, NO_META }
 
     private static final GsonComponentSerializer GSON = GsonComponentSerializer.gson();
     private static final MiniMessage MINI = MiniMessage.miniMessage();
@@ -83,6 +83,13 @@ public final class SkinSlotService {
         int idx = getCurrentIndex(item);
         if (idx < 0 || idx >= slots.size()) return Optional.empty();
         return skinSupplier.get().get(slots.get(idx));
+    }
+
+    public boolean hasTooltip(ItemStack item) {
+        if (item == null) return false;
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null) return false;
+        return meta.getPersistentDataContainer().has(keys.appliedTooltipSkin(), PersistentDataType.STRING);
     }
 
     public AddResult addSlot(ItemStack item, String skinId) {
@@ -172,6 +179,41 @@ public final class SkinSlotService {
         return CycleResult.CYCLED;
     }
 
+    public TooltipApplyResult applyTooltip(ItemStack item, String skinId) {
+        if (item == null) return TooltipApplyResult.NO_META;
+        Optional<SkinDefinition> skinOpt = skinSupplier.get().get(skinId);
+        if (skinOpt.isEmpty()) return TooltipApplyResult.UNKNOWN_SKIN;
+        SkinDefinition skin = skinOpt.get();
+        if (skin.tooltipStyle() == null) return TooltipApplyResult.NO_TOOLTIP;
+
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null) return TooltipApplyResult.NO_META;
+
+        PersistentDataContainer pdc = meta.getPersistentDataContainer();
+        if (!pdc.has(keys.appliedTooltipSkin(), PersistentDataType.STRING)) {
+            captureOriginalTooltipStyle(meta, pdc);
+        }
+        pdc.set(keys.appliedTooltipSkin(), PersistentDataType.STRING, skinId);
+        meta.setTooltipStyle(skin.tooltipStyle());
+        item.setItemMeta(meta);
+        return TooltipApplyResult.APPLIED;
+    }
+
+    public TooltipRemoveResult removeTooltip(ItemStack item) {
+        if (item == null) return TooltipRemoveResult.NO_META;
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null) return TooltipRemoveResult.NO_META;
+
+        PersistentDataContainer pdc = meta.getPersistentDataContainer();
+        if (!pdc.has(keys.appliedTooltipSkin(), PersistentDataType.STRING)) {
+            return TooltipRemoveResult.NOT_APPLIED;
+        }
+        restoreOriginalTooltipStyle(meta, pdc);
+        pdc.remove(keys.appliedTooltipSkin());
+        item.setItemMeta(meta);
+        return TooltipRemoveResult.REMOVED;
+    }
+
     private List<String> readSlots(PersistentDataContainer pdc) {
         if (!pdc.has(keys.slots(), PersistentDataType.LIST.strings())) {
             return new ArrayList<>();
@@ -190,13 +232,11 @@ public final class SkinSlotService {
     private void captureOriginalAppearance(ItemMeta meta, PersistentDataContainer pdc) {
         captureOriginalLore(meta, pdc);
         captureOriginalName(meta, pdc);
-        captureOriginalTooltipStyle(meta, pdc);
     }
 
     private void restoreOriginalAppearance(ItemMeta meta, PersistentDataContainer pdc) {
         restoreOriginalLore(meta, pdc);
         restoreOriginalName(meta, pdc);
-        restoreOriginalTooltipStyle(meta, pdc);
         meta.setItemModel(null);
     }
 
@@ -245,9 +285,8 @@ public final class SkinSlotService {
     private void captureOriginalTooltipStyle(ItemMeta meta, PersistentDataContainer pdc) {
         if (pdc.has(keys.originalTooltipStyle(), PersistentDataType.STRING)) return;
         NamespacedKey style = meta.getTooltipStyle();
-        if (style != null) {
-            pdc.set(keys.originalTooltipStyle(), PersistentDataType.STRING, style.toString());
-        }
+        pdc.set(keys.originalTooltipStyle(), PersistentDataType.STRING,
+                style != null ? style.toString() : "");
     }
 
     private void restoreOriginalTooltipStyle(ItemMeta meta, PersistentDataContainer pdc) {
@@ -269,27 +308,13 @@ public final class SkinSlotService {
         if (skin.hasDisplay()) {
             meta.displayName(MINI.deserialize(skin.display())
                     .decoration(TextDecoration.ITALIC, false));
-        } else {
-            // Skin doesn't override the name — fall back to whatever the item
-            // had before any slot was added.
-            if (pdc.has(keys.originalName(), PersistentDataType.STRING)) {
-                String json = pdc.get(keys.originalName(), PersistentDataType.STRING);
-                meta.displayName(json != null ? GSON.deserialize(json) : null);
-            } else {
-                meta.displayName(null);
-            }
+            return;
         }
-
-        if (skin.tooltipStyle() != null) {
-            meta.setTooltipStyle(skin.tooltipStyle());
+        if (pdc.has(keys.originalName(), PersistentDataType.STRING)) {
+            String json = pdc.get(keys.originalName(), PersistentDataType.STRING);
+            meta.displayName(json != null ? GSON.deserialize(json) : null);
         } else {
-            if (pdc.has(keys.originalTooltipStyle(), PersistentDataType.STRING)) {
-                String s = pdc.get(keys.originalTooltipStyle(), PersistentDataType.STRING);
-                NamespacedKey key = (s != null && !s.isEmpty()) ? NamespacedKey.fromString(s) : null;
-                meta.setTooltipStyle(key);
-            } else {
-                meta.setTooltipStyle(null);
-            }
+            meta.displayName(null);
         }
     }
 

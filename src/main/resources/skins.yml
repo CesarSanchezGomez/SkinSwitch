@@ -13,19 +13,21 @@
 #       item_model:    edospring:flower_set/flower_pickaxe
 #       icon:          '🌷'                            # one slot = one icon (lore)
 #       display:       '<#FCBDE3>Spring Pickaxe</#FCBDE3>' # custom_name when active
-#       tooltip_style: 'minecraft:spring'                  # tooltip_style when active
+#       tooltip_style: 'minecraft:spring'                  # only applied via tooltip token
 #       color:         '#FCBDE3'                           # bracket color when active
 #
 # All extended fields are optional. Behavior:
 #   * If 'icon'    is omitted, the skin id is used (in the lore brackets).
 #   * If 'display' is omitted, the item's original custom_name is restored.
-#   * If 'tooltip_style' is omitted, the item's original tooltip_style is restored.
 #   * If 'color'   is omitted, slot-colors.active is used (per-skin override).
+#   * 'tooltip_style' is NOT applied by the skin slot. To set it on an item,
+#     give the player a tooltip token (/ss givetooltip <player> <skin>) and
+#     have them right-click it onto the target item. Remove it with
+#     /ss removetooltip while holding the item.
 #
 # Item data (durability, enchants, attributes, other PDC) is preserved
-# when switching; only item_model + custom_name + tooltip_style + lore are
-# touched. The original values are captured the first time a slot is added
-# and restored verbatim when the last slot is removed.
+# when switching; only item_model + custom_name + lore are touched by the
+# skin slot. Tooltip_style is managed independently by the tooltip token.
 
 # Internal version — do not edit. Bump = new keys were added.
 config-version: 3
