@@ -1,0 +1,34 @@
+# SkinSwitch - Archivo de idioma en Español (España)
+# Soporta formato MiniMessage.
+# Usa {prefix} para insertar el prefijo del plugin.
+# Versión interna — no editar. Cambio = nuevos mensajes añadidos.
+config-version: 1
+
+prefix: '<white>[<gradient:#C173FF:#950DFF>SkinSwitch</gradient>]</white>'
+
+# -- Comandos ---------------------------------
+command:
+  only-players: '{prefix} <red>Este comando solo puede ser usado por jugadores.</red>'
+  no-permission: '{prefix} <white>No tienes permiso para hacer eso.</white>'
+  reload-success: '{prefix} <white>Configuración recargada exitosamente.</white>'
+  no-item-in-hand: '{prefix} <red>Debes tener un ítem en la mano principal.</red>'
+  unknown-skin: '{prefix} <red>Skin desconocida: <white>{skin}</white>.</red>'
+  slot-added: '{prefix} <white>Slot <#C173FF>{skin}</#C173FF> añadido. Total: <#C173FF>{count}</#C173FF>.</white>'
+  slot-removed: '{prefix} <white>Slot <#C173FF>{skin}</#C173FF> eliminado.</white>'
+  invalid-slot: '{prefix} <red>Índice de slot inválido.</red>'
+  no-slots: '{prefix} <white>Este ítem no tiene slots de skin.</white>'
+  slots-full: '{prefix} <white>Este ítem ha alcanzado el límite de slots ({max}).</white>'
+  duplicate-slot: '{prefix} <white>Esta skin ya está instalada en este ítem.</white>'
+  token-given: '{prefix} <white>Entregaste <#C173FF>{count}</#C173FF> token(s) de <#C173FF>{skin}</#C173FF> a <#C173FF>{player}</#C173FF>.</white>'
+  player-not-found: '{prefix} <red>Jugador no encontrado: <white>{player}</white>.</red>'
+
+# -- Cambio de skin ---------------------------
+skin:
+  switched: '{prefix} <white>Cambiaste a <#C173FF>{skin}</#C173FF>.</white>'
+
+# -- Sección añadida al lore de ítems con slots --
+# {skin} es el nombre visible de la skin (o el id si no hay display).
+lore:
+  header: '<gray>Slots de Skin:</gray>'
+  slot-active: ' <#C173FF>●</#C173FF> <white>{skin}</white>'
+  slot-inactive: ' <dark_gray>○</dark_gray> <gray>{skin}</gray>'

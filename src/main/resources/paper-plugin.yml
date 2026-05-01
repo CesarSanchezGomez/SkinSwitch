@@ -1,0 +1,23 @@
+name: SkinSwitch
+version: '1.0.0'
+authors:
+  - CesarCosmico
+main: com.cesarcosmico.skinswitch.SkinSwitchPlugin
+description: Add skin slots to in-hand items and switch between custom item models.
+api-version: '1.21'
+
+permissions:
+  skinswitch.*:
+    description: Full access to SkinSwitch
+    default: op
+    children:
+      skinswitch.use: true
+      skinswitch.admin: true
+
+  skinswitch.admin:
+    description: Allows reloading the config and managing skin slots/tokens
+    default: op
+
+  skinswitch.use:
+    description: Allows switching skins on items that already have slots
+    default: true

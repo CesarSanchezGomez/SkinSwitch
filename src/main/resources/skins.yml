@@ -1,0 +1,20 @@
+# =============================================
+#                  SkinSwitch Skins
+# =============================================
+# Each entry maps a skin id -> item_model resource location.
+#
+# Two formats are accepted (mixable):
+#   flat:    spring_skin: edospring:flower_set/flower_pickaxe
+#   section: winter_skin:
+#              item_model: edowinter:ice_set/ice_pickaxe
+#              display: '<aqua>Winter Pickaxe</aqua>'
+#
+# The display field is optional and used in lore + chat messages.
+# It supports MiniMessage format. If omitted, the skin id is shown.
+
+# Internal version — do not edit. Bump = new keys were added.
+config-version: 1
+
+skins:
+  spring_skin: edospring:flower_set/flower_pickaxe
+  autum_skin: edoween:bone_set/bone_pickaxe

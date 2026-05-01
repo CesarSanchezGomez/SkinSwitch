@@ -1,0 +1,34 @@
+# =============================================
+#              SkinSwitch Configuration
+# =============================================
+# Supports MiniMessage format for all text fields.
+#
+# Skins are defined in skins.yml. Adding a slot to an item stores the
+# skin id in its persistent data and rebuilds the lore. Switching slots
+# only changes the item_model component — durability, enchantments,
+# attributes and other persistent data are preserved.
+
+# Internal version — do not edit. Bump = new keys were added.
+config-version: 1
+
+# Language file to use from the lang/ folder (without .yml)
+# Available: en_US, es_ES (or create your own)
+lang: 'en_US'
+
+defaults:
+  # Maximum number of skin slots a single item can hold.
+  max-slots: 6
+
+# Token item used to add a skin slot to a held item.
+# Players right-click the token (in the cursor) onto a target item in
+# their inventory; the token is consumed and the slot is added.
+# Use {skin} in the name/lore to insert the bound skin's display name.
+token:
+  material: 'NAME_TAG'
+  custom_name: '<gradient:#C173FF:#950DFF><b>Skin Slot Token</b></gradient> <gray>—</gray> <white>{skin}</white>'
+  lore:
+    - ''
+    - ' <white>Right-click this token onto an</white> '
+    - ' <white>item in your inventory to add</white> '
+    - ' <white>the <#C173FF>{skin}</#C173FF> skin slot.</white> '
+    - ''
