@@ -56,11 +56,11 @@ public final class LoreRenderer {
 
         List<Component> block = new ArrayList<>();
         for (String line : lang.getRawList("lore.lines-before")) {
-            block.add(deserialize(line));
+            block.add(asLoreLine(line));
         }
         block.add(slotRow);
         for (String line : lang.getRawList("lore.lines-after")) {
-            block.add(deserialize(line));
+            block.add(asLoreLine(line));
         }
 
         List<Component> out = new ArrayList<>();
@@ -85,10 +85,9 @@ public final class LoreRenderer {
         String suffix = lang.getRaw("lore.suffix");
         Set<String> tooltipSet = new HashSet<>(tooltipSkinIds);
 
-        StringBuilder line = new StringBuilder();
-        line.append(prefix);
+        StringBuilder middle = new StringBuilder();
         for (int i = 0; i < skinIds.size(); i++) {
-            if (i > 0) line.append(separator);
+            if (i > 0) middle.append(separator);
 
             String id = skinIds.get(i);
             Optional<SkinDefinition> skin = skinConfig.get(id);
@@ -107,16 +106,38 @@ public final class LoreRenderer {
             }
 
             String key = active ? "lore.slot-active" : "lore.slot-inactive";
-            line.append(lang.getRaw(key)
+            middle.append(lang.getRaw(key)
                     .replace("{color}", color)
                     .replace("{icon}", icon)
                     .replace("{skin}", icon));
         }
-        line.append(suffix);
-        return deserialize(line.toString());
+
+        // Build prefix/suffix as explicit text Components instead of baking
+        // them into the MiniMessage string — leading/trailing whitespace on
+        // the root of a MINI.deserialize result is silently dropped by the
+        // Adventure -> NBT pipeline, so we keep them as their own nodes.
+        return Component.text("")
+                .decoration(TextDecoration.ITALIC, false)
+                .append(literal(prefix))
+                .append(deserialize(middle.toString()))
+                .append(literal(suffix));
+    }
+
+    private static Component literal(String raw) {
+        if (raw == null || raw.isEmpty()) return Component.empty();
+        return Component.text(raw).decoration(TextDecoration.ITALIC, false);
     }
 
     private static Component deserialize(String raw) {
         return MINI.deserialize(raw).decoration(TextDecoration.ITALIC, false);
+    }
+
+    // Wraps a deserialized line in an empty parent so that any leading
+    // whitespace (which Adventure's NBT serializer drops from the root
+    // of a top-level TextComponent) is preserved as a child node.
+    private static Component asLoreLine(String raw) {
+        return Component.text("")
+                .decoration(TextDecoration.ITALIC, false)
+                .append(deserialize(raw));
     }
 }
