@@ -2,7 +2,7 @@
 # Supports MiniMessage formatting.
 # Use {prefix} to insert the plugin prefix.
 # Internal version — do not edit. Bump = new messages were added.
-config-version: 5
+config-version: 6
 
 prefix: '<white>[<gradient:#C173FF:#950DFF>SkinSwitch</gradient>]</white>'
 
@@ -35,10 +35,26 @@ skin:
 
 # -- Lore section appended to items with slots --
 # Rendered as a single inline row, e.g. "[🌷] [🎃] [❄]".
-# Placeholders:
+#
+# Placeholders for slot-active / slot-inactive:
 #   {color}  bracket color (resolved from skins.yml: slot-colors / per-skin)
 #   {icon}   per-skin icon configured in skins.yml
+#
+# The default templates wrap only the brackets in {color} so the icon
+# itself is never tinted by the bracket color.
+#
+# Layout:
+#   position      — 'above' or 'below' the item's original lore.
+#   lines-before  — extra MiniMessage lines inserted BEFORE the slot row.
+#   lines-after   — extra MiniMessage lines inserted AFTER the slot row.
+# Both lists are rendered verbatim (each entry is one tooltip line); use
+# them for padding/headers/footers regardless of whether the item has
+# original lore. Empty list = no extra lines.
 lore:
+  position: 'below'
+  lines-before:
+    - ''
+  lines-after: []
   separator: ' '
-  slot-active: '<color:{color}>[<white>{icon}</white>]</color>'
-  slot-inactive: '<color:{color}>[{icon}]</color>'
+  slot-active: '<color:{color}>[</color><white><b>{icon}</b></white><color:{color}>]</color>'
+  slot-inactive: '<color:{color}>[</color><white>{icon}</white><color:{color}>]</color>'

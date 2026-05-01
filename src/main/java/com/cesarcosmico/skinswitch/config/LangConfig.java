@@ -11,26 +11,30 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public final class LangConfig {
 
-    public static final int CURRENT_VERSION = 5;
+    public static final int CURRENT_VERSION = 6;
 
     private static final MiniMessage MINI = MiniMessage.miniMessage();
 
     private final JavaPlugin plugin;
     private final Map<String, String> messages;
+    private final Map<String, List<String>> lists;
     private String prefix;
 
     public LangConfig(JavaPlugin plugin) {
         this.plugin = plugin;
         this.messages = new HashMap<>();
+        this.lists = new HashMap<>();
         load();
     }
 
     public void load() {
         messages.clear();
+        lists.clear();
 
         String lang = plugin.getConfig().getString("lang", "en_US");
         File langFolder = new File(plugin.getDataFolder(), "lang");
@@ -67,7 +71,9 @@ public final class LangConfig {
         for (String key : config.getKeys(true)) {
             if (config.isConfigurationSection(key)) continue;
             if (config.isList(key)) {
-                messages.put(key, String.join("\n", config.getStringList(key)));
+                List<String> items = config.getStringList(key);
+                lists.put(key, List.copyOf(items));
+                messages.put(key, String.join("\n", items));
             } else {
                 messages.put(key, config.getString(key, key));
             }
@@ -80,7 +86,9 @@ public final class LangConfig {
                 if (defaults.isConfigurationSection(key)) continue;
                 if (messages.containsKey(key)) continue;
                 if (defaults.isList(key)) {
-                    messages.put(key, String.join("\n", defaults.getStringList(key)));
+                    List<String> items = defaults.getStringList(key);
+                    lists.put(key, List.copyOf(items));
+                    messages.put(key, String.join("\n", items));
                 } else {
                     String value = defaults.getString(key);
                     if (value != null) messages.put(key, value);
@@ -91,6 +99,10 @@ public final class LangConfig {
 
     public String getRaw(String key) {
         return messages.getOrDefault(key, "<red>Missing message: " + key + "</red>");
+    }
+
+    public List<String> getRawList(String key) {
+        return lists.getOrDefault(key, List.of());
     }
 
     public Component get(String key, String... placeholders) {

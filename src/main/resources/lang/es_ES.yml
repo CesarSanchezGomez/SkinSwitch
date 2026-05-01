@@ -2,7 +2,7 @@
 # Soporta formato MiniMessage.
 # Usa {prefix} para insertar el prefijo del plugin.
 # Versión interna — no editar. Cambio = nuevos mensajes añadidos.
-config-version: 5
+config-version: 6
 
 prefix: '<white>[<gradient:#C173FF:#950DFF>SkinSwitch</gradient>]</white>'
 
@@ -35,10 +35,26 @@ skin:
 
 # -- Sección añadida al lore de ítems con slots --
 # Se renderiza como una sola línea, ej: "[🌷] [🎃] [❄]".
-# Placeholders:
+#
+# Placeholders en slot-active / slot-inactive:
 #   {color}  color de los corchetes (resuelto desde skins.yml)
 #   {icon}   icono por skin configurado en skins.yml
+#
+# Las plantillas por defecto envuelven SOLO los corchetes con {color},
+# así el icono nunca se tinta con el color del corchete.
+#
+# Layout:
+#   position      — 'above' (encima) o 'below' (debajo) del lore original.
+#   lines-before  — líneas MiniMessage extra ANTES de la fila de slots.
+#   lines-after   — líneas MiniMessage extra DESPUÉS de la fila de slots.
+# Ambas listas se renderizan tal cual (una entrada = una línea de tooltip);
+# úsalas para padding/cabeceras/pies sin importar si el ítem tiene lore
+# original. Lista vacía = sin líneas extra.
 lore:
+  position: 'below'
+  lines-before:
+    - ''
+  lines-after: []
   separator: ' '
-  slot-active: '<color:{color}>[<white>{icon}</white>]</color>'
-  slot-inactive: '<color:{color}>[{icon}]</color>'
+  slot-active: '<color:{color}>[</color><white><b>{icon}</b></white><color:{color}>]</color>'
+  slot-inactive: '<color:{color}>[</color><white>{icon}</white><color:{color}>]</color>'
