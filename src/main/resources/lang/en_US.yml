@@ -1,0 +1,37 @@
+# SkinSwitch - English Language File (US)
+# Supports MiniMessage formatting.
+# Use {prefix} to insert the plugin prefix.
+# Internal version — do not edit. Bump = new messages were added.
+config-version: 3
+
+prefix: '<white>[<gradient:#C173FF:#950DFF>SkinSwitch</gradient>]</white>'
+
+# -- Commands ---------------------------------
+command:
+  only-players: '{prefix} <red>This command can only be used by players.</red>'
+  no-permission: '{prefix} <white>You don''t have permission to do that.</white>'
+  reload-success: '{prefix} <white>Configuration reloaded successfully.</white>'
+  no-item-in-hand: '{prefix} <red>You must hold an item in your main hand.</red>'
+  unknown-skin: '{prefix} <red>Unknown skin: <white>{skin}</white>.</red>'
+  slot-added: '{prefix} <white>Slot <#C173FF>{skin}</#C173FF> added. Total: <#C173FF>{count}</#C173FF>.</white>'
+  slot-removed: '{prefix} <white>Slot <#C173FF>{skin}</#C173FF> removed.</white>'
+  invalid-slot: '{prefix} <red>Invalid slot index.</red>'
+  no-slots: '{prefix} <white>This item has no skin slots.</white>'
+  slots-full: '{prefix} <white>This item has reached the maximum slot capacity ({max}).</white>'
+  duplicate-slot: '{prefix} <white>That skin is already installed on this item.</white>'
+  token-given: '{prefix} <white>Gave <#C173FF>{count}</#C173FF> token(s) of <#C173FF>{skin}</#C173FF> to <#C173FF>{player}</#C173FF>.</white>'
+  player-not-found: '{prefix} <red>Player not found: <white>{player}</white>.</red>'
+
+# -- Skin switching ---------------------------
+skin:
+  switched: '{prefix} <white>Switched to <#C173FF>{skin}</#C173FF>.</white>'
+
+# -- Lore section appended to items with slots --
+# Rendered as a single inline row, e.g. "[🌷] [🎃] [❄]".
+# Placeholders:
+#   {color}  bracket color (resolved from skins.yml: slot-colors / per-skin)
+#   {icon}   per-skin icon configured in skins.yml
+lore:
+  separator: ' '
+  slot-active: '<color:{color}>[<white>{icon}</white>]</color>'
+  slot-inactive: '<color:{color}>[{icon}]</color>'
