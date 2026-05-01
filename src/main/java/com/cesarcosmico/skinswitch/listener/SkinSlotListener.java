@@ -35,17 +35,20 @@ public final class SkinSlotListener implements Listener {
         this.skinSupplier = skinSupplier;
     }
 
-    @EventHandler(ignoreCancelled = true)
+    // Not using ignoreCancelled: vanilla pre-cancels sneak+right-click on
+    // many blocks (chests, doors, etc.) which would otherwise hide the event.
+    @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         if (event.getHand() != EquipmentSlot.HAND) return;
-        if (!event.getPlayer().isSneaking()) return;
+
+        Player player = event.getPlayer();
+        if (!player.isSneaking()) return;
         if (event.getAction() != Action.RIGHT_CLICK_AIR
                 && event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
 
-        ItemStack item = event.getItem();
+        ItemStack item = player.getInventory().getItemInMainHand();
         if (!skinSlotService.hasSlots(item)) return;
 
-        Player player = event.getPlayer();
         if (!player.hasPermission("skinswitch.use")) {
             langSupplier.get().send(player, "command.no-permission");
             return;
@@ -53,11 +56,10 @@ public final class SkinSlotListener implements Listener {
 
         SkinSlotService.CycleResult result = skinSlotService.cycleNext(item);
         if (result == SkinSlotService.CycleResult.CYCLED) {
+            player.getInventory().setItemInMainHand(item);
             event.setCancelled(true);
             skinSlotService.getActiveSkin(item).ifPresent(s ->
                     langSupplier.get().send(player, "skin.switched", "{skin}", s.display()));
-        } else if (result == SkinSlotService.CycleResult.SINGLE_SLOT) {
-            event.setCancelled(true);
         }
     }
 

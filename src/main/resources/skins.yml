@@ -4,17 +4,31 @@
 # Each entry maps a skin id -> item_model resource location.
 #
 # Two formats are accepted (mixable):
-#   flat:    spring_skin: edospring:flower_set/flower_pickaxe
-#   section: winter_skin:
-#              item_model: edowinter:ice_set/ice_pickaxe
-#              display: '<aqua>Winter Pickaxe</aqua>'
 #
-# The display field is optional and used in lore + chat messages.
-# It supports MiniMessage format. If omitted, the skin id is shown.
+#   flat:
+#     spring_skin: edospring:flower_set/flower_pickaxe
+#
+#   section (recommended — lets you set icon + display name):
+#     spring_skin:
+#       item_model: edospring:flower_set/flower_pickaxe
+#       icon: '🌷'              # shown in the item's lore (one slot = one icon)
+#       display: 'Spring Pickaxe' # shown in chat ("Switched to ...")
+#
+# Both fields support MiniMessage. If 'icon' is omitted, the skin id is used.
+# If 'display' is omitted, the skin id is used.
+#
+# Item data (durability, enchants, attributes, other PDC) is preserved
+# when switching; only the item_model component is changed.
 
 # Internal version — do not edit. Bump = new keys were added.
-config-version: 1
+config-version: 2
 
 skins:
-  spring_skin: edospring:flower_set/flower_pickaxe
-  autum_skin: edoween:bone_set/bone_pickaxe
+  spring_skin:
+    item_model: edospring:flower_set/flower_pickaxe
+    icon: '🌷'
+    display: 'Spring Pickaxe'
+  autum_skin:
+    item_model: edoween:bone_set/bone_pickaxe
+    icon: '🎃'
+    display: 'Autumn Pickaxe'

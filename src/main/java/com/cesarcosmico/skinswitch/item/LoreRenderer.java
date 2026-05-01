@@ -11,6 +11,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
+/**
+ * Renders the skin-slot section appended to an item's lore.
+ *
+ * Output is a single inline row, e.g. "[🌷] [🎃]", separated from the
+ * original lore by an empty line. The active slot is rendered with a
+ * different style than the inactive ones (configurable in lang/*.yml).
+ */
 public final class LoreRenderer {
 
     private static final MiniMessage MINI = MiniMessage.miniMessage();
@@ -31,24 +38,30 @@ public final class LoreRenderer {
         if (originalLore != null) {
             out.addAll(originalLore);
         }
+        if (skinIds.isEmpty()) {
+            return out;
+        }
         if (!out.isEmpty()) {
             out.add(Component.empty());
         }
 
         LangConfig lang = langSupplier.get();
         SkinConfig skinConfig = skinSupplier.get();
+        String separator = lang.getRaw("lore.separator");
 
-        out.add(deserialize(lang.getRaw("lore.header")));
-
+        StringBuilder line = new StringBuilder();
         for (int i = 0; i < skinIds.size(); i++) {
+            if (i > 0) line.append(separator);
             String id = skinIds.get(i);
-            String displayName = skinConfig.get(id)
-                    .map(SkinDefinition::display)
+            String icon = skinConfig.get(id)
+                    .map(SkinDefinition::icon)
                     .orElse(id);
             String key = i == currentIndex ? "lore.slot-active" : "lore.slot-inactive";
-            String raw = lang.getRaw(key).replace("{skin}", displayName);
-            out.add(deserialize(raw));
+            line.append(lang.getRaw(key)
+                    .replace("{icon}", icon)
+                    .replace("{skin}", icon));
         }
+        out.add(deserialize(line.toString()));
         return out;
     }
 

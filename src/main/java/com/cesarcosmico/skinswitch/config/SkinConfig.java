@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 
 public final class SkinConfig {
 
-    public static final int CURRENT_VERSION = 1;
+    public static final int CURRENT_VERSION = 2;
 
     private final Map<String, SkinDefinition> skins;
 
@@ -32,14 +32,17 @@ public final class SkinConfig {
     private SkinDefinition parseSkin(String id, ConfigurationSection root, Logger logger) {
         String itemModelRaw;
         String display;
+        String icon;
 
         if (root.isConfigurationSection(id)) {
             ConfigurationSection section = root.getConfigurationSection(id);
             itemModelRaw = section.getString("item_model", "");
             display = section.getString("display", id);
+            icon = section.getString("icon", id);
         } else {
             itemModelRaw = root.getString(id, "");
             display = id;
+            icon = id;
         }
 
         if (itemModelRaw.isEmpty()) {
@@ -53,7 +56,7 @@ public final class SkinConfig {
             return null;
         }
 
-        return new SkinDefinition(id, key, display);
+        return new SkinDefinition(id, key, display, icon);
     }
 
     public Optional<SkinDefinition> get(String id) {
