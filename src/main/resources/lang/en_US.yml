@@ -1,5 +1,5 @@
 # SwitchSkin - English Language File (US)
-config-version: 1
+config-version: 2
 
 prefix: '<white>[<gradient:#B4E488:#7DD031>SwitchSkin</gradient>]</white>'
 
@@ -38,14 +38,11 @@ skin:
   switched-vanilla: '<white>Restored <red>vanilla</red> look</white>'
 
 # -- Slot row layout ---------------------------
-# The row of skin slot icons is built from the parts below.
-# To control where it appears in the lore, put '{icons}' inside any
-# `lore:` line in skins.yml — it will be replaced by the row. If no
-# line contains '{icons}', the row is appended at the end of the lore
-# (legacy 'below' behaviour).
+# The slot row is always rendered as the first line of the item's lore,
+# styled like a vanilla enchantment line. Format the row via 'row' and
+# each slot via 'slot-active' / 'slot-inactive'. Slots are joined by a
+# single space.
 lore:
-  prefix: ' '
-  separator: ' '
-  suffix: ' '
+  row: '<gray>Skins:</gray> {slots}'
   slot-active: '<color:{color}>[</color>{icon}<color:{color}>]</color>'
   slot-inactive: '<color:{color}>[</color>{icon}<color:{color}>]</color>'

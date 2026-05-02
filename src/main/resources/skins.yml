@@ -31,12 +31,11 @@
 #   * 'name'                 when present, replaces the item's custom_name
 #                            while this slot is active. Globally toggled by
 #                            features.switch-name in config.yml.
-#   * 'lore'                 when present, replaces the item's lore as the
-#                            base for the slot row. Globally toggled by
-#                            features.switch-lore in config.yml. Use
-#                            '{icons}' inside any line to anchor the slot
-#                            row exactly there. Without {icons}, the row
-#                            is appended at the end (legacy 'below').
+#   * 'lore'                 when present, replaces the item's lore while
+#                            this slot is active. Globally toggled by
+#                            features.switch-lore in config.yml. The slot
+#                            row is always rendered as the first lore line
+#                            on top of whatever lore is shown.
 #   * 'icon'                 the slot-row glyph. When omitted, the skin id
 #                            is used. Keep it as a plain character if you
 #                            want lang templates to drive its colour;

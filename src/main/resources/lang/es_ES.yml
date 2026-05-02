@@ -1,5 +1,5 @@
 # SwitchSkin - Archivo de idioma en Español (España)
-config-version: 1
+config-version: 2
 
 prefix: '<white>[<gradient:#B4E488:#7DD031>SwitchSkin</gradient>]</white>'
 
@@ -37,14 +37,11 @@ skin:
   switched-vanilla: '<white>Restaurado el aspecto <red>vanilla</red></white>'
 
 # -- Layout de la fila de slots ----------------
-# La fila de iconos se construye con las piezas de abajo.
-# Para decidir dónde aparece dentro del lore, mete '{icons}' en
-# cualquier línea de `lore:` en skins.yml — se sustituye por la fila.
-# Si ninguna línea lleva '{icons}', la fila se añade al final del
-# lore (comportamiento clásico 'below').
+# La fila de slots se pinta siempre como la primera línea del lore,
+# al estilo de una línea de encantamiento vanilla. Personaliza el
+# formato con 'row' y cada slot con 'slot-active' / 'slot-inactive'.
+# Los slots se separan por un espacio simple.
 lore:
-  prefix: ' '
-  separator: ' '
-  suffix: ' '
+  row: '<gray>Skins:</gray> {slots}'
   slot-active: '<color:{color}>[</color>{icon}<color:{color}>]</color>'
   slot-inactive: '<color:{color}>[</color>{icon}<color:{color}>]</color>'
