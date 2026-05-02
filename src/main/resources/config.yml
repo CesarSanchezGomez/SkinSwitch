@@ -70,16 +70,16 @@ tokens:
 menu:
   title: '<white><gradient:#A0A0A0:#595959><b>Switch Skin</b></gradient></white>'
   layout:
-    - 'XXXXVXXXX'
-    - 'XSXXXXXXX'
-    - 'XSXXXXXXX'
-    - 'XSXXXXXXX'
-    - 'XXXPCNXXX'
+    - 'WXYZVZYXW'
+    - 'XAAAAAAAX'
+    - 'WASSSSSAW'
+    - 'XAAAAAAAX'
+    - 'WXYPCNYXW'
 
   # Symbol from decorative-icons used to fill the prev/next button slots
   # when the button is hidden (page 0 has no prev, last page has no next).
   # Set to '' to keep those slots empty.
-  fill-empty: 'X'
+  fill-empty: 'Z'
 
   # The skin entries always use the held item's material (a pickaxe menu
   # shows pickaxes, a sword menu shows swords, ...). Defining `material`
@@ -87,10 +87,10 @@ menu:
   skin-slot:
     symbol: 'S'
     entry-active:
-      custom_name: '<gradient:#A0A0A0:#595959><b>{skin}</b></gradient>'
+      custom_name: '<gradient:#A0A0A0:#595959>{skin}</gradient>'
       lore:
         - ''
-        - ' <#A0A0A0>► Active skin</#A0A0A0> '
+        - ' <white>•</white> <gradient:#B4E488:#7DD031>Active skin</gradient> '
         - ''
       tooltip_display:
         hidden_components:
@@ -105,32 +105,39 @@ menu:
         hidden_components:
           - 'attribute_modifiers'
 
-  # The vanilla button also inherits the held item's material so the
-  # player sees a preview of what their item will look like once the
-  # skin is removed. `material` here has no effect.
+  # The vanilla button mirrors the held item's current visual: if a skin
+  # is active, the icon shows that skin (so it matches what's in your
+  # hand); if vanilla is active, the icon shows the raw item with the
+  # [active] marker. `material` here has no effect.
   vanilla-button:
     symbol: 'V'
     active:
-      custom_name: '<red><b>Vanilla</b></red> <gray>(active)</gray>'
+      custom_name: '<gradient:#A0A0A0:#595959><b>Vanilla</b></gradient> <gray>[active]</gray>'
       lore:
         - ''
         - ' <gray>The original look is showing.</gray> '
         - ' <gray>Click any skin to reapply it.</gray> '
         - ''
+      tooltip_display:
+        hidden_components:
+          - 'attribute_modifiers'
     inactive:
-      custom_name: '<red><b>Vanilla</b></red>'
+      custom_name: '<gradient:#A0A0A0:#595959><b>Vanilla</b></gradient>'
       lore:
         - ''
         - ' <gray>Restore the original look</gray> '
         - ' <gray>without losing your tokens.</gray> '
         - ''
+      tooltip_display:
+        hidden_components:
+          - 'attribute_modifiers'
 
   close-button:
     symbol: 'C'
     material: 'PLAYER_HEAD'
     profile:
       textures: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjNmNzRlYWQ5ZjA3MGNmMzEwMTQ1MzgxYjc5ZTQ0MTdlYTQ5MzBlYmQwMjQxMjE1NzcwNWY0OTliMDg4MDgwMiJ9fX0='
-    custom_name: '<red><b>Close</b></red>'
+    custom_name: '<gradient:#A0A0A0:#595959><b>Close</b></gradient>'
     lore:
       - ''
       - ' <gray>Closes this menu.</gray> '
@@ -141,7 +148,7 @@ menu:
     material: 'PLAYER_HEAD'
     profile:
       textures: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODY5NzFkZDg4MWRiYWY0ZmQ2YmNhYTkzNjE0NDkzYzYxMmY4Njk2NDFlZDU5ZDFjOTM2M2EzNjY2YTVmYTYifX19'
-    custom_name: '<white>« Previous</white> <gray>({page}/{pages})</gray>'
+    custom_name: '<white>« Previous</white> <gray>[{page}/{pages}]</gray>'
     lore:
       - ''
       - ' <gray>Go to the previous page.</gray> '
@@ -152,16 +159,36 @@ menu:
     material: 'PLAYER_HEAD'
     profile:
       textures: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjMyY2E2NjA1NmI3Mjg2M2U5OGY3ZjMyYmQ3ZDk0YzdhMGQ3OTZhZjY5MWM5YWMzYTkxMzYzMzEzNTIyODhmOSJ9fX0='
-    custom_name: '<white>Next »</white> <gray>({page}/{pages})</gray>'
+    custom_name: '<white>Next »</white> <gray>[{page}/{pages}]</gray>'
     lore:
       - ''
       - ' <gray>Go to the next page.</gray> '
       - ''
 
   decorative-icons:
-    border:
+    air:
+      symbol: 'A'
+      material: 'AIR'
+      tooltip_display:
+        hide_tooltip: true
+    black-stained-glass-pane:
+      symbol: 'W'
+      material: 'BLACK_STAINED_GLASS_PANE'
+      tooltip_display:
+        hide_tooltip: true
+    gray-stained-glass-pane:
       symbol: 'X'
       material: 'GRAY_STAINED_GLASS_PANE'
+      tooltip_display:
+        hide_tooltip: true
+    polished-deepslate:
+      symbol: 'Y'
+      material: 'POLISHED_DEEPSLATE'
+      tooltip_display:
+        hide_tooltip: true
+    polished-deepslate-slab:
+      symbol: 'Z'
+      material: 'POLISHED_DEEPSLATE_SLAB'
       tooltip_display:
         hide_tooltip: true
 

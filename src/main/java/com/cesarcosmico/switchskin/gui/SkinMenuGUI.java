@@ -74,7 +74,7 @@ public final class SkinMenuGUI implements InventoryHolder {
                           List<String> skinIds, int activeIndex) {
         fillDecoration(menu);
         fillSkinSlots(menu, skinConfig, skinIds, activeIndex);
-        fillVanillaButton(menu, activeIndex);
+        fillVanillaButton(menu, skinConfig, skinIds, activeIndex);
         fillCloseButton(menu);
         fillPaginationButtons(menu);
     }
@@ -125,10 +125,14 @@ public final class SkinMenuGUI implements InventoryHolder {
         }
     }
 
-    private void fillVanillaButton(MenuConfig menu, int activeIndex) {
+    private void fillVanillaButton(MenuConfig menu, SkinConfig skinConfig,
+                                   List<String> skinIds, int activeIndex) {
         final ItemConfig template = activeIndex < 0 ? menu.getVanillaActive() : menu.getVanillaInactive();
         final ItemStack item = menu.getItemFactory().build(template);
         item.setType(heldMaterial);
+        if (activeIndex >= 0 && activeIndex < skinIds.size()) {
+            applySkinPreview(item, skinConfig.get(skinIds.get(activeIndex)).orElse(null));
+        }
         for (int slot : menu.getVanillaPositions()) {
             inventory.setItem(slot, item.clone());
             actionBySlot[slot] = new MenuAction.SelectVanilla();
