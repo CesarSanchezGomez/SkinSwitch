@@ -43,6 +43,7 @@ public final class MenuConfig {
     private final char nextSymbol;
     private final IconConfig nextIcon;
 
+    private final char fillEmptySymbol;
     private final Map<Character, ItemStack> decorativeIcons;
 
     public MenuConfig(ConfigurationSection root, Logger logger) {
@@ -80,6 +81,9 @@ public final class MenuConfig {
         this.nextIcon = iconFactory.parse(nextSection, "ARROW");
 
         this.decorativeIcons = parseDecorative(effective.getConfigurationSection("decorative-icons"));
+
+        final String fillRaw = effective.getString("fill-empty", "X");
+        this.fillEmptySymbol = fillRaw == null || fillRaw.isEmpty() ? '\0' : fillRaw.charAt(0);
     }
 
     private static ConfigurationSection empty() {
@@ -132,4 +136,9 @@ public final class MenuConfig {
     public IconConfig getNextIcon() { return nextIcon; }
 
     public Map<Character, ItemStack> getDecorativeIcons() { return decorativeIcons; }
+
+    public ItemStack getEmptyFillIcon() {
+        if (fillEmptySymbol == '\0') return null;
+        return decorativeIcons.get(fillEmptySymbol);
+    }
 }

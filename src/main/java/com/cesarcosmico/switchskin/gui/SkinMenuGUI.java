@@ -91,7 +91,7 @@ public final class SkinMenuGUI implements InventoryHolder {
         for (int i = 0; i < slots.length; i++) {
             final int globalIndex = start + i;
             if (globalIndex >= skinIds.size()) {
-                inventory.setItem(slots[i], null);
+                applyEmptyFill(menu, slots[i]);
                 continue;
             }
             final String skinId = skinIds.get(globalIndex);
@@ -132,8 +132,21 @@ public final class SkinMenuGUI implements InventoryHolder {
     }
 
     private void fillPaginationButtons(MenuConfig menu) {
-        if (page > 0) fillNav(menu, menu.getPrevPositions(), menu.getPrevIcon(), new MenuAction.PrevPage());
-        if (page < totalPages - 1) fillNav(menu, menu.getNextPositions(), menu.getNextIcon(), new MenuAction.NextPage());
+        if (page > 0) {
+            fillNav(menu, menu.getPrevPositions(), menu.getPrevIcon(), new MenuAction.PrevPage());
+        } else {
+            for (int slot : menu.getPrevPositions()) applyEmptyFill(menu, slot);
+        }
+        if (page < totalPages - 1) {
+            fillNav(menu, menu.getNextPositions(), menu.getNextIcon(), new MenuAction.NextPage());
+        } else {
+            for (int slot : menu.getNextPositions()) applyEmptyFill(menu, slot);
+        }
+    }
+
+    private void applyEmptyFill(MenuConfig menu, int slot) {
+        final ItemStack fill = menu.getEmptyFillIcon();
+        inventory.setItem(slot, fill == null ? null : fill.clone());
     }
 
     private void fillNav(MenuConfig menu, Set<Integer> positions, IconConfig icon, MenuAction action) {
