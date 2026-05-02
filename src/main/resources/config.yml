@@ -68,11 +68,13 @@ tokens:
 # Pagination: total pages = ceil(item-skin-count / nº of S). The prev/next
 # icons accept {page} and {pages} placeholders.
 menu:
-  title: '<white><gradient:#B4E488:#7DD031><b>Switch Skin</b></gradient></white>'
+  title: '<white><gradient:#A0A0A0:#595959><b>Switch Skin</b></gradient></white>'
   layout:
-    - 'XXXXXXXXX'
-    - 'XSSSSSSSX'
-    - 'PVXXXXXCN'
+    - 'XXXXVXXXX'
+    - 'XSXXXXXXX'
+    - 'XSXXXXXXX'
+    - 'XSXXXXXXX'
+    - 'XXXPCNXXX'
 
   # Symbol from decorative-icons used to fill the prev/next button slots
   # when the button is hidden (page 0 has no prev, last page has no next).
@@ -85,7 +87,7 @@ menu:
   skin-slot:
     symbol: 'S'
     entry-active:
-      custom_name: '<gradient:#B4E488:#7DD031><b>{skin}</b></gradient>'
+      custom_name: '<gradient:#A0A0A0:#595959><b>{skin}</b></gradient>'
       lore:
         - ''
         - ' <#B4E488>► Active skin</#B4E488> '
@@ -125,7 +127,9 @@ menu:
 
   close-button:
     symbol: 'C'
-    material: 'OAK_DOOR'
+    material: 'PLAYER_HEAD'
+    profile:
+      textures: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjNmNzRlYWQ5ZjA3MGNmMzEwMTQ1MzgxYjc5ZTQ0MTdlYTQ5MzBlYmQwMjQxMjE1NzcwNWY0OTliMDg4MDgwMiJ9fX0='
     custom_name: '<red><b>Close</b></red>'
     lore:
       - ''
@@ -134,7 +138,9 @@ menu:
 
   prev-button:
     symbol: 'P'
-    material: 'ARROW'
+    material: 'PLAYER_HEAD'
+    profile:
+      textures: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODY5NzFkZDg4MWRiYWY0ZmQ2YmNhYTkzNjE0NDkzYzYxMmY4Njk2NDFlZDU5ZDFjOTM2M2EzNjY2YTVmYTYifX19'
     custom_name: '<white>« Previous</white> <gray>({page}/{pages})</gray>'
     lore:
       - ''
@@ -143,7 +149,9 @@ menu:
 
   next-button:
     symbol: 'N'
-    material: 'ARROW'
+    material: 'PLAYER_HEAD'
+    profile:
+      textures: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjMyY2E2NjA1NmI3Mjg2M2U5OGY3ZjMyYmQ3ZDk0YzdhMGQ3OTZhZjY5MWM5YWMzYTkxMzYzMzEzNTIyODhmOSJ9fX0='
     custom_name: '<white>Next »</white> <gray>({page}/{pages})</gray>'
     lore:
       - ''
@@ -154,7 +162,8 @@ menu:
     border:
       symbol: 'X'
       material: 'GRAY_STAINED_GLASS_PANE'
-      custom_name: ' '
+      tooltip_display:
+        hide_tooltip: true
 
 # Token item used to add a skin slot to a held item.
 # {skin} is replaced by the linked skin's display name.
