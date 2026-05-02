@@ -55,8 +55,8 @@ public final class SkinMenuListener implements Listener {
 
         switch (action) {
             case MenuAction.Close ignored -> player.closeInventory();
-            case MenuAction.SelectSkin select -> handleSkinSelect(player, select.skinId());
-            case MenuAction.SelectVanilla ignored -> handleVanilla(player);
+            case MenuAction.SelectSkin select -> handleSkinSelect(player, gui, select.skinId());
+            case MenuAction.SelectVanilla ignored -> handleVanilla(player, gui);
             case MenuAction.PrevPage ignored -> reopenAtPage(player, gui.getPage() - 1);
             case MenuAction.NextPage ignored -> reopenAtPage(player, gui.getPage() + 1);
         }
@@ -68,7 +68,7 @@ public final class SkinMenuListener implements Listener {
         event.setCancelled(true);
     }
 
-    private void handleSkinSelect(Player player, String skinId) {
+    private void handleSkinSelect(Player player, SkinMenuGUI gui, String skinId) {
         final ItemStack heldItem = player.getInventory().getItemInMainHand();
         final SkinSlotService service = serviceSupplier.get();
         final int targetIndex = service.getSlots(heldItem).indexOf(skinId);
@@ -81,8 +81,8 @@ public final class SkinMenuListener implements Listener {
         switch (service.selectIndex(heldItem, targetIndex)) {
             case SELECTED -> {
                 player.getInventory().setItemInMainHand(heldItem);
-                player.closeInventory();
                 service.getActiveSkin(heldItem).ifPresent(s -> announcerSupplier.get().announceSwitch(player, s));
+                reopenAtPage(player, gui.getPage());
             }
             case ALREADY_ACTIVE -> {
                 final SkinDefinition def = skinSupplier.get().get(skinId).orElse(null);
@@ -94,15 +94,15 @@ public final class SkinMenuListener implements Listener {
         }
     }
 
-    private void handleVanilla(Player player) {
+    private void handleVanilla(Player player, SkinMenuGUI gui) {
         final ItemStack heldItem = player.getInventory().getItemInMainHand();
         final SkinSlotService service = serviceSupplier.get();
 
         switch (service.selectVanilla(heldItem)) {
             case APPLIED -> {
                 player.getInventory().setItemInMainHand(heldItem);
-                player.closeInventory();
                 announcerSupplier.get().announceVanilla(player);
+                reopenAtPage(player, gui.getPage());
             }
             case ALREADY_VANILLA -> langSupplier.get().send(player, "command.already-vanilla");
             case NO_SLOTS -> langSupplier.get().send(player, "command.no-slots");
