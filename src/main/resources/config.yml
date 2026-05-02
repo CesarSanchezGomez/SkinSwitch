@@ -90,7 +90,7 @@ menu:
       custom_name: '<gradient:#A0A0A0:#595959><b>{skin}</b></gradient>'
       lore:
         - ''
-        - ' <#B4E488>► Active skin</#B4E488> '
+        - ' <#A0A0A0>► Active skin</#A0A0A0> '
         - ''
       tooltip_display:
         hidden_components:
@@ -170,12 +170,12 @@ menu:
 # Accepts the full data-component set from the header.
 token:
   material: 'NAME_TAG'
-  custom_name: '<gradient:#B4E488:#7DD031><b>Skin Slot Token</b></gradient> <gray>—</gray> <white>{skin}</white>'
+  custom_name: '<gradient:#A0A0A0:#595959><b>Skin Slot Token</b></gradient> <gray>—</gray> <white>{skin}</white>'
   lore:
     - ''
     - ' <white>Right-click this token onto an</white> '
     - ' <white>item in your inventory to add</white> '
-    - ' <white>the <#7DD031>{skin}</#7DD031> skin slot.</white> '
+    - ' <white>the <#A0A0A0>{skin}</#A0A0A0> skin slot.</white> '
     - ''
   tooltip_display:
     hidden_components:
@@ -185,12 +185,12 @@ token:
 # Same data-component support as `token`.
 tooltip-token:
   material: 'PAPER'
-  custom_name: '<gradient:#B4E488:#7DD031><b>Tooltip Token</b></gradient> <gray>—</gray> <white>{skin}</white>'
+  custom_name: '<gradient:#A0A0A0:#595959><b>Tooltip Token</b></gradient> <gray>—</gray> <white>{skin}</white>'
   lore:
     - ''
     - ' <white>Right-click this token onto an</white> '
     - ' <white>item in your inventory to apply</white> '
-    - ' <white>the <#7DD031>{skin}</#7DD031> tooltip style.</white> '
+    - ' <white>the <#A0A0A0>{skin}</#A0A0A0> tooltip style.</white> '
     - ''
   tooltip_display:
     hidden_components:
