@@ -10,7 +10,6 @@ public record SkinDefinition(
         @Nullable NamespacedKey itemModel,
         String name,
         List<String> lore,
-        String icon,
         String iconActive,
         String iconInactive,
         String bracketColor,
@@ -44,10 +43,11 @@ public record SkinDefinition(
     }
 
     public String activeIcon() {
-        return (iconActive != null && !iconActive.isEmpty()) ? iconActive : icon;
+        return (iconActive != null && !iconActive.isEmpty()) ? iconActive : id;
     }
 
     public String inactiveIcon() {
-        return (iconInactive != null && !iconInactive.isEmpty()) ? iconInactive : icon;
+        if (iconInactive != null && !iconInactive.isEmpty()) return iconInactive;
+        return activeIcon();
     }
 }

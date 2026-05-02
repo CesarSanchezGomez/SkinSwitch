@@ -38,7 +38,6 @@ public final class SkinConfig {
         final String itemModelRaw;
         final String name;
         final List<String> lore;
-        final String icon;
         final String iconActive;
         final String iconInactive;
         final String bracketColor;
@@ -52,7 +51,6 @@ public final class SkinConfig {
             itemModelRaw = section.getString("item_model", "");
             name = section.getString("name", null);
             lore = section.isList("lore") ? section.getStringList("lore") : List.of();
-            icon = section.getString("icon", id);
             iconActive = section.getString("icon-active", null);
             iconInactive = section.getString("icon-inactive", null);
             bracketColor = section.getString("bracket-color", null);
@@ -64,7 +62,6 @@ public final class SkinConfig {
             itemModelRaw = root.getString(id, "");
             name = null;
             lore = List.of();
-            icon = id;
             iconActive = null;
             iconInactive = null;
             bracketColor = null;
@@ -90,7 +87,7 @@ public final class SkinConfig {
             }
         }
 
-        return new SkinDefinition(id, modelKey, name, lore, icon, iconActive, iconInactive,
+        return new SkinDefinition(id, modelKey, name, lore, iconActive, iconInactive,
                 bracketColor, bracketColorDefault, tooltipKey,
                 customModelData, tooltipDisplay);
     }
