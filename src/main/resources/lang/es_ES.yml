@@ -1,7 +1,7 @@
 # SwitchSkin - Archivo de idioma en Español (España)
 config-version: 2
 
-prefix: '<white>[<gradient:#B4E488:#7DD031>SwitchSkin</gradient>]</white>'
+prefix: '<white>[<gradient:#A0A0A0:#595959>SwitchSkin</gradient>]</white>'
 
 # -- Comandos ---------------------------------
 command:
@@ -10,29 +10,29 @@ command:
   reload-success: '{prefix} <white>Configuración recargada exitosamente.</white>'
   no-item-in-hand: '{prefix} <red>Debes tener un ítem en la mano principal.</red>'
   unknown-skin: '{prefix} <red>Skin desconocida: <white>{skin}</white>.</red>'
-  slot-added: '{prefix} <white>Slot <#7DD031>{skin}</#7DD031> añadido. Total: <#7DD031>{count}</#7DD031>.</white>'
-  slot-removed: '{prefix} <white>Slot <#7DD031>{skin}</#7DD031> eliminado.</white>'
+  slot-added: '{prefix} <white>Slot <#A0A0A0>{skin}</#A0A0A0> añadido. Total: <#A0A0A0>{count}</#A0A0A0>.</white>'
+  slot-removed: '{prefix} <white>Slot <#A0A0A0>{skin}</#A0A0A0> eliminado.</white>'
   invalid-slot: '{prefix} <red>Índice de slot inválido.</red>'
   no-slots: '{prefix} <white>Este ítem no tiene slots de skin.</white>'
   slots-full: '{prefix} <white>Este ítem ha alcanzado el límite de slots ({max}).</white>'
   duplicate-slot: '{prefix} <white>Esta skin ya está instalada en este ítem.</white>'
-  token-given: '{prefix} <white>Entregaste <#7DD031>{count}</#7DD031> token(s) de <#7DD031>{skin}</#7DD031> a <#7DD031>{player}</#7DD031>.</white>'
-  tooltip-token-given: '{prefix} <white>Entregaste <#7DD031>{count}</#7DD031> token(s) de tooltip <#7DD031>{skin}</#7DD031> a <#7DD031>{player}</#7DD031>.</white>'
-  tooltip-applied: '{prefix} <white>Tooltip <#7DD031>{skin}</#7DD031> aplicado.</white>'
+  token-given: '{prefix} <white>Entregaste <#A0A0A0>{count}</#A0A0A0> token(s) de <#A0A0A0>{skin}</#A0A0A0> a <#A0A0A0>{player}</#A0A0A0>.</white>'
+  tooltip-token-given: '{prefix} <white>Entregaste <#A0A0A0>{count}</#A0A0A0> token(s) de tooltip <#A0A0A0>{skin}</#A0A0A0> a <#A0A0A0>{player}</#A0A0A0>.</white>'
+  tooltip-applied: '{prefix} <white>Tooltip <#A0A0A0>{skin}</#A0A0A0> aplicado.</white>'
   tooltip-removed: '{prefix} <white>Tooltip eliminado del slot activo.</white>'
   tooltip-not-applied: '{prefix} <white>El slot activo no tiene tooltip aplicado.</white>'
   tooltip-missing: '{prefix} <red>La skin <white>{skin}</white> no tiene tooltip_style definido.</red>'
   tooltip-needs-slot: '{prefix} <red>Debes añadir primero el slot de skin <white>{skin}</white> antes de aplicar su tooltip.</red>'
-  tooltip-duplicate: '{prefix} <white>El tooltip de <#7DD031>{skin}</#7DD031> ya está aplicado.</white>'
+  tooltip-duplicate: '{prefix} <white>El tooltip de <#A0A0A0>{skin}</#A0A0A0> ya está aplicado.</white>'
   player-not-found: '{prefix} <red>Jugador no encontrado: <white>{player}</white>.</red>'
   single-slot: '{prefix} <white>Este ítem solo tiene un slot de skin.</white>'
-  already-active: '{prefix} <white>La skin <#7DD031>{skin}</#7DD031> ya está activa.</white>'
+  already-active: '{prefix} <white>La skin <#A0A0A0>{skin}</#A0A0A0> ya está activa.</white>'
   already-vanilla: '{prefix} <white>El ítem ya está mostrando su aspecto vanilla.</white>'
   skin-not-on-item: '{prefix} <red>La skin <white>{skin}</white> no está instalada en este ítem.</red>'
 
 # -- Cambio de skin ---------------------------
 skin:
-  switched: '<white>Cambiaste a <gradient:#B4E488:#7DD031>{skin}</gradient></white>'
+  switched: '<white>Cambiaste a <gradient:#A0A0A0:#595959>{skin}</gradient></white>'
   switched-vanilla: '<white>Restaurado el aspecto <red>vanilla</red></white>'
 
 # -- Layout de la fila de slots ----------------
