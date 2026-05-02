@@ -87,6 +87,9 @@ menu:
         - ''
         - ' <#B4E488>► Active skin</#B4E488> '
         - ''
+      tooltip_display:
+        hidden_components:
+          - 'attribute_modifiers'
     entry-inactive:
       material: 'NAME_TAG'
       custom_name: '<white>{skin}</white>'
@@ -94,6 +97,9 @@ menu:
         - ''
         - ' <gray>Click to switch to this skin.</gray> '
         - ''
+      tooltip_display:
+        hidden_components:
+          - 'attribute_modifiers'
 
   vanilla-button:
     symbol: 'V'
