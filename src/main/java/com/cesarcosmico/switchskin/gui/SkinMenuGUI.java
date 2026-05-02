@@ -91,7 +91,7 @@ public final class SkinMenuGUI implements InventoryHolder {
         for (int i = 0; i < slots.length; i++) {
             final int globalIndex = start + i;
             if (globalIndex >= skinIds.size()) {
-                applyEmptyFill(menu, slots[i]);
+                inventory.setItem(slots[i], null);
                 continue;
             }
             final String skinId = skinIds.get(globalIndex);

@@ -69,10 +69,9 @@ menu:
     - 'XSSSSSSSX'
     - 'PVXXXXXCN'
 
-  # Symbol from decorative-icons used to fill any role slot (S/P/N) that
-  # ends up empty: skin slots without a skin on the current page, the
-  # prev button on page 0, the next button on the last page. Set to ''
-  # to keep those slots empty.
+  # Symbol from decorative-icons used to fill the prev/next button slots
+  # when the button is hidden (page 0 has no prev, last page has no next).
+  # Set to '' to keep those slots empty.
   fill-empty: 'X'
 
   skin-slot:
