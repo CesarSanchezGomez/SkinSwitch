@@ -5,8 +5,10 @@ import com.cesarcosmico.switchskin.config.SkinConfig;
 import com.cesarcosmico.switchskin.config.SkinDefinition;
 import com.cesarcosmico.switchskin.placeholder.PlaceholderResolver;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,7 +22,10 @@ import java.util.function.Supplier;
 
 public final class LoreRenderer {
 
+    public static final String ICONS_PLACEHOLDER = "{icons}";
+
     private static final MiniMessage MINI = MiniMessage.miniMessage();
+    private static final PlainTextComponentSerializer PLAIN = PlainTextComponentSerializer.plainText();
 
     private final Supplier<LangConfig> langSupplier;
     private final Supplier<SkinConfig> skinSupplier;
@@ -46,25 +51,23 @@ public final class LoreRenderer {
         final LangConfig lang = langSupplier.get();
         final PlaceholderResolver resolver = placeholderSupplier.get();
         final Component slotRow = buildSlotRow(lang, resolver, owner, skinIds, currentIndex, tooltipSkinIds);
-        final boolean above = "above".equalsIgnoreCase(lang.getRaw("lore.position"));
+        final TextReplacementConfig replacement = TextReplacementConfig.builder()
+                .matchLiteral(ICONS_PLACEHOLDER)
+                .replacement(slotRow)
+                .build();
 
-        final List<Component> block = new ArrayList<>();
-        for (String line : lang.getRawList("lore.lines-before")) {
-            block.add(asLoreLine(resolver.resolve(owner, line)));
+        final List<Component> base = originalLore == null ? List.of() : originalLore;
+        final List<Component> out = new ArrayList<>(base.size() + 1);
+        boolean substituted = false;
+        for (Component line : base) {
+            if (PLAIN.serialize(line).contains(ICONS_PLACEHOLDER)) {
+                out.add(line.replaceText(replacement));
+                substituted = true;
+            } else {
+                out.add(line);
+            }
         }
-        block.add(slotRow);
-        for (String line : lang.getRawList("lore.lines-after")) {
-            block.add(asLoreLine(resolver.resolve(owner, line)));
-        }
-
-        final List<Component> out = new ArrayList<>();
-        if (above) {
-            out.addAll(block);
-            if (originalLore != null) out.addAll(originalLore);
-        } else {
-            if (originalLore != null) out.addAll(originalLore);
-            out.addAll(block);
-        }
+        if (!substituted) out.add(slotRow);
         return out;
     }
 
@@ -125,11 +128,5 @@ public final class LoreRenderer {
 
     private static Component deserialize(String raw) {
         return MINI.deserialize(raw).decoration(TextDecoration.ITALIC, false);
-    }
-
-    private static Component asLoreLine(String raw) {
-        return Component.text("")
-                .decoration(TextDecoration.ITALIC, false)
-                .append(deserialize(raw));
     }
 }

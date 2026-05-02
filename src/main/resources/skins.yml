@@ -22,14 +22,21 @@
 #       bracket-color-default: '#888888'                                     # bracket colour when no tooltip is applied
 #       tooltip_style:         'minecraft:summer'                            # only applied via tooltip token
 #
-# All extended fields are optional. Behavior:
-#   * 'item_model'           is required.
+# All fields are optional. A skin with only custom_model_data, lore,
+# tooltip_style or any subset is valid. Behavior:
+#   * 'item_model'           when present, swaps the model while this slot
+#                            is active. The item's original item_model is
+#                            captured on the first slot add and restored
+#                            when the last slot is removed.
 #   * 'name'                 when present, replaces the item's custom_name
 #                            while this slot is active. Globally toggled by
 #                            features.switch-name in config.yml.
 #   * 'lore'                 when present, replaces the item's lore as the
 #                            base for the slot row. Globally toggled by
-#                            features.switch-lore in config.yml.
+#                            features.switch-lore in config.yml. Use
+#                            '{icons}' inside any line to anchor the slot
+#                            row exactly there. Without {icons}, the row
+#                            is appended at the end (legacy 'below').
 #   * 'icon'                 the slot-row glyph. When omitted, the skin id
 #                            is used. Keep it as a plain character if you
 #                            want lang templates to drive its colour;

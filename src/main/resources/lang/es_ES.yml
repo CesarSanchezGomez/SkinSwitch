@@ -37,10 +37,12 @@ skin:
   switched-vanilla: '<white>Restaurado el aspecto <red>vanilla</red></white>'
 
 # -- Layout de la fila de slots ----------------
+# La fila de iconos se construye con las piezas de abajo.
+# Para decidir dónde aparece dentro del lore, mete '{icons}' en
+# cualquier línea de `lore:` en skins.yml — se sustituye por la fila.
+# Si ninguna línea lleva '{icons}', la fila se añade al final del
+# lore (comportamiento clásico 'below').
 lore:
-  position: 'below'
-  lines-before: []
-  lines-after: []
   prefix: ' '
   separator: ' '
   suffix: ' '

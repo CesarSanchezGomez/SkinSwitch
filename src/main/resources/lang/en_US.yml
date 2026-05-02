@@ -38,10 +38,12 @@ skin:
   switched-vanilla: '<white>Restored <red>vanilla</red> look</white>'
 
 # -- Slot row layout ---------------------------
+# The row of skin slot icons is built from the parts below.
+# To control where it appears in the lore, put '{icons}' inside any
+# `lore:` line in skins.yml — it will be replaced by the row. If no
+# line contains '{icons}', the row is appended at the end of the lore
+# (legacy 'below' behaviour).
 lore:
-  position: 'below'
-  lines-before: []
-  lines-after: []
   prefix: ' '
   separator: ' '
   suffix: ' '
