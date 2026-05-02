@@ -27,6 +27,7 @@ public final class MenuConfig {
     private final IconFactory iconFactory;
 
     private final char skinSlotSymbol;
+    private final boolean skinSlotInheritMaterial;
     private final IconConfig skinSlotActive;
     private final IconConfig skinSlotInactive;
 
@@ -56,6 +57,7 @@ public final class MenuConfig {
 
         final ConfigurationSection skinSection = effective.getConfigurationSection("skin-slot");
         this.skinSlotSymbol = symbol(skinSection, "S");
+        this.skinSlotInheritMaterial = skinSection == null || skinSection.getBoolean("inherit-material", true);
         this.skinSlotActive = iconFactory.parse(
                 skinSection != null ? skinSection.getConfigurationSection("entry-active") : null, "NAME_TAG");
         this.skinSlotInactive = iconFactory.parse(
@@ -115,6 +117,7 @@ public final class MenuConfig {
 
     public char getSkinSlotSymbol() { return skinSlotSymbol; }
     public Set<Integer> getSkinSlotPositions() { return layout.getSlotsForSymbol(skinSlotSymbol); }
+    public boolean isSkinSlotInheritingMaterial() { return skinSlotInheritMaterial; }
     public IconConfig getSkinSlotActive() { return skinSlotActive; }
     public IconConfig getSkinSlotInactive() { return skinSlotInactive; }
 

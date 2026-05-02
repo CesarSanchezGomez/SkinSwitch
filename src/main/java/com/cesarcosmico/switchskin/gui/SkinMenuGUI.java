@@ -6,11 +6,13 @@ import com.cesarcosmico.switchskin.config.SkinConfig;
 import com.cesarcosmico.switchskin.config.SkinDefinition;
 import com.cesarcosmico.switchskin.item.IconFactory;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -35,15 +37,18 @@ public final class SkinMenuGUI implements InventoryHolder {
     private final int page;
     private final int totalPages;
     private final int pageSize;
+    private final Material heldMaterial;
 
     public SkinMenuGUI(MenuConfig menuConfig, SkinConfig skinConfig,
-                       List<String> skinIds, int activeIndex, int requestedPage) {
+                       List<String> skinIds, int activeIndex, int requestedPage,
+                       @Nullable Material heldMaterial) {
         final int size = menuConfig.getInventorySize();
         this.inventory = Bukkit.createInventory(this, size, menuConfig.getTitle());
         this.actionBySlot = new MenuAction[size];
         this.pageSize = Math.max(1, menuConfig.getSkinSlotPositions().size());
         this.totalPages = Math.max(1, (int) Math.ceil(skinIds.size() / (double) pageSize));
         this.page = Math.clamp(requestedPage, 0, totalPages - 1);
+        this.heldMaterial = heldMaterial;
 
         populate(menuConfig, skinConfig, skinIds, activeIndex);
     }
@@ -100,6 +105,9 @@ public final class SkinMenuGUI implements InventoryHolder {
             final IconConfig template = active ? menu.getSkinSlotActive() : menu.getSkinSlotInactive();
             final String displayName = def != null ? def.nameOrId() : skinId;
             final ItemStack item = factory.build(template, Map.of("{skin}", displayName));
+            if (menu.isSkinSlotInheritingMaterial() && heldMaterial != null) {
+                item.setType(heldMaterial);
+            }
             applySkinModelFallback(item, def);
             inventory.setItem(slots[i], item);
             actionBySlot[slots[i]] = new MenuAction.SelectSkin(skinId);

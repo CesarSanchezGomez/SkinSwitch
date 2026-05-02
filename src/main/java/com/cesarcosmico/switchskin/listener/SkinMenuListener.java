@@ -131,7 +131,7 @@ public final class SkinMenuListener implements Listener {
         final List<String> slots = service.getSlots(heldItem);
         final int activeIndex = service.getCurrentIndex(heldItem);
         final SkinMenuGUI next = new SkinMenuGUI(pluginSupplier.get().getMenu(),
-                skinSupplier.get(), slots, activeIndex, targetPage);
+                skinSupplier.get(), slots, activeIndex, targetPage, heldItem.getType());
         plugin.getServer().getScheduler().runTask(plugin, () -> next.open(player));
     }
 

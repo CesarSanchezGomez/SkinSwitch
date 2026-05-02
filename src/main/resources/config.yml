@@ -76,6 +76,10 @@ menu:
 
   skin-slot:
     symbol: 'S'
+    # When true, every skin entry uses the held item's material (a pickaxe
+    # menu shows pickaxes, a sword menu shows swords, etc.). When false,
+    # entry-active.material / entry-inactive.material are used as-is.
+    inherit-material: true
     entry-active:
       material: 'NAME_TAG'
       custom_name: '<gradient:#B4E488:#7DD031><b>{skin}</b></gradient>'
