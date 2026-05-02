@@ -25,7 +25,6 @@ command:
   tooltip-needs-slot: '{prefix} <red>You must add the <white>{skin}</white> skin slot before applying its tooltip.</red>'
   tooltip-duplicate: '{prefix} <white>The <#7DD031>{skin}</#7DD031> tooltip is already applied.</white>'
   player-not-found: '{prefix} <red>Player not found: <white>{player}</white>.</red>'
-  cooldown: '{prefix} <white>Wait <#7DD031>{seconds}s</#7DD031> before switching again.</white>'
   single-slot: '{prefix} <white>This item only has one skin slot.</white>'
   already-active: '{prefix} <white>Skin <#7DD031>{skin}</#7DD031> is already active.</white>'
   already-vanilla: '{prefix} <white>The item is already showing its vanilla look.</white>'

@@ -9,14 +9,8 @@ public final class PluginConfig {
 
     public static final int CURRENT_VERSION = 1;
 
-    public record Features(boolean switchName, boolean switchLore) {}
-
     public record SoundConfig(boolean enabled, String key, float volume, float pitch) {
         public boolean playable() { return enabled && key != null && !key.isEmpty(); }
-    }
-
-    public record CooldownConfig(boolean enabled, long millis) {
-        public boolean active() { return enabled && millis > 0; }
     }
 
     public record FeedbackConfig(String mode) {
@@ -26,9 +20,7 @@ public final class PluginConfig {
     private final int defaultMaxSlots;
     private final ItemConfig token;
     private final ItemConfig tooltipToken;
-    private final Features features;
     private final SoundConfig switchSound;
-    private final CooldownConfig switchCooldown;
     private final FeedbackConfig switchFeedback;
     private final MenuConfig menu;
 
@@ -39,14 +31,8 @@ public final class PluginConfig {
         this.token = itemFactory.parse(root.getConfigurationSection("token"), "NAME_TAG");
         this.tooltipToken = itemFactory.parse(root.getConfigurationSection("tooltip-token"), "PAPER");
 
-        final ConfigurationSection featuresSection = root.getConfigurationSection("features");
-        final boolean switchName = featuresSection == null || featuresSection.getBoolean("switch-name", true);
-        final boolean switchLore = featuresSection == null || featuresSection.getBoolean("switch-lore", true);
-        this.features = new Features(switchName, switchLore);
-
         final ConfigurationSection switchSection = root.getConfigurationSection("switch");
         this.switchSound = readSound(switchSection != null ? switchSection.getConfigurationSection("sound") : null);
-        this.switchCooldown = readCooldown(switchSection != null ? switchSection.getConfigurationSection("cooldown") : null);
         this.switchFeedback = new FeedbackConfig(
                 switchSection != null ? switchSection.getString("feedback", "actionbar") : "actionbar");
 
@@ -63,20 +49,10 @@ public final class PluginConfig {
         );
     }
 
-    private CooldownConfig readCooldown(ConfigurationSection section) {
-        if (section == null) return new CooldownConfig(true, 500L);
-        return new CooldownConfig(
-                section.getBoolean("enabled", true),
-                Math.max(0, section.getLong("millis", 500L))
-        );
-    }
-
     public int getDefaultMaxSlots() { return defaultMaxSlots; }
     public ItemConfig getToken() { return token; }
     public ItemConfig getTooltipToken() { return tooltipToken; }
-    public Features getFeatures() { return features; }
     public SoundConfig getSwitchSound() { return switchSound; }
-    public CooldownConfig getSwitchCooldown() { return switchCooldown; }
     public FeedbackConfig getSwitchFeedback() { return switchFeedback; }
     public MenuConfig getMenu() { return menu; }
 }

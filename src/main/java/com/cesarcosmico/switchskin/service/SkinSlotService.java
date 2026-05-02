@@ -552,7 +552,7 @@ public final class SkinSlotService {
             applyOriginalItemModel(meta, pdc);
         }
 
-        if (pluginSupplier.get().getFeatures().switchName() && skin.hasName()) {
+        if (skin.hasName()) {
             final String resolved = placeholderSupplier.get().resolve(readOwner(pdc), skin.name());
             meta.displayName(MINI.deserialize(resolved)
                     .decoration(TextDecoration.ITALIC, false));
@@ -618,8 +618,7 @@ public final class SkinSlotService {
     private List<Component> resolveBaseLore(PersistentDataContainer pdc,
                                             List<String> slots, int currentIndex,
                                             @Nullable OfflinePlayer owner) {
-        if (pluginSupplier.get().getFeatures().switchLore()
-                && currentIndex >= 0 && currentIndex < slots.size()) {
+        if (currentIndex >= 0 && currentIndex < slots.size()) {
             final SkinDefinition active = skinSupplier.get().get(slots.get(currentIndex)).orElse(null);
             if (active != null && active.hasLore()) {
                 final PlaceholderResolver resolver = placeholderSupplier.get();

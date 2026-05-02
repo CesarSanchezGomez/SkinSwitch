@@ -3,7 +3,6 @@ package com.cesarcosmico.switchskin.command.feature;
 import com.cesarcosmico.switchskin.config.LangConfig;
 import com.cesarcosmico.switchskin.config.SkinConfig;
 import com.cesarcosmico.switchskin.config.SkinDefinition;
-import com.cesarcosmico.switchskin.service.CooldownService;
 import com.cesarcosmico.switchskin.service.SkinSlotService;
 import com.cesarcosmico.switchskin.service.SwitchAnnouncer;
 import com.mojang.brigadier.Command;
@@ -28,18 +27,15 @@ public final class SwitchCommand {
     private final Supplier<LangConfig> langSupplier;
     private final Supplier<SkinConfig> skinSupplier;
     private final Supplier<SkinSlotService> serviceSupplier;
-    private final Supplier<CooldownService> cooldownSupplier;
     private final Supplier<SwitchAnnouncer> announcerSupplier;
 
     public SwitchCommand(Supplier<LangConfig> langSupplier,
                          Supplier<SkinConfig> skinSupplier,
                          Supplier<SkinSlotService> serviceSupplier,
-                         Supplier<CooldownService> cooldownSupplier,
                          Supplier<SwitchAnnouncer> announcerSupplier) {
         this.langSupplier = langSupplier;
         this.skinSupplier = skinSupplier;
         this.serviceSupplier = serviceSupplier;
-        this.cooldownSupplier = cooldownSupplier;
         this.announcerSupplier = announcerSupplier;
     }
 
@@ -58,7 +54,7 @@ public final class SwitchCommand {
             langSupplier.get().send(ctx.getSource().getSender(), "command.only-players");
             return Command.SINGLE_SUCCESS;
         }
-        if (!checkCommonPreconditions(player)) return Command.SINGLE_SUCCESS;
+        if (!hasItemInHand(player)) return Command.SINGLE_SUCCESS;
 
         final ItemStack item = player.getInventory().getItemInMainHand();
         final SkinSlotService service = serviceSupplier.get();
@@ -70,7 +66,6 @@ public final class SwitchCommand {
         switch (service.cycleNext(item)) {
             case CYCLED -> {
                 player.getInventory().setItemInMainHand(item);
-                cooldownSupplier.get().mark(player);
                 service.getActiveSkin(item).ifPresent(s -> announcerSupplier.get().announceSwitch(player, s));
             }
             case SINGLE_SLOT -> langSupplier.get().send(player, "command.single-slot");
@@ -84,7 +79,7 @@ public final class SwitchCommand {
             langSupplier.get().send(ctx.getSource().getSender(), "command.only-players");
             return Command.SINGLE_SUCCESS;
         }
-        if (!checkCommonPreconditions(player)) return Command.SINGLE_SUCCESS;
+        if (!hasItemInHand(player)) return Command.SINGLE_SUCCESS;
 
         final String requested = StringArgumentType.getString(ctx, "skin");
         if (VANILLA_LITERAL.equalsIgnoreCase(requested)) {
@@ -111,7 +106,6 @@ public final class SwitchCommand {
         switch (result) {
             case SELECTED -> {
                 player.getInventory().setItemInMainHand(item);
-                cooldownSupplier.get().mark(player);
                 service.getActiveSkin(item).ifPresent(s -> announcerSupplier.get().announceSwitch(player, s));
             }
             case ALREADY_ACTIVE -> langSupplier.get().send(player, "command.already-active",
@@ -126,7 +120,6 @@ public final class SwitchCommand {
         switch (serviceSupplier.get().selectVanilla(item)) {
             case APPLIED -> {
                 player.getInventory().setItemInMainHand(item);
-                cooldownSupplier.get().mark(player);
                 announcerSupplier.get().announceVanilla(player);
             }
             case ALREADY_VANILLA -> langSupplier.get().send(player, "command.already-vanilla");
@@ -136,15 +129,8 @@ public final class SwitchCommand {
         return Command.SINGLE_SUCCESS;
     }
 
-    private boolean checkCommonPreconditions(Player player) {
-        final CooldownService cooldown = cooldownSupplier.get();
-        if (!cooldown.isReady(player)) {
-            langSupplier.get().send(player, "command.cooldown",
-                    "{seconds}", String.format("%.1f", cooldown.remainingMillis(player) / 1000.0));
-            return false;
-        }
-        final ItemStack item = player.getInventory().getItemInMainHand();
-        if (item.getType().isAir()) {
+    private boolean hasItemInHand(Player player) {
+        if (player.getInventory().getItemInMainHand().getType().isAir()) {
             langSupplier.get().send(player, "command.no-item-in-hand");
             return false;
         }

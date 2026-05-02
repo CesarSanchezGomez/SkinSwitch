@@ -28,13 +28,13 @@
 #                            captured on the first slot add and restored
 #                            when the last slot is removed.
 #   * 'name'                 when present, replaces the item's custom_name
-#                            while this slot is active. Globally toggled by
-#                            features.switch-name in config.yml.
+#                            while this slot is active. Omit it to keep
+#                            the item's vanilla name.
 #   * 'lore'                 when present, replaces the item's lore while
-#                            this slot is active. Globally toggled by
-#                            features.switch-lore in config.yml. The slot
-#                            row is always rendered as the first lore line
-#                            on top of whatever lore is shown.
+#                            this slot is active. Omit it to keep the
+#                            item's vanilla lore. The slot row is always
+#                            rendered as the first lore line on top of
+#                            whatever lore is shown.
 #   * 'icon-active'          slot-row glyph used when this skin is the
 #                            active one. Falls back to the skin id.
 #                            Keep it as a plain character if you want

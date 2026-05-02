@@ -35,20 +35,11 @@ defaults:
   # Maximum number of skin slots a single item can hold.
   max-slots: 6
 
-# Per-feature switches for what a skin can override on the held item.
-features:
-  switch-name: true
-  switch-lore: true
-
 # Behaviour of the skin switch action (menu, /ss switch, etc.)
 switch:
   # 'actionbar' shows the message above the hotbar.
   # 'chat' falls back to a regular chat message.
   feedback: 'actionbar'
-
-  cooldown:
-    enabled: true
-    millis: 500
 
   sound:
     enabled: true

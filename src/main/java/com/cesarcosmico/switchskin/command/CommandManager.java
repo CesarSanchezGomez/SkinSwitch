@@ -12,7 +12,6 @@ import com.cesarcosmico.switchskin.config.PluginConfig;
 import com.cesarcosmico.switchskin.config.SkinConfig;
 import com.cesarcosmico.switchskin.config.SkinDefinition;
 import com.cesarcosmico.switchskin.item.TokenFactory;
-import com.cesarcosmico.switchskin.service.CooldownService;
 import com.cesarcosmico.switchskin.service.SkinSlotService;
 import com.cesarcosmico.switchskin.service.SwitchAnnouncer;
 import com.mojang.brigadier.tree.LiteralCommandNode;
@@ -38,7 +37,6 @@ public final class CommandManager {
                           Supplier<SkinSlotService> serviceSupplier,
                           Supplier<TokenFactory> skinTokenSupplier,
                           Supplier<TokenFactory> tooltipTokenSupplier,
-                          Supplier<CooldownService> cooldownSupplier,
                           Supplier<SwitchAnnouncer> announcerSupplier,
                           Runnable reloadAction) {
         this.reloadCommand = new ReloadCommand(langSupplier, reloadAction);
@@ -52,7 +50,7 @@ public final class CommandManager {
         this.removeTooltipCommand = new RemoveTooltipCommand(langSupplier, serviceSupplier);
         this.menuCommand = new MenuCommand(langSupplier, skinSupplier, pluginSupplier, serviceSupplier);
         this.switchCommand = new SwitchCommand(langSupplier, skinSupplier, serviceSupplier,
-                cooldownSupplier, announcerSupplier);
+                announcerSupplier);
     }
 
     public LiteralCommandNode<CommandSourceStack> createCommand() {

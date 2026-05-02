@@ -6,7 +6,6 @@ import com.cesarcosmico.switchskin.config.SkinConfig;
 import com.cesarcosmico.switchskin.config.SkinDefinition;
 import com.cesarcosmico.switchskin.gui.SkinMenuGUI;
 import com.cesarcosmico.switchskin.gui.SkinMenuGUI.MenuAction;
-import com.cesarcosmico.switchskin.service.CooldownService;
 import com.cesarcosmico.switchskin.service.SkinSlotService;
 import com.cesarcosmico.switchskin.service.SwitchAnnouncer;
 import org.bukkit.entity.Player;
@@ -27,7 +26,6 @@ public final class SkinMenuListener implements Listener {
     private final Supplier<SkinConfig> skinSupplier;
     private final Supplier<PluginConfig> pluginSupplier;
     private final Supplier<SkinSlotService> serviceSupplier;
-    private final Supplier<CooldownService> cooldownSupplier;
     private final Supplier<SwitchAnnouncer> announcerSupplier;
 
     public SkinMenuListener(JavaPlugin plugin,
@@ -35,14 +33,12 @@ public final class SkinMenuListener implements Listener {
                             Supplier<SkinConfig> skinSupplier,
                             Supplier<PluginConfig> pluginSupplier,
                             Supplier<SkinSlotService> serviceSupplier,
-                            Supplier<CooldownService> cooldownSupplier,
                             Supplier<SwitchAnnouncer> announcerSupplier) {
         this.plugin = plugin;
         this.langSupplier = langSupplier;
         this.skinSupplier = skinSupplier;
         this.pluginSupplier = pluginSupplier;
         this.serviceSupplier = serviceSupplier;
-        this.cooldownSupplier = cooldownSupplier;
         this.announcerSupplier = announcerSupplier;
     }
 
@@ -73,8 +69,6 @@ public final class SkinMenuListener implements Listener {
     }
 
     private void handleSkinSelect(Player player, String skinId) {
-        if (notReady(player)) return;
-
         final ItemStack heldItem = player.getInventory().getItemInMainHand();
         final SkinSlotService service = serviceSupplier.get();
         final int targetIndex = service.getSlots(heldItem).indexOf(skinId);
@@ -87,7 +81,6 @@ public final class SkinMenuListener implements Listener {
         switch (service.selectIndex(heldItem, targetIndex)) {
             case SELECTED -> {
                 player.getInventory().setItemInMainHand(heldItem);
-                cooldownSupplier.get().mark(player);
                 player.closeInventory();
                 service.getActiveSkin(heldItem).ifPresent(s -> announcerSupplier.get().announceSwitch(player, s));
             }
@@ -102,15 +95,12 @@ public final class SkinMenuListener implements Listener {
     }
 
     private void handleVanilla(Player player) {
-        if (notReady(player)) return;
-
         final ItemStack heldItem = player.getInventory().getItemInMainHand();
         final SkinSlotService service = serviceSupplier.get();
 
         switch (service.selectVanilla(heldItem)) {
             case APPLIED -> {
                 player.getInventory().setItemInMainHand(heldItem);
-                cooldownSupplier.get().mark(player);
                 player.closeInventory();
                 announcerSupplier.get().announceVanilla(player);
             }
@@ -133,13 +123,5 @@ public final class SkinMenuListener implements Listener {
         final SkinMenuGUI next = new SkinMenuGUI(pluginSupplier.get().getMenu(),
                 skinSupplier.get(), slots, activeIndex, targetPage, heldItem.getType());
         plugin.getServer().getScheduler().runTask(plugin, () -> next.open(player));
-    }
-
-    private boolean notReady(Player player) {
-        final CooldownService cooldown = cooldownSupplier.get();
-        if (cooldown.isReady(player)) return false;
-        langSupplier.get().send(player, "command.cooldown",
-                "{seconds}", String.format("%.1f", cooldown.remainingMillis(player) / 1000.0));
-        return true;
     }
 }
