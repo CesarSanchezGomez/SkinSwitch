@@ -248,7 +248,7 @@ public final class SkinSlotService {
         if (readIndex(pdc) == VANILLA_INDEX) return VanillaResult.ALREADY_VANILLA;
 
         pdc.set(keys.currentIndex(), PersistentDataType.INTEGER, VANILLA_INDEX);
-        meta.setItemModel(null);
+        applyOriginalItemModel(meta, pdc);
         applyOriginalName(meta, pdc);
         applyOriginalCustomModelData(meta, pdc);
         applyTooltipStyleForActive(meta, pdc, null, readList(pdc, keys.tooltipSlots()));
@@ -365,6 +365,7 @@ public final class SkinSlotService {
     private void captureOriginalAppearance(ItemStack item, ItemMeta meta, PersistentDataContainer pdc) {
         captureOriginalLore(meta, pdc);
         captureOriginalName(meta, pdc);
+        captureOriginalItemModel(meta, pdc);
         captureOriginalTooltipStyle(meta, pdc);
         captureOriginalCustomModelData(meta, pdc);
         captureOriginalTooltipDisplay(item, pdc);
@@ -373,10 +374,31 @@ public final class SkinSlotService {
     private void restoreOriginalAppearance(ItemStack item, ItemMeta meta, PersistentDataContainer pdc) {
         restoreOriginalLore(meta, pdc);
         restoreOriginalName(meta, pdc);
+        restoreOriginalItemModel(meta, pdc);
         restoreOriginalTooltipStyle(meta, pdc);
         restoreOriginalCustomModelData(meta, pdc);
         // tooltip_display is restored after item.setItemMeta to avoid being clobbered.
-        meta.setItemModel(null);
+    }
+
+    private void captureOriginalItemModel(ItemMeta meta, PersistentDataContainer pdc) {
+        if (pdc.has(keys.originalItemModel(), PersistentDataType.STRING)) return;
+        final NamespacedKey model = meta.getItemModel();
+        pdc.set(keys.originalItemModel(), PersistentDataType.STRING,
+                model != null ? model.toString() : "");
+    }
+
+    private void restoreOriginalItemModel(ItemMeta meta, PersistentDataContainer pdc) {
+        applyOriginalItemModel(meta, pdc);
+        pdc.remove(keys.originalItemModel());
+    }
+
+    private void applyOriginalItemModel(ItemMeta meta, PersistentDataContainer pdc) {
+        if (pdc.has(keys.originalItemModel(), PersistentDataType.STRING)) {
+            final String s = pdc.get(keys.originalItemModel(), PersistentDataType.STRING);
+            meta.setItemModel((s != null && !s.isEmpty()) ? NamespacedKey.fromString(s) : null);
+        } else {
+            meta.setItemModel(null);
+        }
     }
 
     private void captureOriginalLore(ItemMeta meta, PersistentDataContainer pdc) {
@@ -530,7 +552,11 @@ public final class SkinSlotService {
     }
 
     private void applySkinAppearance(ItemMeta meta, PersistentDataContainer pdc, SkinDefinition skin) {
-        meta.setItemModel(skin.itemModel());
+        if (skin.itemModel() != null) {
+            meta.setItemModel(skin.itemModel());
+        } else {
+            applyOriginalItemModel(meta, pdc);
+        }
 
         if (pluginSupplier.get().getFeatures().switchName() && skin.hasName()) {
             final String resolved = placeholderSupplier.get().resolve(readOwner(pdc), skin.name());

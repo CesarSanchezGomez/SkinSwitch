@@ -74,15 +74,12 @@ public final class SkinConfig {
             tooltipDisplay = null;
         }
 
-        if (itemModelRaw.isEmpty()) {
-            logger.warning("Skin '" + id + "' is missing an item_model value.");
-            return null;
-        }
-
-        final NamespacedKey modelKey = NamespacedKey.fromString(itemModelRaw);
-        if (modelKey == null) {
-            logger.warning("Skin '" + id + "' has an invalid item_model: " + itemModelRaw);
-            return null;
+        NamespacedKey modelKey = null;
+        if (!itemModelRaw.isEmpty()) {
+            modelKey = NamespacedKey.fromString(itemModelRaw);
+            if (modelKey == null) {
+                logger.warning("Skin '" + id + "' has an invalid item_model: " + itemModelRaw);
+            }
         }
 
         NamespacedKey tooltipKey = null;

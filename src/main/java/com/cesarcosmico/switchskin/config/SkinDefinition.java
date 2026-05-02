@@ -7,7 +7,7 @@ import java.util.List;
 
 public record SkinDefinition(
         String id,
-        NamespacedKey itemModel,
+        @Nullable NamespacedKey itemModel,
         String name,
         List<String> lore,
         String icon,

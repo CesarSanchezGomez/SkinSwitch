@@ -16,7 +16,8 @@ public final class ConfigVersionChecker {
     private ConfigVersionChecker() {}
 
     public static void check(FileConfiguration live, String resourceName,
-                             int expectedVersion, JavaPlugin plugin, Logger logger) {
+                             int expectedVersion, JavaPlugin plugin, Logger logger,
+                             String... ignoredKeyPrefixes) {
         final int current = live.getInt("config-version", 0);
         final boolean outdated = current < expectedVersion;
 
@@ -29,6 +30,7 @@ public final class ConfigVersionChecker {
         final List<String> missing = new ArrayList<>();
         for (String key : defaults.getKeys(true)) {
             if (defaults.isConfigurationSection(key)) continue;
+            if (isIgnored(key, ignoredKeyPrefixes)) continue;
             if (!live.isSet(key)) missing.add(key);
         }
 
@@ -45,5 +47,12 @@ public final class ConfigVersionChecker {
             }
             logger.warning("Add them manually or regenerate the file.");
         }
+    }
+
+    private static boolean isIgnored(String key, String[] prefixes) {
+        for (String prefix : prefixes) {
+            if (key.equals(prefix) || key.startsWith(prefix + ".")) return true;
+        }
+        return false;
     }
 }

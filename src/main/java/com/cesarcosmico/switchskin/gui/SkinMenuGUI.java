@@ -112,7 +112,7 @@ public final class SkinMenuGUI implements InventoryHolder {
     }
 
     private static void applySkinModelFallback(ItemStack item, SkinDefinition def) {
-        if (def == null) return;
+        if (def == null || def.itemModel() == null) return;
         final var meta = item.getItemMeta();
         if (meta == null || meta.getItemModel() != null) return;
         meta.setItemModel(def.itemModel());
