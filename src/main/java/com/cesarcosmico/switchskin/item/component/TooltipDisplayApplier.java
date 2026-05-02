@@ -77,7 +77,8 @@ public final class TooltipDisplayApplier implements ComponentApplier {
                 continue;
             }
             try {
-                map.put(field.getName().toLowerCase(), (DataComponentType) field.get(null));
+                final DataComponentType type = (DataComponentType) field.get(null);
+                map.put(type.getKey().value(), type);
             } catch (IllegalAccessException e) {
                 System.getLogger("TooltipDisplayApplier")
                         .log(System.Logger.Level.WARNING, "Failed to access field: " + field.getName(), e);
