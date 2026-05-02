@@ -5,6 +5,7 @@ import com.cesarcosmico.switchskin.config.MenuConfig;
 import com.cesarcosmico.switchskin.config.SkinConfig;
 import com.cesarcosmico.switchskin.config.SkinDefinition;
 import com.cesarcosmico.switchskin.item.ItemFactory;
+import com.cesarcosmico.switchskin.item.component.CustomModelDataApplier;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -105,18 +106,23 @@ public final class SkinMenuGUI implements InventoryHolder {
             final String displayName = def != null ? def.nameOrId() : skinId;
             final ItemStack item = factory.build(template, Map.of("{skin}", displayName));
             item.setType(heldMaterial);
-            applySkinModelFallback(item, def);
+            applySkinPreview(item, def);
             inventory.setItem(slots[i], item);
             actionBySlot[slots[i]] = new MenuAction.SelectSkin(skinId);
         }
     }
 
-    private static void applySkinModelFallback(ItemStack item, SkinDefinition def) {
-        if (def == null || def.itemModel() == null) return;
+    private static void applySkinPreview(ItemStack item, SkinDefinition def) {
+        if (def == null) return;
         final var meta = item.getItemMeta();
-        if (meta == null || meta.getItemModel() != null) return;
-        meta.setItemModel(def.itemModel());
+        if (meta == null) return;
+        if (def.itemModel() != null && meta.getItemModel() == null) {
+            meta.setItemModel(def.itemModel());
+        }
         item.setItemMeta(meta);
+        if (def.customModelData() != null) {
+            CustomModelDataApplier.applyTo(item, def.customModelData());
+        }
     }
 
     private void fillVanillaButton(MenuConfig menu, int activeIndex) {
