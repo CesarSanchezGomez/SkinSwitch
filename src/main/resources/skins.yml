@@ -66,9 +66,9 @@
 #                                strings: ['variant_a']
 #   * 'tooltip_display'      optional. Mirrors the vanilla tooltip_display
 #                            data component (hide_tooltip + hidden_components
-#                            list). Applied alongside `tooltip_style` when
-#                            this slot's tooltip token is active. The
-#                            item's original tooltip_display is captured
+#                            list). Purely visual, so applied whenever the
+#                            slot is active (no tooltip token required).
+#                            The item's original tooltip_display is captured
 #                            and restored under the same rules as the CMD.
 #                            Example:
 #                              tooltip_display:

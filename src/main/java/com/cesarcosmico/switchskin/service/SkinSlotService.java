@@ -136,8 +136,8 @@ public final class SkinSlotService {
 
         applyLore(meta, pdc, current, currentIndex);
         item.setItemMeta(meta);
-        applyTooltipDisplayForActive(item, currentIndex >= 0 && currentIndex < current.size()
-                ? current.get(currentIndex) : null, readList(pdc, keys.tooltipSlots()));
+        applyTooltipDisplayForActiveSkin(item, currentIndex >= 0 && currentIndex < current.size()
+                ? current.get(currentIndex) : null);
         return AddResult.ADDED;
     }
 
@@ -183,7 +183,7 @@ public final class SkinSlotService {
             applyOriginalTooltipDisplay(item, pdc);
             clearTooltipDisplayKeysOnItem(item);
         } else {
-            applyTooltipDisplayForActive(item, activeAfter, tooltips);
+            applyTooltipDisplayForActiveSkin(item, activeAfter);
         }
         return RemoveResult.REMOVED;
     }
@@ -279,7 +279,6 @@ public final class SkinSlotService {
         applyTooltipStyleForActive(meta, pdc, activeId, tooltips);
         applyLore(meta, pdc, slots, idx);
         item.setItemMeta(meta);
-        applyTooltipDisplayForActive(item, activeId, tooltips);
         return TooltipApplyResult.APPLIED;
     }
 
@@ -303,7 +302,6 @@ public final class SkinSlotService {
         applyTooltipStyleForActive(meta, pdc, activeId, tooltips);
         applyLore(meta, pdc, slots, idx);
         item.setItemMeta(meta);
-        applyTooltipDisplayForActive(item, activeId, tooltips);
         return TooltipRemoveResult.REMOVED;
     }
 
@@ -316,7 +314,7 @@ public final class SkinSlotService {
         applyTooltipStyleForActive(meta, pdc, activeId, tooltips);
         applyLore(meta, pdc, slots, index);
         item.setItemMeta(meta);
-        applyTooltipDisplayForActive(item, activeId, tooltips);
+        applyTooltipDisplayForActiveSkin(item, activeId);
     }
 
     private List<String> readList(PersistentDataContainer pdc, NamespacedKey key) {
@@ -589,8 +587,10 @@ public final class SkinSlotService {
         }
     }
 
-    private void applyTooltipDisplayForActive(ItemStack item, String activeSkinId, List<String> tooltipSlots) {
-        final SkinDefinition skin = activeTooltipSkin(activeSkinId, tooltipSlots);
+    private void applyTooltipDisplayForActiveSkin(ItemStack item, String activeSkinId) {
+        final SkinDefinition skin = activeSkinId != null
+                ? skinSupplier.get().get(activeSkinId).orElse(null)
+                : null;
         final ItemMeta meta = item.getItemMeta();
         if (meta == null) return;
         final PersistentDataContainer pdc = meta.getPersistentDataContainer();
