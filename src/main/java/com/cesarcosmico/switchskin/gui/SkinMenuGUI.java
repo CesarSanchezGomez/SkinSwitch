@@ -12,7 +12,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -41,7 +40,7 @@ public final class SkinMenuGUI implements InventoryHolder {
 
     public SkinMenuGUI(MenuConfig menuConfig, SkinConfig skinConfig,
                        List<String> skinIds, int activeIndex, int requestedPage,
-                       @Nullable Material heldMaterial) {
+                       @NotNull Material heldMaterial) {
         final int size = menuConfig.getInventorySize();
         this.inventory = Bukkit.createInventory(this, size, menuConfig.getTitle());
         this.actionBySlot = new MenuAction[size];
@@ -105,9 +104,7 @@ public final class SkinMenuGUI implements InventoryHolder {
             final IconConfig template = active ? menu.getSkinSlotActive() : menu.getSkinSlotInactive();
             final String displayName = def != null ? def.nameOrId() : skinId;
             final ItemStack item = factory.build(template, Map.of("{skin}", displayName));
-            if (menu.isSkinSlotInheritingMaterial() && heldMaterial != null) {
-                item.setType(heldMaterial);
-            }
+            item.setType(heldMaterial);
             applySkinModelFallback(item, def);
             inventory.setItem(slots[i], item);
             actionBySlot[slots[i]] = new MenuAction.SelectSkin(skinId);

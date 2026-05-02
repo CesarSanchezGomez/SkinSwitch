@@ -27,7 +27,6 @@ public final class MenuConfig {
     private final IconFactory iconFactory;
 
     private final char skinSlotSymbol;
-    private final boolean skinSlotInheritMaterial;
     private final IconConfig skinSlotActive;
     private final IconConfig skinSlotInactive;
 
@@ -57,11 +56,10 @@ public final class MenuConfig {
 
         final ConfigurationSection skinSection = effective.getConfigurationSection("skin-slot");
         this.skinSlotSymbol = symbol(skinSection, "S");
-        this.skinSlotInheritMaterial = skinSection == null || skinSection.getBoolean("inherit-material", true);
         this.skinSlotActive = iconFactory.parse(
-                skinSection != null ? skinSection.getConfigurationSection("entry-active") : null, "NAME_TAG");
+                skinSection != null ? skinSection.getConfigurationSection("entry-active") : null, "STONE");
         this.skinSlotInactive = iconFactory.parse(
-                skinSection != null ? skinSection.getConfigurationSection("entry-inactive") : null, "NAME_TAG");
+                skinSection != null ? skinSection.getConfigurationSection("entry-inactive") : null, "STONE");
 
         final ConfigurationSection vanillaSection = effective.getConfigurationSection("vanilla-button");
         this.vanillaSymbol = symbol(vanillaSection, "V");
@@ -117,7 +115,6 @@ public final class MenuConfig {
 
     public char getSkinSlotSymbol() { return skinSlotSymbol; }
     public Set<Integer> getSkinSlotPositions() { return layout.getSlotsForSymbol(skinSlotSymbol); }
-    public boolean isSkinSlotInheritingMaterial() { return skinSlotInheritMaterial; }
     public IconConfig getSkinSlotActive() { return skinSlotActive; }
     public IconConfig getSkinSlotInactive() { return skinSlotInactive; }
 
