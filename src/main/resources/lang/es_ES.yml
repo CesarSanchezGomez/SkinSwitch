@@ -6,7 +6,6 @@ prefix: '<white>[<gradient:#A0A0A0:#595959>SwitchSkin</gradient>]</white>'
 # -- Comandos ---------------------------------
 command:
   only-players: '{prefix} <red>Este comando solo puede ser usado por jugadores.</red>'
-  no-permission: '{prefix} <white>No tienes permiso para hacer eso.</white>'
   reload-success: '{prefix} <white>Configuración recargada exitosamente.</white>'
   no-item-in-hand: '{prefix} <red>Debes tener un ítem en la mano principal.</red>'
   unknown-skin: '{prefix} <red>Skin desconocida: <white>{skin}</white>.</red>'
