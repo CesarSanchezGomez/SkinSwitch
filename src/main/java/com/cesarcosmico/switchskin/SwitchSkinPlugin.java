@@ -122,9 +122,9 @@ public final class SwitchSkinPlugin extends JavaPlugin {
                 new SkinTokenListener(skinSlotService, skinTokenFactory, tooltipTokenFactory,
                         this::getLangConfig, this::getSkinConfig), this);
         getServer().getPluginManager().registerEvents(
-                new SkinMenuListener(this::getLangConfig, this::getSkinConfig,
-                        this::getSkinSlotService, this::getCooldownService,
-                        this::getSwitchAnnouncer), this);
+                new SkinMenuListener(this, this::getLangConfig, this::getSkinConfig,
+                        this::getPluginConfig, this::getSkinSlotService,
+                        this::getCooldownService, this::getSwitchAnnouncer), this);
     }
 
     private void saveDefaultIfMissing(String name) {

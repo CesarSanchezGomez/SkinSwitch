@@ -36,16 +36,21 @@ switch:
 
 # Skin selection menu (/ss menu).
 # The layout uses single-character symbols. Each character maps to a role:
-#   skin-slot.symbol      -> one slot per character; populated in order
+#   skin-slot.symbol      -> one slot per character; page size = nº of S
 #   vanilla-button.symbol -> reverts the held item to its original look
 #   close-button.symbol   -> closes the menu
+#   prev-button.symbol    -> previous page (auto-hidden on the first page)
+#   next-button.symbol    -> next page     (auto-hidden on the last page)
 #   any other character   -> looked up in decorative-icons
+#
+# Pagination: total pages = ceil(item-skin-count / nº of S). The prev/next
+# icons accept {page} and {pages} placeholders.
 menu:
   title: '<white><gradient:#B4E488:#7DD031><b>Switch Skin</b></gradient></white>'
   layout:
     - 'XXXXXXXXX'
     - 'XSSSSSSSX'
-    - 'XVXXXXXCX'
+    - 'PVXXXXXCN'
 
   skin-slot:
     symbol: 'S'
@@ -90,6 +95,24 @@ menu:
     lore:
       - ''
       - ' <gray>Closes this menu.</gray> '
+      - ''
+
+  prev-button:
+    symbol: 'P'
+    material: 'ARROW'
+    custom_name: '<white>« Previous</white> <gray>({page}/{pages})</gray>'
+    lore:
+      - ''
+      - ' <gray>Go to the previous page.</gray> '
+      - ''
+
+  next-button:
+    symbol: 'N'
+    material: 'ARROW'
+    custom_name: '<white>Next »</white> <gray>({page}/{pages})</gray>'
+    lore:
+      - ''
+      - ' <gray>Go to the next page.</gray> '
       - ''
 
   decorative-icons:

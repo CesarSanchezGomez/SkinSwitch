@@ -13,27 +13,37 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public final class SkinMenuGUI implements InventoryHolder {
 
     public sealed interface MenuAction
-            permits MenuAction.SelectSkin, MenuAction.SelectVanilla, MenuAction.Close {
+            permits MenuAction.SelectSkin, MenuAction.SelectVanilla,
+                    MenuAction.Close, MenuAction.PrevPage, MenuAction.NextPage {
         record SelectSkin(String skinId) implements MenuAction {}
         record SelectVanilla() implements MenuAction {}
         record Close() implements MenuAction {}
+        record PrevPage() implements MenuAction {}
+        record NextPage() implements MenuAction {}
     }
 
     private final Inventory inventory;
     private final MenuAction[] actionBySlot;
+    private final int page;
+    private final int totalPages;
+    private final int pageSize;
 
     public SkinMenuGUI(MenuConfig menuConfig, SkinConfig skinConfig,
-                       List<String> skinIds, int activeIndex) {
+                       List<String> skinIds, int activeIndex, int requestedPage) {
         final int size = menuConfig.getInventorySize();
         this.inventory = Bukkit.createInventory(this, size, menuConfig.getTitle());
         this.actionBySlot = new MenuAction[size];
+        this.pageSize = Math.max(1, menuConfig.getSkinSlotPositions().size());
+        this.totalPages = Math.max(1, (int) Math.ceil(skinIds.size() / (double) pageSize));
+        this.page = Math.clamp(requestedPage, 0, totalPages - 1);
 
         populate(menuConfig, skinConfig, skinIds, activeIndex);
     }
@@ -47,6 +57,9 @@ public final class SkinMenuGUI implements InventoryHolder {
         return actionBySlot[slot];
     }
 
+    public int getPage() { return page; }
+    public int getTotalPages() { return totalPages; }
+
     @Override
     public @NotNull Inventory getInventory() {
         return inventory;
@@ -58,6 +71,7 @@ public final class SkinMenuGUI implements InventoryHolder {
         fillSkinSlots(menu, skinConfig, skinIds, activeIndex);
         fillVanillaButton(menu, activeIndex);
         fillCloseButton(menu);
+        fillPaginationButtons(menu);
     }
 
     private void fillDecoration(MenuConfig menu) {
@@ -72,12 +86,17 @@ public final class SkinMenuGUI implements InventoryHolder {
                                List<String> skinIds, int activeIndex) {
         final IconFactory factory = menu.getIconFactory();
         final int[] slots = sortedSlots(menu.getSkinSlotPositions());
-        final Iterator<String> ids = skinIds.iterator();
+        final int start = page * pageSize;
 
-        for (int i = 0; i < slots.length && ids.hasNext(); i++) {
-            final String skinId = ids.next();
+        for (int i = 0; i < slots.length; i++) {
+            final int globalIndex = start + i;
+            if (globalIndex >= skinIds.size()) {
+                inventory.setItem(slots[i], null);
+                continue;
+            }
+            final String skinId = skinIds.get(globalIndex);
             final SkinDefinition def = skinConfig.get(skinId).orElse(null);
-            final boolean active = i == activeIndex;
+            final boolean active = globalIndex == activeIndex;
             final IconConfig template = active ? menu.getSkinSlotActive() : menu.getSkinSlotInactive();
             final String displayName = def != null ? def.nameOrId() : skinId;
             final ItemStack item = factory.build(template,
@@ -105,7 +124,28 @@ public final class SkinMenuGUI implements InventoryHolder {
         }
     }
 
-    private static int[] sortedSlots(java.util.Set<Integer> slots) {
+    private void fillPaginationButtons(MenuConfig menu) {
+        if (page > 0) fillNav(menu, menu.getPrevPositions(), menu.getPrevIcon(), new MenuAction.PrevPage());
+        if (page < totalPages - 1) fillNav(menu, menu.getNextPositions(), menu.getNextIcon(), new MenuAction.NextPage());
+    }
+
+    private void fillNav(MenuConfig menu, Set<Integer> positions, IconConfig icon, MenuAction action) {
+        if (positions.isEmpty()) return;
+        final ItemStack item = menu.getIconFactory().build(icon, pageInfoPlaceholders(), null);
+        for (int slot : positions) {
+            inventory.setItem(slot, item.clone());
+            actionBySlot[slot] = action;
+        }
+    }
+
+    private Map<String, String> pageInfoPlaceholders() {
+        final Map<String, String> placeholders = new HashMap<>();
+        placeholders.put("{page}", String.valueOf(page + 1));
+        placeholders.put("{pages}", String.valueOf(totalPages));
+        return placeholders;
+    }
+
+    private static int[] sortedSlots(Set<Integer> slots) {
         final int[] arr = slots.stream().mapToInt(Integer::intValue).toArray();
         Arrays.sort(arr);
         return arr;

@@ -8,6 +8,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -17,6 +18,10 @@ public final class MenuConfig {
     private static final MiniMessage MINI = MiniMessage.miniMessage();
     private static final String DEFAULT_TITLE =
             "<white><gradient:#B4E488:#7DD031><b>Switch Skin</b></gradient></white>";
+    private static final List<String> DEFAULT_LAYOUT = List.of(
+            "XXXXXXXXX",
+            "XSSSSSSSX",
+            "PVXXXXXCN");
 
     private final Component title;
     private final LayoutParser layout;
@@ -33,6 +38,12 @@ public final class MenuConfig {
     private final char closeSymbol;
     private final IconConfig closeIcon;
 
+    private final char prevSymbol;
+    private final IconConfig prevIcon;
+
+    private final char nextSymbol;
+    private final IconConfig nextIcon;
+
     private final Map<Character, ItemStack> decorativeIcons;
 
     public MenuConfig(ConfigurationSection root, Logger logger) {
@@ -40,18 +51,19 @@ public final class MenuConfig {
 
         if (root == null) {
             this.title = MINI.deserialize(DEFAULT_TITLE);
-            this.layout = new LayoutParser(java.util.List.of(
-                    "XXXXXXXXX",
-                    "XSSSSSSSX",
-                    "XVXXXXXCX"), logger);
+            this.layout = new LayoutParser(DEFAULT_LAYOUT, logger);
             this.skinSlotSymbol = 'S';
             this.vanillaSymbol = 'V';
             this.closeSymbol = 'C';
-            this.skinSlotActive = new IconConfig("NAME_TAG", "<gradient:#B4E488:#7DD031><b>{skin}</b></gradient>", java.util.List.of(), null);
-            this.skinSlotInactive = new IconConfig("NAME_TAG", "<white>{skin}</white>", java.util.List.of(), null);
-            this.vanillaActive = new IconConfig("BARRIER", "<red><b>Vanilla (active)</b></red>", java.util.List.of(), null);
-            this.vanillaInactive = new IconConfig("BARRIER", "<red>Vanilla</red>", java.util.List.of(), null);
-            this.closeIcon = new IconConfig("OAK_DOOR", "<red>Close</red>", java.util.List.of(), null);
+            this.prevSymbol = 'P';
+            this.nextSymbol = 'N';
+            this.skinSlotActive = defaultIcon("NAME_TAG", "<gradient:#B4E488:#7DD031><b>{skin}</b></gradient>");
+            this.skinSlotInactive = defaultIcon("NAME_TAG", "<white>{skin}</white>");
+            this.vanillaActive = defaultIcon("BARRIER", "<red><b>Vanilla (active)</b></red>");
+            this.vanillaInactive = defaultIcon("BARRIER", "<red>Vanilla</red>");
+            this.closeIcon = defaultIcon("OAK_DOOR", "<red>Close</red>");
+            this.prevIcon = defaultIcon("ARROW", "<white>Previous page</white>");
+            this.nextIcon = defaultIcon("ARROW", "<white>Next page</white>");
             this.decorativeIcons = new HashMap<>();
             return;
         }
@@ -77,7 +89,19 @@ public final class MenuConfig {
         this.closeSymbol = symbol(closeSection, "C");
         this.closeIcon = iconFactory.parse(closeSection, "OAK_DOOR");
 
+        final ConfigurationSection prevSection = root.getConfigurationSection("prev-button");
+        this.prevSymbol = symbol(prevSection, "P");
+        this.prevIcon = iconFactory.parse(prevSection, "ARROW");
+
+        final ConfigurationSection nextSection = root.getConfigurationSection("next-button");
+        this.nextSymbol = symbol(nextSection, "N");
+        this.nextIcon = iconFactory.parse(nextSection, "ARROW");
+
         this.decorativeIcons = parseDecorative(root.getConfigurationSection("decorative-icons"));
+    }
+
+    private static IconConfig defaultIcon(String material, String name) {
+        return new IconConfig(material, name, List.of(), null);
     }
 
     private static char symbol(ConfigurationSection section, String fallback) {
@@ -116,6 +140,14 @@ public final class MenuConfig {
     public char getCloseSymbol() { return closeSymbol; }
     public Set<Integer> getClosePositions() { return layout.getSlotsForSymbol(closeSymbol); }
     public IconConfig getCloseIcon() { return closeIcon; }
+
+    public char getPrevSymbol() { return prevSymbol; }
+    public Set<Integer> getPrevPositions() { return layout.getSlotsForSymbol(prevSymbol); }
+    public IconConfig getPrevIcon() { return prevIcon; }
+
+    public char getNextSymbol() { return nextSymbol; }
+    public Set<Integer> getNextPositions() { return layout.getSlotsForSymbol(nextSymbol); }
+    public IconConfig getNextIcon() { return nextIcon; }
 
     public Map<Character, ItemStack> getDecorativeIcons() { return decorativeIcons; }
 }

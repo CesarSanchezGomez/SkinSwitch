@@ -1,6 +1,7 @@
 package com.cesarcosmico.switchskin.listener;
 
 import com.cesarcosmico.switchskin.config.LangConfig;
+import com.cesarcosmico.switchskin.config.PluginConfig;
 import com.cesarcosmico.switchskin.config.SkinConfig;
 import com.cesarcosmico.switchskin.config.SkinDefinition;
 import com.cesarcosmico.switchskin.gui.SkinMenuGUI;
@@ -14,24 +15,32 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.List;
 import java.util.function.Supplier;
 
 public final class SkinMenuListener implements Listener {
 
+    private final JavaPlugin plugin;
     private final Supplier<LangConfig> langSupplier;
     private final Supplier<SkinConfig> skinSupplier;
+    private final Supplier<PluginConfig> pluginSupplier;
     private final Supplier<SkinSlotService> serviceSupplier;
     private final Supplier<CooldownService> cooldownSupplier;
     private final Supplier<SwitchAnnouncer> announcerSupplier;
 
-    public SkinMenuListener(Supplier<LangConfig> langSupplier,
+    public SkinMenuListener(JavaPlugin plugin,
+                            Supplier<LangConfig> langSupplier,
                             Supplier<SkinConfig> skinSupplier,
+                            Supplier<PluginConfig> pluginSupplier,
                             Supplier<SkinSlotService> serviceSupplier,
                             Supplier<CooldownService> cooldownSupplier,
                             Supplier<SwitchAnnouncer> announcerSupplier) {
+        this.plugin = plugin;
         this.langSupplier = langSupplier;
         this.skinSupplier = skinSupplier;
+        this.pluginSupplier = pluginSupplier;
         this.serviceSupplier = serviceSupplier;
         this.cooldownSupplier = cooldownSupplier;
         this.announcerSupplier = announcerSupplier;
@@ -52,6 +61,8 @@ public final class SkinMenuListener implements Listener {
             case MenuAction.Close ignored -> player.closeInventory();
             case MenuAction.SelectSkin select -> handleSkinSelect(player, select.skinId());
             case MenuAction.SelectVanilla ignored -> handleVanilla(player);
+            case MenuAction.PrevPage ignored -> reopenAtPage(player, gui.getPage() - 1);
+            case MenuAction.NextPage ignored -> reopenAtPage(player, gui.getPage() + 1);
         }
     }
 
@@ -107,6 +118,21 @@ public final class SkinMenuListener implements Listener {
             case NO_SLOTS -> langSupplier.get().send(player, "command.no-slots");
             case NO_META -> langSupplier.get().send(player, "command.no-item-in-hand");
         }
+    }
+
+    private void reopenAtPage(Player player, int targetPage) {
+        final SkinSlotService service = serviceSupplier.get();
+        final ItemStack heldItem = player.getInventory().getItemInMainHand();
+        if (!service.hasSlots(heldItem)) {
+            langSupplier.get().send(player, "command.no-slots");
+            player.closeInventory();
+            return;
+        }
+        final List<String> slots = service.getSlots(heldItem);
+        final int activeIndex = service.getCurrentIndex(heldItem);
+        final SkinMenuGUI next = new SkinMenuGUI(pluginSupplier.get().getMenu(),
+                skinSupplier.get(), slots, activeIndex, targetPage);
+        plugin.getServer().getScheduler().runTask(plugin, () -> next.open(player));
     }
 
     private boolean notReady(Player player) {
