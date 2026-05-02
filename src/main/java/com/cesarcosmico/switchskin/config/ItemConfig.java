@@ -4,12 +4,12 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
-public record IconConfig(
+public record ItemConfig(
         ItemStack baseItem,
         String customNameRaw,
         List<String> loreRaw
 ) {
-    public IconConfig {
+    public ItemConfig {
         loreRaw = loreRaw == null ? List.of() : List.copyOf(loreRaw);
     }
 

@@ -5,8 +5,9 @@
 #
 # -- Data Components --------------------------
 # Every menu icon (skin-slot, vanilla-button, close-button, prev-button,
-# next-button, decorative-icons.*) supports the following Minecraft data
-# components on top of `material`:
+# next-button, decorative-icons.*) AND every token (`token`,
+# `tooltip-token` below) supports the following Minecraft data components
+# on top of `material`:
 #   custom_name                - Item name (MiniMessage)
 #   lore                       - List of lines (MiniMessage)
 #   profile                    - Head texture (textures: 'base64...') or
@@ -19,6 +20,10 @@
 #   tooltip_display            - hide_tooltip + hidden_components list
 #   tooltip_style              - Resource location
 #   enchantment_glint_override - true / false
+#
+# Skins (skins.yml) only support the visual subset:
+# item_model, name, lore, tooltip_style, tooltip_display, custom_model_data.
+# See skins.yml for details.
 
 config-version: 1
 
@@ -151,6 +156,8 @@ menu:
       custom_name: ' '
 
 # Token item used to add a skin slot to a held item.
+# {skin} is replaced by the linked skin's display name.
+# Accepts the full data-component set from the header.
 token:
   material: 'NAME_TAG'
   custom_name: '<gradient:#B4E488:#7DD031><b>Skin Slot Token</b></gradient> <gray>—</gray> <white>{skin}</white>'
@@ -160,8 +167,12 @@ token:
     - ' <white>item in your inventory to add</white> '
     - ' <white>the <#7DD031>{skin}</#7DD031> skin slot.</white> '
     - ''
+  tooltip_display:
+    hidden_components:
+      - 'attribute_modifiers'
 
 # Tooltip token: applies a skin's tooltip_style without touching the slot row.
+# Same data-component support as `token`.
 tooltip-token:
   material: 'PAPER'
   custom_name: '<gradient:#B4E488:#7DD031><b>Tooltip Token</b></gradient> <gray>—</gray> <white>{skin}</white>'
@@ -171,3 +182,6 @@ tooltip-token:
     - ' <white>item in your inventory to apply</white> '
     - ' <white>the <#7DD031>{skin}</#7DD031> tooltip style.</white> '
     - ''
+  tooltip_display:
+    hidden_components:
+      - 'attribute_modifiers'

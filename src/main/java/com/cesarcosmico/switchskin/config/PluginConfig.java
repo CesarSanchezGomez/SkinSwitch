@@ -1,16 +1,13 @@
 package com.cesarcosmico.switchskin.config;
 
+import com.cesarcosmico.switchskin.item.ItemFactory;
 import org.bukkit.configuration.ConfigurationSection;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Logger;
 
 public final class PluginConfig {
 
     public static final int CURRENT_VERSION = 1;
-
-    public record TokenConfig(String material, String customName, List<String> lore) {}
 
     public record Features(boolean switchName, boolean switchLore) {}
 
@@ -27,20 +24,20 @@ public final class PluginConfig {
     }
 
     private final int defaultMaxSlots;
-    private final TokenConfig token;
-    private final TokenConfig tooltipToken;
+    private final ItemConfig token;
+    private final ItemConfig tooltipToken;
     private final Features features;
     private final SoundConfig switchSound;
     private final CooldownConfig switchCooldown;
     private final FeedbackConfig switchFeedback;
     private final MenuConfig menu;
 
-    public PluginConfig(ConfigurationSection root, Logger logger) {
+    public PluginConfig(ConfigurationSection root, ItemFactory itemFactory, Logger logger) {
         final ConfigurationSection defaults = root.getConfigurationSection("defaults");
         this.defaultMaxSlots = Math.max(1, defaults != null ? defaults.getInt("max-slots", 6) : 6);
 
-        this.token = readToken(root.getConfigurationSection("token"), "NAME_TAG");
-        this.tooltipToken = readToken(root.getConfigurationSection("tooltip-token"), "PAPER");
+        this.token = itemFactory.parse(root.getConfigurationSection("token"), "NAME_TAG");
+        this.tooltipToken = itemFactory.parse(root.getConfigurationSection("tooltip-token"), "PAPER");
 
         final ConfigurationSection featuresSection = root.getConfigurationSection("features");
         final boolean switchName = featuresSection == null || featuresSection.getBoolean("switch-name", true);
@@ -53,16 +50,7 @@ public final class PluginConfig {
         this.switchFeedback = new FeedbackConfig(
                 switchSection != null ? switchSection.getString("feedback", "actionbar") : "actionbar");
 
-        this.menu = new MenuConfig(root.getConfigurationSection("menu"), logger);
-    }
-
-    private TokenConfig readToken(ConfigurationSection section, String defaultMaterial) {
-        if (section == null) return new TokenConfig(defaultMaterial, "", new ArrayList<>());
-        return new TokenConfig(
-                section.getString("material", defaultMaterial),
-                section.getString("custom_name", ""),
-                new ArrayList<>(section.getStringList("lore"))
-        );
+        this.menu = new MenuConfig(root.getConfigurationSection("menu"), itemFactory, logger);
     }
 
     private SoundConfig readSound(ConfigurationSection section) {
@@ -84,8 +72,8 @@ public final class PluginConfig {
     }
 
     public int getDefaultMaxSlots() { return defaultMaxSlots; }
-    public TokenConfig getToken() { return token; }
-    public TokenConfig getTooltipToken() { return tooltipToken; }
+    public ItemConfig getToken() { return token; }
+    public ItemConfig getTooltipToken() { return tooltipToken; }
     public Features getFeatures() { return features; }
     public SoundConfig getSwitchSound() { return switchSound; }
     public CooldownConfig getSwitchCooldown() { return switchCooldown; }

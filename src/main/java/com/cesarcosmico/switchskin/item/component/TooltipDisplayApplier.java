@@ -1,5 +1,6 @@
 package com.cesarcosmico.switchskin.item.component;
 
+import com.cesarcosmico.switchskin.config.TooltipDisplayConfig;
 import io.papermc.paper.datacomponent.DataComponentType;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.TooltipDisplay;
@@ -31,16 +32,23 @@ public final class TooltipDisplayApplier implements ComponentApplier {
     public void apply(ItemStack item, ConfigurationSection section) {
         final ConfigurationSection tooltipSection = section.getConfigurationSection(key());
         if (tooltipSection == null) return;
+        applyTo(item, parse(tooltipSection), logger);
+    }
+
+    public static TooltipDisplayConfig parse(ConfigurationSection section) {
+        return new TooltipDisplayConfig(
+                section.getBoolean("hide_tooltip", false),
+                section.getStringList("hidden_components"));
+    }
+
+    public static void applyTo(ItemStack item, TooltipDisplayConfig config, Logger logger) {
+        if (config == null) return;
 
         final TooltipDisplay.Builder builder = TooltipDisplay.tooltipDisplay();
+        if (config.hideTooltip()) builder.hideTooltip(true);
 
-        if (tooltipSection.getBoolean("hide_tooltip", false)) {
-            builder.hideTooltip(true);
-        }
-
-        for (String componentId : tooltipSection.getStringList("hidden_components")) {
-            final String normalized = componentId.replace("minecraft:", "").toLowerCase();
-            final DataComponentType type = TYPE_REGISTRY.get(normalized);
+        for (String componentId : config.hiddenComponents()) {
+            final DataComponentType type = resolveType(componentId);
             if (type == null) {
                 logger.warning("Unknown component for tooltip_display hidden_components: " + componentId);
                 continue;
@@ -49,6 +57,15 @@ public final class TooltipDisplayApplier implements ComponentApplier {
         }
 
         item.setData(DataComponentTypes.TOOLTIP_DISPLAY, builder.build());
+    }
+
+    public static boolean knowsComponent(String componentId) {
+        return resolveType(componentId) != null;
+    }
+
+    private static DataComponentType resolveType(String componentId) {
+        final String normalized = componentId.replace("minecraft:", "").toLowerCase();
+        return TYPE_REGISTRY.get(normalized);
     }
 
     private static Map<String, DataComponentType> buildTypeRegistry() {

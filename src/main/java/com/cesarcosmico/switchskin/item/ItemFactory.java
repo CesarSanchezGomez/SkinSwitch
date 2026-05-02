@@ -1,6 +1,6 @@
 package com.cesarcosmico.switchskin.item;
 
-import com.cesarcosmico.switchskin.config.IconConfig;
+import com.cesarcosmico.switchskin.config.ItemConfig;
 import com.cesarcosmico.switchskin.item.component.ComponentRegistry;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -14,35 +14,35 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-public final class IconFactory {
+public final class ItemFactory {
 
     private static final MiniMessage MINI = MiniMessage.miniMessage();
 
     private final Logger logger;
     private final ComponentRegistry components;
 
-    public IconFactory(Logger logger) {
+    public ItemFactory(Logger logger) {
         this.logger = logger;
         this.components = new ComponentRegistry(logger);
     }
 
-    public IconConfig parse(ConfigurationSection section, String fallbackMaterial) {
+    public ItemConfig parse(ConfigurationSection section, String fallbackMaterial) {
         if (section == null) {
-            return new IconConfig(new ItemStack(resolveMaterial(fallbackMaterial)), "", List.of());
+            return new ItemConfig(new ItemStack(resolveMaterial(fallbackMaterial)), "", List.of());
         }
         final ItemStack baseItem = new ItemStack(resolveMaterial(section.getString("material", fallbackMaterial)));
         components.applyAll(baseItem, section);
 
         final String customNameRaw = section.getString("custom_name", "");
         final List<String> loreRaw = section.getStringList("lore");
-        return new IconConfig(baseItem, customNameRaw, loreRaw);
+        return new ItemConfig(baseItem, customNameRaw, loreRaw);
     }
 
-    public ItemStack build(IconConfig config) {
+    public ItemStack build(ItemConfig config) {
         return config.baseItem().clone();
     }
 
-    public ItemStack build(IconConfig config, Map<String, String> placeholders) {
+    public ItemStack build(ItemConfig config, Map<String, String> placeholders) {
         final ItemStack item = config.baseItem().clone();
         if (placeholders.isEmpty()) return item;
         if (!config.hasDynamicName() && !config.hasDynamicLore()) return item;
@@ -56,7 +56,7 @@ public final class IconFactory {
         if (config.hasDynamicLore()) {
             final List<Component> lore = config.loreRaw().stream()
                     .map(line -> replace(line, placeholders))
-                    .map(IconFactory::deserialize)
+                    .map(ItemFactory::deserialize)
                     .toList();
             meta.lore(lore);
         }

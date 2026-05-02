@@ -5,6 +5,7 @@ import com.cesarcosmico.switchskin.config.ConfigVersionChecker;
 import com.cesarcosmico.switchskin.config.LangConfig;
 import com.cesarcosmico.switchskin.config.PluginConfig;
 import com.cesarcosmico.switchskin.config.SkinConfig;
+import com.cesarcosmico.switchskin.item.ItemFactory;
 import com.cesarcosmico.switchskin.item.LoreRenderer;
 import com.cesarcosmico.switchskin.item.SkinSlotKeys;
 import com.cesarcosmico.switchskin.item.TokenFactory;
@@ -17,7 +18,6 @@ import com.cesarcosmico.switchskin.service.CooldownService;
 import com.cesarcosmico.switchskin.service.SkinSlotService;
 import com.cesarcosmico.switchskin.service.SwitchAnnouncer;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
-import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -26,6 +26,7 @@ import java.io.File;
 
 public final class SwitchSkinPlugin extends JavaPlugin {
 
+    private ItemFactory itemFactory;
     private LangConfig langConfig;
     private PluginConfig pluginConfig;
     private SkinConfig skinConfig;
@@ -38,6 +39,7 @@ public final class SwitchSkinPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        this.itemFactory = new ItemFactory(getLogger());
         loadConfigurations();
 
         this.placeholderResolver = resolvePlaceholderBackend();
@@ -48,11 +50,11 @@ public final class SwitchSkinPlugin extends JavaPlugin {
         final LoreRenderer loreRenderer = new LoreRenderer(
                 this::getLangConfig, this::getSkinConfig, this::getPlaceholderResolver);
         this.skinSlotService = new SkinSlotService(keys, loreRenderer,
-                this::getSkinConfig, this::getPluginConfig, this::getPlaceholderResolver);
+                this::getSkinConfig, this::getPluginConfig, this::getPlaceholderResolver, getLogger());
         this.skinTokenFactory = new TokenFactory(keys.tokenSkin(),
-                () -> getPluginConfig().getToken(), this::getSkinConfig, Material.NAME_TAG);
+                () -> getPluginConfig().getToken(), this::getSkinConfig, itemFactory);
         this.tooltipTokenFactory = new TokenFactory(keys.tokenTooltip(),
-                () -> getPluginConfig().getTooltipToken(), this::getSkinConfig, Material.PAPER);
+                () -> getPluginConfig().getTooltipToken(), this::getSkinConfig, itemFactory);
 
         registerCommands();
         registerListeners();
@@ -86,7 +88,7 @@ public final class SwitchSkinPlugin extends JavaPlugin {
         } else {
             this.langConfig.load();
         }
-        this.pluginConfig = new PluginConfig(getConfig(), getLogger());
+        this.pluginConfig = new PluginConfig(getConfig(), itemFactory, getLogger());
         this.skinConfig = new SkinConfig(skinsYml, getLogger());
     }
 

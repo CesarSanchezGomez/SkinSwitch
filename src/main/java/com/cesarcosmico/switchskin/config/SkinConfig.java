@@ -1,5 +1,7 @@
 package com.cesarcosmico.switchskin.config;
 
+import com.cesarcosmico.switchskin.item.component.CustomModelDataApplier;
+import com.cesarcosmico.switchskin.item.component.TooltipDisplayApplier;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
 
@@ -42,6 +44,8 @@ public final class SkinConfig {
         final String bracketColor;
         final String bracketColorDefault;
         final String tooltipStyleRaw;
+        final CustomModelDataConfig customModelData;
+        final TooltipDisplayConfig tooltipDisplay;
 
         if (root.isConfigurationSection(id)) {
             final ConfigurationSection section = root.getConfigurationSection(id);
@@ -54,6 +58,8 @@ public final class SkinConfig {
             bracketColor = section.getString("bracket-color", null);
             bracketColorDefault = section.getString("bracket-color-default", null);
             tooltipStyleRaw = section.getString("tooltip_style", null);
+            customModelData = parseCustomModelData(section.getConfigurationSection("custom_model_data"));
+            tooltipDisplay = parseTooltipDisplay(id, section.getConfigurationSection("tooltip_display"), logger);
         } else {
             itemModelRaw = root.getString(id, "");
             name = null;
@@ -64,6 +70,8 @@ public final class SkinConfig {
             bracketColor = null;
             bracketColorDefault = null;
             tooltipStyleRaw = null;
+            customModelData = null;
+            tooltipDisplay = null;
         }
 
         if (itemModelRaw.isEmpty()) {
@@ -86,7 +94,26 @@ public final class SkinConfig {
         }
 
         return new SkinDefinition(id, modelKey, name, lore, icon, iconActive, iconInactive,
-                bracketColor, bracketColorDefault, tooltipKey);
+                bracketColor, bracketColorDefault, tooltipKey,
+                customModelData, tooltipDisplay);
+    }
+
+    private CustomModelDataConfig parseCustomModelData(ConfigurationSection section) {
+        if (section == null) return null;
+        final CustomModelDataConfig parsed = CustomModelDataApplier.parse(section);
+        return parsed.isEmpty() ? null : parsed;
+    }
+
+    private TooltipDisplayConfig parseTooltipDisplay(String skinId, ConfigurationSection section, Logger logger) {
+        if (section == null) return null;
+        final TooltipDisplayConfig parsed = TooltipDisplayApplier.parse(section);
+        for (String componentId : parsed.hiddenComponents()) {
+            if (!TooltipDisplayApplier.knowsComponent(componentId)) {
+                logger.warning("Skin '" + skinId + "' references unknown component in tooltip_display.hidden_components: "
+                        + componentId);
+            }
+        }
+        return parsed;
     }
 
     public Optional<SkinDefinition> get(String id) {

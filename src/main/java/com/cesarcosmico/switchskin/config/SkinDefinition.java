@@ -1,6 +1,7 @@
 package com.cesarcosmico.switchskin.config;
 
 import org.bukkit.NamespacedKey;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -14,7 +15,9 @@ public record SkinDefinition(
         String iconInactive,
         String bracketColor,
         String bracketColorDefault,
-        NamespacedKey tooltipStyle
+        NamespacedKey tooltipStyle,
+        @Nullable CustomModelDataConfig customModelData,
+        @Nullable TooltipDisplayConfig tooltipDisplay
 ) {
     public SkinDefinition {
         lore = lore == null ? List.of() : List.copyOf(lore);

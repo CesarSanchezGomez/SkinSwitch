@@ -1,10 +1,10 @@
 package com.cesarcosmico.switchskin.gui;
 
-import com.cesarcosmico.switchskin.config.IconConfig;
+import com.cesarcosmico.switchskin.config.ItemConfig;
 import com.cesarcosmico.switchskin.config.MenuConfig;
 import com.cesarcosmico.switchskin.config.SkinConfig;
 import com.cesarcosmico.switchskin.config.SkinDefinition;
-import com.cesarcosmico.switchskin.item.IconFactory;
+import com.cesarcosmico.switchskin.item.ItemFactory;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -88,7 +88,7 @@ public final class SkinMenuGUI implements InventoryHolder {
 
     private void fillSkinSlots(MenuConfig menu, SkinConfig skinConfig,
                                List<String> skinIds, int activeIndex) {
-        final IconFactory factory = menu.getIconFactory();
+        final ItemFactory factory = menu.getItemFactory();
         final int[] slots = sortedSlots(menu.getSkinSlotPositions());
         final int start = page * pageSize;
 
@@ -101,7 +101,7 @@ public final class SkinMenuGUI implements InventoryHolder {
             final String skinId = skinIds.get(globalIndex);
             final SkinDefinition def = skinConfig.get(skinId).orElse(null);
             final boolean active = globalIndex == activeIndex;
-            final IconConfig template = active ? menu.getSkinSlotActive() : menu.getSkinSlotInactive();
+            final ItemConfig template = active ? menu.getSkinSlotActive() : menu.getSkinSlotInactive();
             final String displayName = def != null ? def.nameOrId() : skinId;
             final ItemStack item = factory.build(template, Map.of("{skin}", displayName));
             item.setType(heldMaterial);
@@ -120,8 +120,8 @@ public final class SkinMenuGUI implements InventoryHolder {
     }
 
     private void fillVanillaButton(MenuConfig menu, int activeIndex) {
-        final IconConfig template = activeIndex < 0 ? menu.getVanillaActive() : menu.getVanillaInactive();
-        final ItemStack item = menu.getIconFactory().build(template);
+        final ItemConfig template = activeIndex < 0 ? menu.getVanillaActive() : menu.getVanillaInactive();
+        final ItemStack item = menu.getItemFactory().build(template);
         for (int slot : menu.getVanillaPositions()) {
             inventory.setItem(slot, item.clone());
             actionBySlot[slot] = new MenuAction.SelectVanilla();
@@ -129,7 +129,7 @@ public final class SkinMenuGUI implements InventoryHolder {
     }
 
     private void fillCloseButton(MenuConfig menu) {
-        final ItemStack item = menu.getIconFactory().build(menu.getCloseIcon());
+        final ItemStack item = menu.getItemFactory().build(menu.getCloseIcon());
         for (int slot : menu.getClosePositions()) {
             inventory.setItem(slot, item.clone());
             actionBySlot[slot] = new MenuAction.Close();
@@ -154,9 +154,9 @@ public final class SkinMenuGUI implements InventoryHolder {
         inventory.setItem(slot, fill == null ? null : fill.clone());
     }
 
-    private void fillNav(MenuConfig menu, Set<Integer> positions, IconConfig icon, MenuAction action) {
+    private void fillNav(MenuConfig menu, Set<Integer> positions, ItemConfig icon, MenuAction action) {
         if (positions.isEmpty()) return;
-        final ItemStack item = menu.getIconFactory().build(icon, pageInfoPlaceholders());
+        final ItemStack item = menu.getItemFactory().build(icon, pageInfoPlaceholders());
         for (int slot : positions) {
             inventory.setItem(slot, item.clone());
             actionBySlot[slot] = action;

@@ -51,10 +51,36 @@
 #                            item. The skin slot must already exist on the
 #                            item. Remove the active slot's tooltip with
 #                            /ss removetooltip while holding the item.
+#   * 'custom_model_data'    optional. Mirrors the vanilla custom_model_data
+#                            data component (floats / flags / strings /
+#                            colors lists). Applied when this slot is the
+#                            active one; the item's original CMD is captured
+#                            on the first slot add and restored when the
+#                            last slot is removed (or vanilla is selected).
+#                            Example:
+#                              custom_model_data:
+#                                floats:  [42.0]
+#                                strings: ['variant_a']
+#   * 'tooltip_display'      optional. Mirrors the vanilla tooltip_display
+#                            data component (hide_tooltip + hidden_components
+#                            list). Applied alongside `tooltip_style` when
+#                            this slot's tooltip token is active. The
+#                            item's original tooltip_display is captured
+#                            and restored under the same rules as the CMD.
+#                            Example:
+#                              tooltip_display:
+#                                hidden_components:
+#                                  - 'attribute_modifiers'
+#
+# Skins are visual-only: enchants, material, profile, etc. are NOT
+# accepted. Use a plugin like ItemsAdder if you need that level of
+# transformation.
 #
 # Item data (durability, enchants, attributes, other PDC) is preserved
-# when switching; only item_model + custom_name + lore are touched by
-# the skin slot. Tooltip_style is managed by the tooltip token system.
+# when switching; only item_model + custom_name + lore + custom_model_data
+# + tooltip_display + tooltip_style are touched by the skin / tooltip
+# tokens. Originals are captured the first time a slot is added and
+# restored the moment the last slot leaves.
 
 # Internal version — do not edit. Bump = new keys were added.
 config-version: 1
@@ -102,3 +128,9 @@ skins:
     icon-inactive: ' <white>⊰ ❊ ⊱</white> '
     bracket-color: '#0ED2F7'
     tooltip_style: 'minecraft:aqua'
+    tooltip_display:
+      hidden_components:
+        - 'attribute_modifiers'
+    custom_model_data:
+      strings:
+        - 'glacial'
