@@ -6,7 +6,6 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,59 +48,42 @@ public final class MenuConfig {
     public MenuConfig(ConfigurationSection root, Logger logger) {
         this.iconFactory = new IconFactory(logger);
 
-        if (root == null) {
-            this.title = MINI.deserialize(DEFAULT_TITLE);
-            this.layout = new LayoutParser(DEFAULT_LAYOUT, logger);
-            this.skinSlotSymbol = 'S';
-            this.vanillaSymbol = 'V';
-            this.closeSymbol = 'C';
-            this.prevSymbol = 'P';
-            this.nextSymbol = 'N';
-            this.skinSlotActive = defaultIcon("NAME_TAG", "<gradient:#B4E488:#7DD031><b>{skin}</b></gradient>");
-            this.skinSlotInactive = defaultIcon("NAME_TAG", "<white>{skin}</white>");
-            this.vanillaActive = defaultIcon("BARRIER", "<red><b>Vanilla (active)</b></red>");
-            this.vanillaInactive = defaultIcon("BARRIER", "<red>Vanilla</red>");
-            this.closeIcon = defaultIcon("OAK_DOOR", "<red>Close</red>");
-            this.prevIcon = defaultIcon("ARROW", "<white>Previous page</white>");
-            this.nextIcon = defaultIcon("ARROW", "<white>Next page</white>");
-            this.decorativeIcons = new HashMap<>();
-            return;
-        }
+        final ConfigurationSection effective = root != null ? root : empty();
+        this.title = MINI.deserialize(effective.getString("title", DEFAULT_TITLE));
+        this.layout = new LayoutParser(
+                effective.isList("layout") ? effective.getStringList("layout") : DEFAULT_LAYOUT, logger);
 
-        this.title = MINI.deserialize(root.getString("title", DEFAULT_TITLE));
-        this.layout = new LayoutParser(root.getStringList("layout"), logger);
-
-        final ConfigurationSection skinSection = root.getConfigurationSection("skin-slot");
+        final ConfigurationSection skinSection = effective.getConfigurationSection("skin-slot");
         this.skinSlotSymbol = symbol(skinSection, "S");
         this.skinSlotActive = iconFactory.parse(
                 skinSection != null ? skinSection.getConfigurationSection("entry-active") : null, "NAME_TAG");
         this.skinSlotInactive = iconFactory.parse(
                 skinSection != null ? skinSection.getConfigurationSection("entry-inactive") : null, "NAME_TAG");
 
-        final ConfigurationSection vanillaSection = root.getConfigurationSection("vanilla-button");
+        final ConfigurationSection vanillaSection = effective.getConfigurationSection("vanilla-button");
         this.vanillaSymbol = symbol(vanillaSection, "V");
         this.vanillaActive = iconFactory.parse(
                 vanillaSection != null ? vanillaSection.getConfigurationSection("active") : null, "BARRIER");
         this.vanillaInactive = iconFactory.parse(
                 vanillaSection != null ? vanillaSection.getConfigurationSection("inactive") : null, "BARRIER");
 
-        final ConfigurationSection closeSection = root.getConfigurationSection("close-button");
+        final ConfigurationSection closeSection = effective.getConfigurationSection("close-button");
         this.closeSymbol = symbol(closeSection, "C");
         this.closeIcon = iconFactory.parse(closeSection, "OAK_DOOR");
 
-        final ConfigurationSection prevSection = root.getConfigurationSection("prev-button");
+        final ConfigurationSection prevSection = effective.getConfigurationSection("prev-button");
         this.prevSymbol = symbol(prevSection, "P");
         this.prevIcon = iconFactory.parse(prevSection, "ARROW");
 
-        final ConfigurationSection nextSection = root.getConfigurationSection("next-button");
+        final ConfigurationSection nextSection = effective.getConfigurationSection("next-button");
         this.nextSymbol = symbol(nextSection, "N");
         this.nextIcon = iconFactory.parse(nextSection, "ARROW");
 
-        this.decorativeIcons = parseDecorative(root.getConfigurationSection("decorative-icons"));
+        this.decorativeIcons = parseDecorative(effective.getConfigurationSection("decorative-icons"));
     }
 
-    private static IconConfig defaultIcon(String material, String name) {
-        return new IconConfig(material, name, List.of(), null);
+    private static ConfigurationSection empty() {
+        return new org.bukkit.configuration.MemoryConfiguration();
     }
 
     private static char symbol(ConfigurationSection section, String fallback) {

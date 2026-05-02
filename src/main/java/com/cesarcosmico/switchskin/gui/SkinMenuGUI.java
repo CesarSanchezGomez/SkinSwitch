@@ -99,12 +99,19 @@ public final class SkinMenuGUI implements InventoryHolder {
             final boolean active = globalIndex == activeIndex;
             final IconConfig template = active ? menu.getSkinSlotActive() : menu.getSkinSlotInactive();
             final String displayName = def != null ? def.nameOrId() : skinId;
-            final ItemStack item = factory.build(template,
-                    Map.of("{skin}", displayName),
-                    def != null ? def.itemModel() : null);
+            final ItemStack item = factory.build(template, Map.of("{skin}", displayName));
+            applySkinModelFallback(item, def);
             inventory.setItem(slots[i], item);
             actionBySlot[slots[i]] = new MenuAction.SelectSkin(skinId);
         }
+    }
+
+    private static void applySkinModelFallback(ItemStack item, SkinDefinition def) {
+        if (def == null) return;
+        final var meta = item.getItemMeta();
+        if (meta == null || meta.getItemModel() != null) return;
+        meta.setItemModel(def.itemModel());
+        item.setItemMeta(meta);
     }
 
     private void fillVanillaButton(MenuConfig menu, int activeIndex) {
@@ -131,7 +138,7 @@ public final class SkinMenuGUI implements InventoryHolder {
 
     private void fillNav(MenuConfig menu, Set<Integer> positions, IconConfig icon, MenuAction action) {
         if (positions.isEmpty()) return;
-        final ItemStack item = menu.getIconFactory().build(icon, pageInfoPlaceholders(), null);
+        final ItemStack item = menu.getIconFactory().build(icon, pageInfoPlaceholders());
         for (int slot : positions) {
             inventory.setItem(slot, item.clone());
             actionBySlot[slot] = action;

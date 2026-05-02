@@ -1,16 +1,23 @@
 package com.cesarcosmico.switchskin.config;
 
-import org.bukkit.NamespacedKey;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
 public record IconConfig(
-        String material,
-        String customName,
-        List<String> lore,
-        NamespacedKey itemModel
+        ItemStack baseItem,
+        String customNameRaw,
+        List<String> loreRaw
 ) {
     public IconConfig {
-        lore = lore == null ? List.of() : List.copyOf(lore);
+        loreRaw = loreRaw == null ? List.of() : List.copyOf(loreRaw);
+    }
+
+    public boolean hasDynamicName() {
+        return customNameRaw != null && !customNameRaw.isEmpty();
+    }
+
+    public boolean hasDynamicLore() {
+        return !loreRaw.isEmpty();
     }
 }

@@ -2,6 +2,23 @@
 #              SwitchSkin Configuration
 # =============================================
 # Supports MiniMessage format for all text fields.
+#
+# -- Data Components --------------------------
+# Every menu icon (skin-slot, vanilla-button, close-button, prev-button,
+# next-button, decorative-icons.*) supports the following Minecraft data
+# components on top of `material`:
+#   custom_name                - Item name (MiniMessage)
+#   lore                       - List of lines (MiniMessage)
+#   profile                    - Head texture (textures: 'base64...') or
+#                                a player name. Switches the material to
+#                                PLAYER_HEAD automatically.
+#   enchantments               - { id: level } map
+#   custom_model_data          - floats / flags / strings / colors lists
+#   item_model                 - Resource location (e.g. namespace:path)
+#   potion_contents.custom_color - Integer RGB
+#   tooltip_display            - hide_tooltip + hidden_components list
+#   tooltip_style              - Resource location
+#   enchantment_glint_override - true / false
 
 config-version: 1
 
