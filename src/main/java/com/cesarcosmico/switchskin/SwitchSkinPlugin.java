@@ -50,7 +50,7 @@ public final class SwitchSkinPlugin extends JavaPlugin {
         final LoreRenderer loreRenderer = new LoreRenderer(
                 this::getLangConfig, this::getSkinConfig, this::getPlaceholderResolver);
         this.skinSlotService = new SkinSlotService(keys, loreRenderer,
-                this::getSkinConfig, this::getPluginConfig, this::getPlaceholderResolver, getLogger());
+                this::getSkinConfig, this::getPluginConfig, this::getPlaceholderResolver);
         this.skinTokenFactory = new TokenFactory(keys.tokenSkin(),
                 () -> getPluginConfig().getToken(), this::getSkinConfig, itemFactory);
         this.tooltipTokenFactory = new TokenFactory(keys.tokenTooltip(),

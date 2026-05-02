@@ -42,6 +42,15 @@ public final class TooltipDisplayApplier implements ComponentApplier {
     }
 
     public static void applyTo(ItemStack item, TooltipDisplayConfig config, Logger logger) {
+        applyTo(item, config, logger, true);
+    }
+
+    public static void applyToSilently(ItemStack item, TooltipDisplayConfig config) {
+        applyTo(item, config, null, false);
+    }
+
+    private static void applyTo(ItemStack item, TooltipDisplayConfig config,
+                                Logger logger, boolean warnOnUnknown) {
         if (config == null) return;
 
         final TooltipDisplay.Builder builder = TooltipDisplay.tooltipDisplay();
@@ -50,7 +59,9 @@ public final class TooltipDisplayApplier implements ComponentApplier {
         for (String componentId : config.hiddenComponents()) {
             final DataComponentType type = resolveType(componentId);
             if (type == null) {
-                logger.warning("Unknown component for tooltip_display hidden_components: " + componentId);
+                if (warnOnUnknown && logger != null) {
+                    logger.warning("Unknown component for tooltip_display hidden_components: " + componentId);
+                }
                 continue;
             }
             builder.addHiddenComponents(type);

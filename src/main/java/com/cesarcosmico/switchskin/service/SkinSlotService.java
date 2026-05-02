@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
-import java.util.logging.Logger;
 
 public final class SkinSlotService {
 
@@ -55,19 +54,16 @@ public final class SkinSlotService {
     private final Supplier<SkinConfig> skinSupplier;
     private final Supplier<PluginConfig> pluginSupplier;
     private final Supplier<PlaceholderResolver> placeholderSupplier;
-    private final Logger logger;
 
     public SkinSlotService(SkinSlotKeys keys, LoreRenderer loreRenderer,
                            Supplier<SkinConfig> skinSupplier,
                            Supplier<PluginConfig> pluginSupplier,
-                           Supplier<PlaceholderResolver> placeholderSupplier,
-                           Logger logger) {
+                           Supplier<PlaceholderResolver> placeholderSupplier) {
         this.keys = keys;
         this.loreRenderer = loreRenderer;
         this.skinSupplier = skinSupplier;
         this.pluginSupplier = pluginSupplier;
         this.placeholderSupplier = placeholderSupplier;
-        this.logger = logger;
     }
 
     public boolean hasSlots(ItemStack item) {
@@ -542,7 +538,7 @@ public final class SkinSlotService {
                 PersistentDataType.BYTE, (byte) 0) == 1;
         final List<String> hidden = pdc.getOrDefault(keys.originalTooltipDisplayHidden(),
                 PersistentDataType.LIST.strings(), List.of());
-        TooltipDisplayApplier.applyTo(item, new TooltipDisplayConfig(hide, hidden), logger);
+        TooltipDisplayApplier.applyToSilently(item, new TooltipDisplayConfig(hide, hidden));
     }
 
     private void clearOriginalTooltipDisplayKeys(PersistentDataContainer pdc) {
@@ -599,7 +595,7 @@ public final class SkinSlotService {
         if (meta == null) return;
         final PersistentDataContainer pdc = meta.getPersistentDataContainer();
         if (skin != null && skin.tooltipDisplay() != null) {
-            TooltipDisplayApplier.applyTo(item, skin.tooltipDisplay(), logger);
+            TooltipDisplayApplier.applyToSilently(item, skin.tooltipDisplay());
         } else {
             applyOriginalTooltipDisplay(item, pdc);
         }
