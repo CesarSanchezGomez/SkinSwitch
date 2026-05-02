@@ -118,7 +118,7 @@ public final class SwitchSkinPlugin extends JavaPlugin {
     private void registerListeners() {
         getServer().getPluginManager().registerEvents(
                 new SkinTokenListener(skinSlotService, skinTokenFactory, tooltipTokenFactory,
-                        this::getLangConfig, this::getSkinConfig), this);
+                        this::getLangConfig, this::getSkinConfig, this::getSwitchAnnouncer), this);
         getServer().getPluginManager().registerEvents(
                 new SkinMenuListener(this, this::getLangConfig, this::getSkinConfig,
                         this::getPluginConfig, this::getSkinSlotService,

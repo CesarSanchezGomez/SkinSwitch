@@ -47,6 +47,15 @@ switch:
     volume: 1.0
     pitch: 1.2
 
+# Played to the player when a skin or tooltip token is consumed onto an
+# item (right-click in the inventory).
+tokens:
+  sound:
+    enabled: true
+    key: 'minecraft:entity.experience_orb.pickup'
+    volume: 1.0
+    pitch: 1.4
+
 # Skin selection menu (/ss menu).
 # The layout uses single-character symbols. Each character maps to a role:
 #   skin-slot.symbol      -> one slot per character; page size = nº of S
@@ -94,10 +103,12 @@ menu:
         hidden_components:
           - 'attribute_modifiers'
 
+  # The vanilla button also inherits the held item's material so the
+  # player sees a preview of what their item will look like once the
+  # skin is removed. `material` here has no effect.
   vanilla-button:
     symbol: 'V'
     active:
-      material: 'BARRIER'
       custom_name: '<red><b>Vanilla</b></red> <gray>(active)</gray>'
       lore:
         - ''
@@ -105,7 +116,6 @@ menu:
         - ' <gray>Click any skin to reapply it.</gray> '
         - ''
     inactive:
-      material: 'BARRIER'
       custom_name: '<red><b>Vanilla</b></red>'
       lore:
         - ''

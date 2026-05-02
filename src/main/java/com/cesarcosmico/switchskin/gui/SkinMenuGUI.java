@@ -128,6 +128,7 @@ public final class SkinMenuGUI implements InventoryHolder {
     private void fillVanillaButton(MenuConfig menu, int activeIndex) {
         final ItemConfig template = activeIndex < 0 ? menu.getVanillaActive() : menu.getVanillaInactive();
         final ItemStack item = menu.getItemFactory().build(template);
+        item.setType(heldMaterial);
         for (int slot : menu.getVanillaPositions()) {
             inventory.setItem(slot, item.clone());
             actionBySlot[slot] = new MenuAction.SelectVanilla();

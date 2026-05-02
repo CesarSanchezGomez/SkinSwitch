@@ -21,6 +21,7 @@ public final class PluginConfig {
     private final ItemConfig token;
     private final ItemConfig tooltipToken;
     private final SoundConfig switchSound;
+    private final SoundConfig tokenSound;
     private final FeedbackConfig switchFeedback;
     private final MenuConfig menu;
 
@@ -32,20 +33,25 @@ public final class PluginConfig {
         this.tooltipToken = itemFactory.parse(root.getConfigurationSection("tooltip-token"), "PAPER");
 
         final ConfigurationSection switchSection = root.getConfigurationSection("switch");
-        this.switchSound = readSound(switchSection != null ? switchSection.getConfigurationSection("sound") : null);
+        this.switchSound = readSound(switchSection != null ? switchSection.getConfigurationSection("sound") : null,
+                "minecraft:ui.button.click", 1.0f);
         this.switchFeedback = new FeedbackConfig(
                 switchSection != null ? switchSection.getString("feedback", "actionbar") : "actionbar");
+
+        final ConfigurationSection tokensSection = root.getConfigurationSection("tokens");
+        this.tokenSound = readSound(tokensSection != null ? tokensSection.getConfigurationSection("sound") : null,
+                "minecraft:entity.experience_orb.pickup", 1.4f);
 
         this.menu = new MenuConfig(root.getConfigurationSection("menu"), itemFactory, logger);
     }
 
-    private SoundConfig readSound(ConfigurationSection section) {
-        if (section == null) return new SoundConfig(false, "", 1.0f, 1.0f);
+    private SoundConfig readSound(ConfigurationSection section, String defaultKey, float defaultPitch) {
+        if (section == null) return new SoundConfig(false, "", 1.0f, defaultPitch);
         return new SoundConfig(
                 section.getBoolean("enabled", true),
-                section.getString("key", "minecraft:ui.button.click"),
+                section.getString("key", defaultKey),
                 (float) section.getDouble("volume", 1.0),
-                (float) section.getDouble("pitch", 1.0)
+                (float) section.getDouble("pitch", defaultPitch)
         );
     }
 
@@ -53,6 +59,7 @@ public final class PluginConfig {
     public ItemConfig getToken() { return token; }
     public ItemConfig getTooltipToken() { return tooltipToken; }
     public SoundConfig getSwitchSound() { return switchSound; }
+    public SoundConfig getTokenSound() { return tokenSound; }
     public FeedbackConfig getSwitchFeedback() { return switchFeedback; }
     public MenuConfig getMenu() { return menu; }
 }

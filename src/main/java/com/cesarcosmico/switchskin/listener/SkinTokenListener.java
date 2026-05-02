@@ -5,6 +5,7 @@ import com.cesarcosmico.switchskin.config.SkinConfig;
 import com.cesarcosmico.switchskin.config.SkinDefinition;
 import com.cesarcosmico.switchskin.item.TokenFactory;
 import com.cesarcosmico.switchskin.service.SkinSlotService;
+import com.cesarcosmico.switchskin.service.SwitchAnnouncer;
 import com.cesarcosmico.switchskin.util.CursorUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -23,17 +24,20 @@ public final class SkinTokenListener implements Listener {
     private final TokenFactory tooltipTokenFactory;
     private final Supplier<LangConfig> langSupplier;
     private final Supplier<SkinConfig> skinSupplier;
+    private final Supplier<SwitchAnnouncer> announcerSupplier;
 
     public SkinTokenListener(SkinSlotService skinSlotService,
                              TokenFactory skinTokenFactory,
                              TokenFactory tooltipTokenFactory,
                              Supplier<LangConfig> langSupplier,
-                             Supplier<SkinConfig> skinSupplier) {
+                             Supplier<SkinConfig> skinSupplier,
+                             Supplier<SwitchAnnouncer> announcerSupplier) {
         this.skinSlotService = skinSlotService;
         this.skinTokenFactory = skinTokenFactory;
         this.tooltipTokenFactory = tooltipTokenFactory;
         this.langSupplier = langSupplier;
         this.skinSupplier = skinSupplier;
+        this.announcerSupplier = announcerSupplier;
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -72,6 +76,7 @@ public final class SkinTokenListener implements Listener {
         switch (result) {
             case ADDED -> {
                 CursorUtil.consumeOne(player, cursor);
+                announcerSupplier.get().playTokenSound(player);
                 final SkinDefinition def = skinSupplier.get().get(skinId).orElse(null);
                 final String display = def == null ? skinId : def.nameOrId();
                 langSupplier.get().send(player, "command.slot-added",
@@ -97,6 +102,7 @@ public final class SkinTokenListener implements Listener {
         switch (result) {
             case APPLIED -> {
                 CursorUtil.consumeOne(player, cursor);
+                announcerSupplier.get().playTokenSound(player);
                 langSupplier.get().send(player, "command.tooltip-applied", "{skin}", display);
             }
             case NO_SKIN_SLOT -> langSupplier.get().send(player, "command.tooltip-needs-slot",

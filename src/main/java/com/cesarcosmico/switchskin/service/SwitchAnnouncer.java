@@ -29,6 +29,10 @@ public final class SwitchAnnouncer {
         announce(player, VANILLA_KEY);
     }
 
+    public void playTokenSound(Player player) {
+        play(player, pluginSupplier.get().getTokenSound());
+    }
+
     private void announce(Player player, String key, String... placeholders) {
         final LangConfig lang = langSupplier.get();
         if (pluginSupplier.get().getSwitchFeedback().isActionBar()) {
@@ -40,7 +44,10 @@ public final class SwitchAnnouncer {
     }
 
     public void playSwitchSound(Player player) {
-        final PluginConfig.SoundConfig sound = pluginSupplier.get().getSwitchSound();
+        play(player, pluginSupplier.get().getSwitchSound());
+    }
+
+    private static void play(Player player, PluginConfig.SoundConfig sound) {
         if (!sound.playable()) return;
         player.playSound(player.getLocation(), sound.key(), sound.volume(), sound.pitch());
     }
