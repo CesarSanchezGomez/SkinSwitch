@@ -19,7 +19,10 @@ public final class ConfigVersionChecker {
                              int expectedVersion, JavaPlugin plugin, Logger logger,
                              String... ignoredKeyPrefixes) {
         final int current = live.getInt("config-version", 0);
-        final boolean outdated = current < expectedVersion;
+        if (current >= expectedVersion) return;
+
+        logger.warning(resourceName + " is outdated (version " + current
+                + ", expected " + expectedVersion + ").");
 
         final InputStream stream = plugin.getResource(resourceName);
         if (stream == null) return;
@@ -33,20 +36,13 @@ public final class ConfigVersionChecker {
             if (isIgnored(key, ignoredKeyPrefixes)) continue;
             if (!live.isSet(key)) missing.add(key);
         }
+        if (missing.isEmpty()) return;
 
-        if (!outdated && missing.isEmpty()) return;
-
-        if (outdated) {
-            logger.warning(resourceName + " is outdated (version " + current
-                    + ", expected " + expectedVersion + ").");
+        logger.warning(resourceName + " is missing " + missing.size() + " key(s) introduced by the new version:");
+        for (String key : missing) {
+            logger.warning("  - " + key);
         }
-        if (!missing.isEmpty()) {
-            logger.warning(resourceName + " is missing " + missing.size() + " key(s):");
-            for (String key : missing) {
-                logger.warning("  - " + key);
-            }
-            logger.warning("Add them manually or regenerate the file.");
-        }
+        logger.warning("Add them manually or regenerate the file.");
     }
 
     private static boolean isIgnored(String key, String[] prefixes) {
