@@ -5,6 +5,7 @@ import com.cesarcosmico.switchskin.config.ConfigVersionChecker;
 import com.cesarcosmico.switchskin.config.LangConfig;
 import com.cesarcosmico.switchskin.config.PluginConfig;
 import com.cesarcosmico.switchskin.config.SkinConfig;
+import com.cesarcosmico.switchskin.config.SkinDefinition;
 import com.cesarcosmico.switchskin.item.ItemFactory;
 import com.cesarcosmico.switchskin.item.LoreRenderer;
 import com.cesarcosmico.switchskin.item.SkinSlotKeys;
@@ -49,9 +50,11 @@ public final class SwitchSkinPlugin extends JavaPlugin {
         this.skinSlotService = new SkinSlotService(keys, loreRenderer,
                 this::getSkinConfig, this::getPluginConfig, this::getPlaceholderResolver);
         this.skinTokenFactory = new TokenFactory(keys.tokenSkin(),
-                () -> getPluginConfig().getToken(), this::getSkinConfig, itemFactory);
+                () -> getPluginConfig().getToken(), this::getSkinConfig, itemFactory,
+                SkinDefinition::tokenSkin);
         this.tooltipTokenFactory = new TokenFactory(keys.tokenTooltip(),
-                () -> getPluginConfig().getTooltipToken(), this::getSkinConfig, itemFactory);
+                () -> getPluginConfig().getTooltipToken(), this::getSkinConfig, itemFactory,
+                SkinDefinition::tokenTooltip);
 
         registerCommands();
         registerListeners();

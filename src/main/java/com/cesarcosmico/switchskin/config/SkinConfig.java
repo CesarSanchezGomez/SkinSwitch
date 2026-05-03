@@ -16,6 +16,9 @@ public final class SkinConfig {
 
     public static final int CURRENT_VERSION = 1;
 
+    private static final String DEFAULT_BRACKET_COLOR_ACTIVE = "<gray>";
+    private static final String DEFAULT_BRACKET_COLOR_INACTIVE = "<dark_gray>";
+
     private final Map<String, SkinDefinition> skins;
     private final String defaultBracketColorActive;
     private final String defaultBracketColorInactive;
@@ -34,8 +37,10 @@ public final class SkinConfig {
             }
         }
         this.skins = Collections.unmodifiableMap(map);
-        this.defaultBracketColorActive = stripWrapTag(root.getString("default-bracket-color-active", "gray"));
-        this.defaultBracketColorInactive = stripWrapTag(root.getString("default-bracket-color-inactive", "dark_gray"));
+        this.defaultBracketColorActive = parseGlobalColor(root, "default-bracket-color-active",
+                DEFAULT_BRACKET_COLOR_ACTIVE, logger);
+        this.defaultBracketColorInactive = parseGlobalColor(root, "default-bracket-color-inactive",
+                DEFAULT_BRACKET_COLOR_INACTIVE, logger);
         this.defaultIconActive = root.getString("default-icon-active", "");
         this.defaultIconInactive = root.getString("default-icon-inactive", "");
     }
@@ -51,6 +56,8 @@ public final class SkinConfig {
         final String tooltipStyleRaw;
         final CustomModelDataConfig customModelData;
         final TooltipDisplayConfig tooltipDisplay;
+        final TokenVisualConfig tokenSkin;
+        final TokenVisualConfig tokenTooltip;
 
         if (root.isConfigurationSection(id)) {
             final ConfigurationSection section = root.getConfigurationSection(id);
@@ -59,11 +66,13 @@ public final class SkinConfig {
             lore = section.isList("lore") ? section.getStringList("lore") : List.of();
             iconActive = section.getString("icon-active", null);
             iconInactive = section.getString("icon-inactive", null);
-            bracketColorActive = stripWrapTag(section.getString("bracket-color-active", null));
-            bracketColorInactive = stripWrapTag(section.getString("bracket-color-inactive", null));
+            bracketColorActive = parsePerSkinColor(section, "bracket-color-active", id, logger);
+            bracketColorInactive = parsePerSkinColor(section, "bracket-color-inactive", id, logger);
             tooltipStyleRaw = section.getString("tooltip_style", null);
             customModelData = parseCustomModelData(section.getConfigurationSection("custom_model_data"));
             tooltipDisplay = parseTooltipDisplay(id, section.getConfigurationSection("tooltip_display"), logger);
+            tokenSkin = parseTokenVisual(id, "token-skin", section.getConfigurationSection("token-skin"), logger);
+            tokenTooltip = parseTokenVisual(id, "token-tooltip", section.getConfigurationSection("token-tooltip"), logger);
         } else {
             itemModelRaw = root.getString(id, "");
             name = null;
@@ -75,6 +84,8 @@ public final class SkinConfig {
             tooltipStyleRaw = null;
             customModelData = null;
             tooltipDisplay = null;
+            tokenSkin = null;
+            tokenTooltip = null;
         }
 
         NamespacedKey modelKey = null;
@@ -95,7 +106,7 @@ public final class SkinConfig {
 
         return new SkinDefinition(id, modelKey, name, lore, iconActive, iconInactive,
                 bracketColorActive, bracketColorInactive, tooltipKey,
-                customModelData, tooltipDisplay);
+                customModelData, tooltipDisplay, tokenSkin, tokenTooltip);
     }
 
     private CustomModelDataConfig parseCustomModelData(ConfigurationSection section) {
@@ -116,6 +127,44 @@ public final class SkinConfig {
         return parsed;
     }
 
+    private TokenVisualConfig parseTokenVisual(String skinId, String fieldName,
+                                               ConfigurationSection section, Logger logger) {
+        if (section == null) return null;
+        NamespacedKey itemModel = null;
+        final String itemModelRaw = section.getString("item_model", "");
+        if (!itemModelRaw.isEmpty()) {
+            itemModel = NamespacedKey.fromString(itemModelRaw);
+            if (itemModel == null) {
+                logger.warning("Skin '" + skinId + "' has an invalid " + fieldName + ".item_model: " + itemModelRaw);
+            }
+        }
+        final CustomModelDataConfig cmd = parseCustomModelData(section.getConfigurationSection("custom_model_data"));
+        final TokenVisualConfig visual = new TokenVisualConfig(itemModel, cmd);
+        return visual.isEmpty() ? null : visual;
+    }
+
+    private String parsePerSkinColor(ConfigurationSection section, String key, String skinId, Logger logger) {
+        final String raw = section.getString(key, null);
+        if (raw == null) return null;
+        if (isValidColorTag(raw)) return raw;
+        logger.warning("Skin '" + skinId + "' has invalid " + key + ": '" + raw
+                + "'. Use a MiniMessage color tag like '<gray>' or '<#FCBDE3>'. Falling back to global default.");
+        return null;
+    }
+
+    private static String parseGlobalColor(ConfigurationSection root, String key, String fallback, Logger logger) {
+        final String raw = root.getString(key, fallback);
+        if (isValidColorTag(raw)) return raw;
+        logger.warning(key + " must be a MiniMessage color tag like '<gray>' or '<#FCBDE3>', got '"
+                + raw + "'. Using bundled default '" + fallback + "'.");
+        return fallback;
+    }
+
+    private static boolean isValidColorTag(String raw) {
+        return raw != null && raw.length() >= 2
+                && raw.charAt(0) == '<' && raw.charAt(raw.length() - 1) == '>';
+    }
+
     public Optional<SkinDefinition> get(String id) {
         return Optional.ofNullable(skins.get(id));
     }
@@ -132,12 +181,4 @@ public final class SkinConfig {
     public String getDefaultBracketColorInactive() { return defaultBracketColorInactive; }
     public String getDefaultIconActive() { return defaultIconActive; }
     public String getDefaultIconInactive() { return defaultIconInactive; }
-
-    private static String stripWrapTag(String raw) {
-        if (raw == null || raw.length() < 2) return raw;
-        if (raw.charAt(0) == '<' && raw.charAt(raw.length() - 1) == '>') {
-            return raw.substring(1, raw.length() - 1);
-        }
-        return raw;
-    }
 }

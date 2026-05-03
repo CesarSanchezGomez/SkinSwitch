@@ -17,9 +17,13 @@
 #         - '<gray>Sun-soaked.</gray>'
 #       icon-active:            '<gradient:#FFB347:#FFCC33>⊰ 🍦 ⊱</gradient>'  # slot-row glyph when active
 #       icon-inactive:          '<white>⊰ 🍦 ⊱</white>'                        # slot-row glyph when inactive (falls back to icon-active, then to default-icon-*)
-#       bracket-color-active:   '#FCBDE3'                                     # bracket colour when this slot is active
-#       bracket-color-inactive: '#888888'                                     # bracket colour when this slot is in the row but not active
+#       bracket-color-active:   '<#FCBDE3>'                                   # MiniMessage colour tag for the bracket while this slot is active
+#       bracket-color-inactive: '<#888888>'                                   # MiniMessage colour tag for the bracket while this slot is inactive
 #       tooltip_style:          'minecraft:summer'                            # only applied via tooltip token
+#       token-skin:                                                           # OPTIONAL — overrides the global skin token visual for this skin
+#         item_model: edosummer:ice_cream_token
+#       token-tooltip:                                                        # OPTIONAL — same idea for the tooltip token
+#         item_model: edosummer:ice_cream_tooltip_token
 #
 # All fields are optional. A skin with only custom_model_data, lore,
 # tooltip_style or any subset is valid. Behavior:
@@ -44,18 +48,23 @@
 #   * 'icon-inactive'        slot-row glyph used when this skin is in the
 #                            row but not active. Falls back to icon-active,
 #                            then to default-icon-inactive.
-#   * 'bracket-color-active'   bracket colour while this slot is the active
-#                              one. Falls back to default-bracket-color-active.
-#   * 'bracket-color-inactive' bracket colour while this slot is in the row
+#   * 'bracket-color-active'   MiniMessage colour tag for the bracket while
+#                              this slot is the active one. Must be wrapped
+#                              in angle brackets (e.g. '<gray>', '<#FCBDE3>',
+#                              '<aqua>'). Falls back to
+#                              default-bracket-color-active. Bare names
+#                              like 'gray' or '#FCBDE3' are rejected with
+#                              a warning.
+#   * 'bracket-color-inactive' Same idea, used when this slot is in the row
 #                              but not active. Falls back to
 #                              default-bracket-color-inactive.
 #   * 'tooltip_style'        is NOT applied by the skin slot. Each slot has
 #                            its own tooltip flag — give the player a
-#                            tooltip token (/ss givetooltip <player> <skin>)
-#                            and have them right-click it onto the target
-#                            item. The skin slot must already exist on the
-#                            item. Remove the active slot's tooltip with
-#                            /ss removetooltip while holding the item.
+#                            tooltip token (/ss givetokentooltip <player>
+#                            <skin>) and have them right-click it onto the
+#                            target item. The skin slot must already exist
+#                            on the item. Remove the active slot's tooltip
+#                            with /ss removetooltip while holding the item.
 #   * 'custom_model_data'    optional. Mirrors the vanilla custom_model_data
 #                            data component (floats / flags / strings /
 #                            colors lists). Applied when this slot is the
@@ -76,6 +85,21 @@
 #                              tooltip_display:
 #                                hidden_components:
 #                                  - 'attribute_modifiers'
+#   * 'token-skin'           optional. Per-skin override of how the SKIN
+#                            TOKEN looks when given for this skin. Accepts
+#                            'item_model' and 'custom_model_data' only —
+#                            the rest of the token (material, custom_name,
+#                            lore) comes from the global config.yml.token
+#                            block. Lets you give each skin its own
+#                            distinguishable token model.
+#                            Example:
+#                              token-skin:
+#                                item_model: edoxmas:glacial_token
+#                                custom_model_data:
+#                                  floats: [42.0]
+#   * 'token-tooltip'        optional. Same shape as token-skin, but for
+#                            the TOOLTIP TOKEN. Falls back to the global
+#                            config.yml.tooltip-token block.
 #
 # Skins are visual-only: enchants, material, profile, etc. are NOT
 # accepted. Use a plugin like ItemsAdder if you need that level of
@@ -91,14 +115,13 @@
 config-version: 1
 
 # Slot-row fallbacks. Used whenever a skin omits its own override.
-# Bracket colour values accept either bare MiniMessage names ('gray',
-# 'gold', 'aqua', '#FCBDE3', …) or wrapped in angle brackets ('<gray>',
-# '<#BDBDBD>') for consistency with how MiniMessage tags look elsewhere
-# in your config — both forms are equivalent. Icons are MiniMessage
-# strings (a single glyph or styled segment); leave them empty to fall
-# through to the skin id.
-default-bracket-color-active: 'gray'
-default-bracket-color-inactive: 'dark_gray'
+# Bracket colour values must be MiniMessage colour tags wrapped in angle
+# brackets ('<gray>', '<gold>', '<aqua>', '<#FCBDE3>', …). Bare names
+# like 'gray' or '#FCBDE3' are rejected with a warning and replaced by
+# the bundled default. Icons are MiniMessage strings (a single glyph or
+# styled segment); leave them empty to fall through to the skin id.
+default-bracket-color-active: '<gray>'
+default-bracket-color-inactive: '<dark_gray>'
 default-icon-active: '●'
 default-icon-inactive: '○'
 
@@ -107,7 +130,7 @@ skins:
     item_model: edosummer:ice_cream_pickaxe
     name: '<#FCBDE3>Summer Pickaxe</#FCBDE3>'
     icon-active: '🍦'
-    bracket-color-active: '#FCBDE3'
+    bracket-color-active: '<#FCBDE3>'
 
   autum_skin:
     item_model: edoween:bone_set/bone_pickaxe
@@ -120,7 +143,7 @@ skins:
       - ''
     icon-active: ' <gradient:#FFFFFF:#BDBDBD>⊰ 🎃 ⊱</gradient> '
     icon-inactive: ' <white>⊰ 🎃 ⊱</white> '
-    bracket-color-active: '#414345'
+    bracket-color-active: '<#414345>'
     tooltip_style: 'minecraft:white'
 
   winter_skin:
@@ -134,7 +157,7 @@ skins:
       - ''
     icon-active: ' <gradient:#A6F6FF:#0ED2F7>⊰ ❊ ⊱</gradient> '
     icon-inactive: ' <white>⊰ ❊ ⊱</white> '
-    bracket-color-active: '#0ED2F7'
+    bracket-color-active: '<#0ED2F7>'
     tooltip_style: 'minecraft:aqua'
     tooltip_display:
       hidden_components:

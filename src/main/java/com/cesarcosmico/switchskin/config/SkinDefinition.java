@@ -16,7 +16,9 @@ public record SkinDefinition(
         String bracketColorInactive,
         NamespacedKey tooltipStyle,
         @Nullable CustomModelDataConfig customModelData,
-        @Nullable TooltipDisplayConfig tooltipDisplay
+        @Nullable TooltipDisplayConfig tooltipDisplay,
+        @Nullable TokenVisualConfig tokenSkin,
+        @Nullable TokenVisualConfig tokenTooltip
 ) {
     public SkinDefinition {
         lore = lore == null ? List.of() : List.copyOf(lore);

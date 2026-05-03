@@ -42,9 +42,9 @@ public final class CommandManager {
         this.reloadCommand = new ReloadCommand(langSupplier, reloadAction);
         this.addSlotCommand = new AddSlotCommand(langSupplier, skinSupplier, serviceSupplier);
         this.removeSlotCommand = new RemoveSlotCommand(langSupplier, serviceSupplier);
-        this.giveSkinTokenCommand = new GiveTokenCommand("givetoken", "command.token-given",
+        this.giveSkinTokenCommand = new GiveTokenCommand("givetokenskin", "command.token-given",
                 langSupplier, skinSupplier, skinTokenSupplier, def -> true);
-        this.giveTooltipTokenCommand = new GiveTokenCommand("givetooltip", "command.tooltip-token-given",
+        this.giveTooltipTokenCommand = new GiveTokenCommand("givetokentooltip", "command.tooltip-token-given",
                 langSupplier, skinSupplier, tooltipTokenSupplier,
                 (SkinDefinition def) -> def.tooltipStyle() != null);
         this.removeTooltipCommand = new RemoveTooltipCommand(langSupplier, serviceSupplier);

@@ -192,9 +192,13 @@ menu:
       tooltip_display:
         hide_tooltip: true
 
-# Token item used to add a skin slot to a held item.
+# Token item used to add a skin slot to a held item. Issued via
+# /ss givetokenskin <player> <skin> <amount>.
 # {skin} is replaced by the linked skin's display name.
-# Accepts the full data-component set from the header.
+# Accepts the full data-component set from the header. The 'item_model'
+# and 'custom_model_data' values here act as the global fallback —
+# individual skins can override them via 'token-skin' in skins.yml so
+# each skin's token has its own model in inventory.
 token:
   material: 'NAME_TAG'
   custom_name: '<gradient:#A0A0A0:#595959><b>Skin Slot Token</b></gradient> <gray>—</gray> <white>{skin}</white>'
@@ -208,8 +212,10 @@ token:
     hidden_components:
       - 'attribute_modifiers'
 
-# Tooltip token: applies a skin's tooltip_style without touching the slot row.
-# Same data-component support as `token`.
+# Tooltip token: applies a skin's tooltip_style without touching the slot
+# row. Issued via /ss givetokentooltip <player> <skin> <amount>. Same
+# data-component support as `token`. Per-skin overrides live under
+# 'token-tooltip' in skins.yml.
 tooltip-token:
   material: 'PAPER'
   custom_name: '<gradient:#A0A0A0:#595959><b>Tooltip Token</b></gradient> <gray>—</gray> <white>{skin}</white>'
