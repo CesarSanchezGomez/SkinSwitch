@@ -91,10 +91,12 @@
 config-version: 1
 
 # Slot-row fallbacks. Used whenever a skin omits its own override.
-# Colour values are MiniMessage colour names (gray, gold, aqua, …) or
-# hex codes like '#FCBDE3'. Wrap-tags like '<gray>' are NOT accepted —
-# just the value. Icons are MiniMessage strings (a single glyph or
-# styled segment); leave them empty to fall through to the skin id.
+# Bracket colour values accept either bare MiniMessage names ('gray',
+# 'gold', 'aqua', '#FCBDE3', …) or wrapped in angle brackets ('<gray>',
+# '<#BDBDBD>') for consistency with how MiniMessage tags look elsewhere
+# in your config — both forms are equivalent. Icons are MiniMessage
+# strings (a single glyph or styled segment); leave them empty to fall
+# through to the skin id.
 default-bracket-color-active: 'gray'
 default-bracket-color-inactive: 'dark_gray'
 default-icon-active: '●'

@@ -34,8 +34,8 @@ public final class SkinConfig {
             }
         }
         this.skins = Collections.unmodifiableMap(map);
-        this.defaultBracketColorActive = root.getString("default-bracket-color-active", "gray");
-        this.defaultBracketColorInactive = root.getString("default-bracket-color-inactive", "dark_gray");
+        this.defaultBracketColorActive = stripWrapTag(root.getString("default-bracket-color-active", "gray"));
+        this.defaultBracketColorInactive = stripWrapTag(root.getString("default-bracket-color-inactive", "dark_gray"));
         this.defaultIconActive = root.getString("default-icon-active", "");
         this.defaultIconInactive = root.getString("default-icon-inactive", "");
     }
@@ -59,8 +59,8 @@ public final class SkinConfig {
             lore = section.isList("lore") ? section.getStringList("lore") : List.of();
             iconActive = section.getString("icon-active", null);
             iconInactive = section.getString("icon-inactive", null);
-            bracketColorActive = section.getString("bracket-color-active", null);
-            bracketColorInactive = section.getString("bracket-color-inactive", null);
+            bracketColorActive = stripWrapTag(section.getString("bracket-color-active", null));
+            bracketColorInactive = stripWrapTag(section.getString("bracket-color-inactive", null));
             tooltipStyleRaw = section.getString("tooltip_style", null);
             customModelData = parseCustomModelData(section.getConfigurationSection("custom_model_data"));
             tooltipDisplay = parseTooltipDisplay(id, section.getConfigurationSection("tooltip_display"), logger);
@@ -132,4 +132,12 @@ public final class SkinConfig {
     public String getDefaultBracketColorInactive() { return defaultBracketColorInactive; }
     public String getDefaultIconActive() { return defaultIconActive; }
     public String getDefaultIconInactive() { return defaultIconInactive; }
+
+    private static String stripWrapTag(String raw) {
+        if (raw == null || raw.length() < 2) return raw;
+        if (raw.charAt(0) == '<' && raw.charAt(raw.length() - 1) == '>') {
+            return raw.substring(1, raw.length() - 1);
+        }
+        return raw;
+    }
 }
