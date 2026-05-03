@@ -11,7 +11,10 @@ import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Supplier;
 
 public final class LoreRenderer {
@@ -34,26 +37,30 @@ public final class LoreRenderer {
     public List<Component> render(List<Component> originalLore,
                                   List<String> skinIds,
                                   int currentIndex,
+                                  Collection<String> tooltipSkinIds,
                                   @Nullable OfflinePlayer owner) {
         final List<Component> base = originalLore == null ? List.of() : originalLore;
         if (skinIds.isEmpty()) return new ArrayList<>(base);
 
-        final Component row = buildRow(skinIds, currentIndex, owner);
+        final Component row = buildRow(skinIds, currentIndex, tooltipSkinIds, owner);
         final List<Component> out = new ArrayList<>(base.size() + 1);
         out.add(row);
         out.addAll(base);
         return out;
     }
 
-    private Component buildRow(List<String> skinIds, int currentIndex, @Nullable OfflinePlayer owner) {
+    private Component buildRow(List<String> skinIds, int currentIndex,
+                               Collection<String> tooltipSkinIds, @Nullable OfflinePlayer owner) {
         final LangConfig lang = langSupplier.get();
         final SkinConfig skinConfig = skinSupplier.get();
         final PlaceholderResolver resolver = placeholderSupplier.get();
+        final Set<String> tooltipSet = new HashSet<>(tooltipSkinIds);
 
         final StringBuilder slots = new StringBuilder();
         for (int i = 0; i < skinIds.size(); i++) {
             if (i > 0) slots.append(SLOT_SEPARATOR);
-            slots.append(renderSlot(lang, skinConfig, skinIds.get(i), i == currentIndex));
+            final String id = skinIds.get(i);
+            slots.append(renderSlot(lang, skinConfig, id, i == currentIndex, tooltipSet.contains(id)));
         }
 
         final String row = resolver.resolve(owner, lang.getRaw("lore.row"))
@@ -61,10 +68,11 @@ public final class LoreRenderer {
         return MINI.deserialize(row).decoration(TextDecoration.ITALIC, false);
     }
 
-    private static String renderSlot(LangConfig lang, SkinConfig skinConfig, String skinId, boolean active) {
+    private static String renderSlot(LangConfig lang, SkinConfig skinConfig, String skinId,
+                                     boolean active, boolean hasTooltip) {
         final SkinDefinition skin = skinConfig.get(skinId).orElse(null);
         final String icon = resolveIcon(skin, skinId, skinConfig, active);
-        final String color = resolveBracketColor(skin, skinConfig, active);
+        final String color = resolveBracketColor(skin, skinConfig, active, hasTooltip);
         final String template = lang.getRaw(active ? "lore.slot-active" : "lore.slot-inactive");
         return template
                 .replace("{color}", color)
@@ -88,8 +96,8 @@ public final class LoreRenderer {
     }
 
     private static String resolveBracketColor(@Nullable SkinDefinition skin,
-                                              SkinConfig config, boolean active) {
-        if (active) {
+                                              SkinConfig config, boolean active, boolean hasTooltip) {
+        if (active && hasTooltip) {
             if (skin != null && skin.hasBracketColorActive()) return skin.bracketColorActive();
             return config.getDefaultBracketColorActive();
         }

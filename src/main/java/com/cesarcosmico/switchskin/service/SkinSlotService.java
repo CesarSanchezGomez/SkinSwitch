@@ -612,7 +612,8 @@ public final class SkinSlotService {
                            List<String> slots, int currentIndex) {
         final OfflinePlayer owner = readOwner(pdc);
         final List<Component> baseLore = resolveBaseLore(pdc, slots, currentIndex, owner);
-        meta.lore(loreRenderer.render(baseLore, slots, currentIndex, owner));
+        final List<String> tooltipSlots = readList(pdc, keys.tooltipSlots());
+        meta.lore(loreRenderer.render(baseLore, slots, currentIndex, tooltipSlots, owner));
     }
 
     private List<Component> resolveBaseLore(PersistentDataContainer pdc,

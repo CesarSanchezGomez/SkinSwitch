@@ -51,14 +51,16 @@
 #                            row but not active. Falls back to icon-active,
 #                            then to default-icon-inactive.
 #   * 'bracket-color-active'   MiniMessage colour tag for the bracket while
-#                              this slot is the active one. Must be wrapped
-#                              in angle brackets (e.g. '<gray>', '<#FCBDE3>',
+#                              this slot is BOTH active AND has its tooltip
+#                              token applied. Must be wrapped in angle
+#                              brackets (e.g. '<gray>', '<#FCBDE3>',
 #                              '<aqua>'). Falls back to
 #                              default-bracket-color-active. Bare names
 #                              like 'gray' or '#FCBDE3' are rejected with
 #                              a warning.
-#   * 'bracket-color-inactive' Same idea, used when this slot is in the row
-#                              but not active. Falls back to
+#   * 'bracket-color-inactive' MiniMessage colour tag for the bracket in any
+#                              other case (inactive, or active but without
+#                              its tooltip token applied). Falls back to
 #                              default-bracket-color-inactive.
 #   * 'tooltip_style'        is NOT applied by the skin slot. Each slot has
 #                            its own tooltip flag — give the player a
