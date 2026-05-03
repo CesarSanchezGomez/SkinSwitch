@@ -1,14 +1,30 @@
 # =============================================
-#              SkinSwitch Configuration
+#              SwitchSkin Configuration
 # =============================================
 # Supports MiniMessage format for all text fields.
 #
-# Skins are defined in skins.yml. Adding a slot to an item stores the
-# skin id in its persistent data and rebuilds the lore. Switching slots
-# only changes the item_model component — durability, enchantments,
-# attributes and other persistent data are preserved.
+# -- Data Components --------------------------
+# Every menu icon (skin-slot, vanilla-button, close-button, prev-button,
+# next-button, decorative-icons.*) AND every token (`token`,
+# `tooltip-token` below) supports the following Minecraft data components
+# on top of `material`:
+#   custom_name                - Item name (MiniMessage)
+#   lore                       - List of lines (MiniMessage)
+#   profile                    - Head texture (textures: 'base64...') or
+#                                a player name. Switches the material to
+#                                PLAYER_HEAD automatically.
+#   enchantments               - { id: level } map
+#   custom_model_data          - floats / flags / strings / colors lists
+#   item_model                 - Resource location (e.g. namespace:path)
+#   potion_contents.custom_color - Integer RGB
+#   tooltip_display            - hide_tooltip + hidden_components list
+#   tooltip_style              - Resource location
+#   enchantment_glint_override - true / false
+#
+# Skins (skins.yml) only support the visual subset:
+# item_model, name, lore, tooltip_style, tooltip_display, custom_model_data.
+# See skins.yml for details.
 
-# Internal version — do not edit. Bump = new keys were added.
 config-version: 1
 
 # Language file to use from the lang/ folder (without .yml)
@@ -19,48 +35,196 @@ defaults:
   # Maximum number of skin slots a single item can hold.
   max-slots: 6
 
-# Toggles for which fields a skin can override when its slot is active.
-# All toggles are independent — disabling one keeps the rest working.
-#
-#   switch-name: when true, a skin's `display` (skins.yml) is applied as
-#                the item's custom_name while that slot is active. When
-#                false, the item keeps the custom_name it had before any
-#                slot was added.
-#   switch-lore: when true, a skin's `lore` (skins.yml) replaces the
-#                item's original lore as the base for the slot row. When
-#                false, the item keeps its original lore regardless of
-#                what each skin defines.
-#
-# item_model always switches (that's the point of a skin slot).
-# tooltip_style is governed by the separate tooltip-token system.
-features:
-  switch-name: true
-  switch-lore: true
+# Behaviour of the skin switch action (menu, /ss switch, etc.)
+switch:
+  # 'actionbar' shows the message above the hotbar.
+  # 'chat' falls back to a regular chat message.
+  feedback: 'actionbar'
 
-# Token item used to add a skin slot to a held item.
-# Players right-click the token (in the cursor) onto a target item in
-# their inventory; the token is consumed and the slot is added.
-# Use {skin} in the name/lore to insert the bound skin's display name.
+  sound:
+    enabled: true
+    key: 'minecraft:ui.button.click'
+    volume: 1.0
+    pitch: 1.2
+
+# Played to the player when a skin or tooltip token is consumed onto an
+# item (right-click in the inventory).
+tokens:
+  sound:
+    enabled: true
+    key: 'minecraft:entity.experience_orb.pickup'
+    volume: 1.0
+    pitch: 1.4
+
+# Skin selection menu (/ss menu).
+# The layout uses single-character symbols. Each character maps to a role:
+#   skin-slot.symbol      -> one slot per character; page size = nº of S
+#   vanilla-button.symbol -> reverts the held item to its original look
+#   close-button.symbol   -> closes the menu
+#   prev-button.symbol    -> previous page (auto-hidden on the first page)
+#   next-button.symbol    -> next page     (auto-hidden on the last page)
+#   any other character   -> looked up in decorative-icons
+#
+# Pagination: total pages = ceil(item-skin-count / nº of S). The prev/next
+# icons accept {page} and {pages} placeholders.
+menu:
+  title: '<white><gradient:#A0A0A0:#595959><b>Switch Skin</b></gradient></white>'
+  layout:
+    - 'WXYZVZYXW'
+    - 'XAAAAAAAX'
+    - 'WASSSSSAW'
+    - 'XAAAAAAAX'
+    - 'WXYPCNYXW'
+
+  # Symbol from decorative-icons used to fill the prev/next button slots
+  # when the button is hidden (page 0 has no prev, last page has no next).
+  # Set to '' to keep those slots empty.
+  fill-empty: 'Z'
+
+  # The skin entries always use the held item's material (a pickaxe menu
+  # shows pickaxes, a sword menu shows swords, ...). Defining `material`
+  # under entry-active / entry-inactive has no effect.
+  skin-slot:
+    symbol: 'S'
+    entry-active:
+      custom_name: '<gradient:#A0A0A0:#595959>{skin}</gradient>'
+      lore:
+        - ''
+        - ' <white>•</white> <gradient:#B4E488:#7DD031>Active skin</gradient> '
+        - ''
+      tooltip_display:
+        hidden_components:
+          - 'attribute_modifiers'
+    entry-inactive:
+      custom_name: '<white>{skin}</white>'
+      lore:
+        - ''
+        - ' <gray>Click to switch to this skin.</gray> '
+        - ''
+      tooltip_display:
+        hidden_components:
+          - 'attribute_modifiers'
+
+  # The vanilla button mirrors the held item's current visual: if a skin
+  # is active, the icon shows that skin (so it matches what's in your
+  # hand); if vanilla is active, the icon shows the raw item with the
+  # [active] marker. `material` here has no effect.
+  vanilla-button:
+    symbol: 'V'
+    active:
+      custom_name: '<gradient:#A0A0A0:#595959><b>Vanilla</b></gradient> <gray>[active]</gray>'
+      lore:
+        - ''
+        - ' <gray>The original look is showing.</gray> '
+        - ' <gray>Click any skin to reapply it.</gray> '
+        - ''
+      tooltip_display:
+        hidden_components:
+          - 'attribute_modifiers'
+    inactive:
+      custom_name: '<gradient:#A0A0A0:#595959><b>Vanilla</b></gradient>'
+      lore:
+        - ''
+        - ' <gray>Restore the original look</gray> '
+        - ' <gray>without losing your tokens.</gray> '
+        - ''
+      tooltip_display:
+        hidden_components:
+          - 'attribute_modifiers'
+
+  close-button:
+    symbol: 'C'
+    material: 'PLAYER_HEAD'
+    profile:
+      textures: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjNmNzRlYWQ5ZjA3MGNmMzEwMTQ1MzgxYjc5ZTQ0MTdlYTQ5MzBlYmQwMjQxMjE1NzcwNWY0OTliMDg4MDgwMiJ9fX0='
+    custom_name: '<gradient:#A0A0A0:#595959><b>Close</b></gradient>'
+    lore:
+      - ''
+      - ' <gray>Closes this menu.</gray> '
+      - ''
+
+  prev-button:
+    symbol: 'P'
+    material: 'PLAYER_HEAD'
+    profile:
+      textures: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODY5NzFkZDg4MWRiYWY0ZmQ2YmNhYTkzNjE0NDkzYzYxMmY4Njk2NDFlZDU5ZDFjOTM2M2EzNjY2YTVmYTYifX19'
+    custom_name: '<white>« Previous</white> <gray>[{page}/{pages}]</gray>'
+    lore:
+      - ''
+      - ' <gray>Go to the previous page.</gray> '
+      - ''
+
+  next-button:
+    symbol: 'N'
+    material: 'PLAYER_HEAD'
+    profile:
+      textures: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjMyY2E2NjA1NmI3Mjg2M2U5OGY3ZjMyYmQ3ZDk0YzdhMGQ3OTZhZjY5MWM5YWMzYTkxMzYzMzEzNTIyODhmOSJ9fX0='
+    custom_name: '<white>Next »</white> <gray>[{page}/{pages}]</gray>'
+    lore:
+      - ''
+      - ' <gray>Go to the next page.</gray> '
+      - ''
+
+  decorative-icons:
+    air:
+      symbol: 'A'
+      material: 'AIR'
+      tooltip_display:
+        hide_tooltip: true
+    black-stained-glass-pane:
+      symbol: 'W'
+      material: 'BLACK_STAINED_GLASS_PANE'
+      tooltip_display:
+        hide_tooltip: true
+    gray-stained-glass-pane:
+      symbol: 'X'
+      material: 'GRAY_STAINED_GLASS_PANE'
+      tooltip_display:
+        hide_tooltip: true
+    polished-deepslate:
+      symbol: 'Y'
+      material: 'POLISHED_DEEPSLATE'
+      tooltip_display:
+        hide_tooltip: true
+    polished-deepslate-slab:
+      symbol: 'Z'
+      material: 'POLISHED_DEEPSLATE_SLAB'
+      tooltip_display:
+        hide_tooltip: true
+
+# Token item used to add a skin slot to a held item. Issued via
+# /ss givetokenskin <player> <skin> <amount>.
+# {skin} is replaced by the linked skin's display name.
+# Accepts the full data-component set from the header. The 'item_model'
+# and 'custom_model_data' values here act as the global fallback —
+# individual skins can override them via 'token-skin' in skins.yml so
+# each skin's token has its own model in inventory.
 token:
   material: 'NAME_TAG'
-  custom_name: '<gradient:#C173FF:#950DFF><b>Skin Slot Token</b></gradient> <gray>—</gray> <white>{skin}</white>'
+  custom_name: '<gradient:#A0A0A0:#595959><b>Skin Slot Token</b></gradient> <gray>—</gray> <white>{skin}</white>'
   lore:
     - ''
     - ' <white>Right-click this token onto an</white> '
     - ' <white>item in your inventory to add</white> '
-    - ' <white>the <#C173FF>{skin}</#C173FF> skin slot.</white> '
+    - ' <white>the <#A0A0A0>{skin}</#A0A0A0> skin slot.</white> '
     - ''
+  tooltip_display:
+    hidden_components:
+      - 'attribute_modifiers'
 
-# Tooltip token: separate item from the skin token. Applies the bound
-# skin's tooltip_style to a target item without touching the skin slot
-# row. Players right-click the token onto an item to apply it; only one
-# tooltip can be active per item (re-applying replaces it).
+# Tooltip token: applies a skin's tooltip_style without touching the slot
+# row. Issued via /ss givetokentooltip <player> <skin> <amount>. Same
+# data-component support as `token`. Per-skin overrides live under
+# 'token-tooltip' in skins.yml.
 tooltip-token:
   material: 'PAPER'
-  custom_name: '<gradient:#C173FF:#950DFF><b>Tooltip Token</b></gradient> <gray>—</gray> <white>{skin}</white>'
+  custom_name: '<gradient:#A0A0A0:#595959><b>Tooltip Token</b></gradient> <gray>—</gray> <white>{skin}</white>'
   lore:
     - ''
     - ' <white>Right-click this token onto an</white> '
     - ' <white>item in your inventory to apply</white> '
-    - ' <white>the <#C173FF>{skin}</#C173FF> tooltip style.</white> '
+    - ' <white>the <#A0A0A0>{skin}</#A0A0A0> tooltip style.</white> '
     - ''
+  tooltip_display:
+    hidden_components:
+      - 'attribute_modifiers'

@@ -1,14 +1,14 @@
 plugins {
     id("java")
-    id("com.gradleup.shadow") version "9.1.0"
+    id("com.gradleup.shadow") version "9.4.1"
 }
 
 group = "com.cesarcosmico"
-version = "1.0.0"
+version = "2.0.0"
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(25)
     }
 }
 
@@ -25,7 +25,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:26.1.2.build.53-stable")
     compileOnly("me.clip:placeholderapi:2.12.2")
 
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
