@@ -1,37 +1,46 @@
-# SkinSwitch - Archivo de idioma en Español (España)
-# Soporta formato MiniMessage.
-# Usa {prefix} para insertar el prefijo del plugin.
-# Versión interna — no editar. Cambio = nuevos mensajes añadidos.
-config-version: 3
+# SwitchSkin - Archivo de idioma en Español (España)
+config-version: 2
 
-prefix: '<white>[<gradient:#C173FF:#950DFF>SkinSwitch</gradient>]</white>'
+prefix: '<white>[<gradient:#A0A0A0:#595959>SwitchSkin</gradient>]</white>'
 
 # -- Comandos ---------------------------------
 command:
   only-players: '{prefix} <red>Este comando solo puede ser usado por jugadores.</red>'
-  no-permission: '{prefix} <white>No tienes permiso para hacer eso.</white>'
   reload-success: '{prefix} <white>Configuración recargada exitosamente.</white>'
   no-item-in-hand: '{prefix} <red>Debes tener un ítem en la mano principal.</red>'
   unknown-skin: '{prefix} <red>Skin desconocida: <white>{skin}</white>.</red>'
-  slot-added: '{prefix} <white>Slot <#C173FF>{skin}</#C173FF> añadido. Total: <#C173FF>{count}</#C173FF>.</white>'
-  slot-removed: '{prefix} <white>Slot <#C173FF>{skin}</#C173FF> eliminado.</white>'
+  slot-added: '{prefix} <white>Slot <#A0A0A0>{skin}</#A0A0A0> añadido. Total: <#A0A0A0>{count}</#A0A0A0>.</white>'
+  slot-removed: '{prefix} <white>Slot <#A0A0A0>{skin}</#A0A0A0> eliminado.</white>'
   invalid-slot: '{prefix} <red>Índice de slot inválido.</red>'
   no-slots: '{prefix} <white>Este ítem no tiene slots de skin.</white>'
   slots-full: '{prefix} <white>Este ítem ha alcanzado el límite de slots ({max}).</white>'
   duplicate-slot: '{prefix} <white>Esta skin ya está instalada en este ítem.</white>'
-  token-given: '{prefix} <white>Entregaste <#C173FF>{count}</#C173FF> token(s) de <#C173FF>{skin}</#C173FF> a <#C173FF>{player}</#C173FF>.</white>'
+  skin-incompatible: '{prefix} <red>La skin <white>{skin}</white> no se puede aplicar a <white>{material}</white>.</red>'
+  token-given: '{prefix} <white>Entregaste <#A0A0A0>{count}</#A0A0A0> token(s) de <#A0A0A0>{skin}</#A0A0A0> a <#A0A0A0>{player}</#A0A0A0>.</white>'
+  tooltip-token-given: '{prefix} <white>Entregaste <#A0A0A0>{count}</#A0A0A0> token(s) de tooltip <#A0A0A0>{skin}</#A0A0A0> a <#A0A0A0>{player}</#A0A0A0>.</white>'
+  tooltip-applied: '{prefix} <white>Tooltip <#A0A0A0>{skin}</#A0A0A0> aplicado.</white>'
+  tooltip-removed: '{prefix} <white>Tooltip eliminado del slot activo.</white>'
+  tooltip-not-applied: '{prefix} <white>El slot activo no tiene tooltip aplicado.</white>'
+  tooltip-missing: '{prefix} <red>La skin <white>{skin}</white> no tiene tooltip_style definido.</red>'
+  tooltip-needs-slot: '{prefix} <red>Debes añadir primero el slot de skin <white>{skin}</white> antes de aplicar su tooltip.</red>'
+  tooltip-duplicate: '{prefix} <white>El tooltip de <#A0A0A0>{skin}</#A0A0A0> ya está aplicado.</white>'
   player-not-found: '{prefix} <red>Jugador no encontrado: <white>{player}</white>.</red>'
+  single-slot: '{prefix} <white>Este ítem solo tiene un slot de skin.</white>'
+  already-active: '{prefix} <white>La skin <#A0A0A0>{skin}</#A0A0A0> ya está activa.</white>'
+  already-vanilla: '{prefix} <white>El ítem ya está mostrando su aspecto vanilla.</white>'
+  skin-not-on-item: '{prefix} <red>La skin <white>{skin}</white> no está instalada en este ítem.</red>'
 
 # -- Cambio de skin ---------------------------
 skin:
-  switched: '{prefix} <white>Cambiaste a <#C173FF>{skin}</#C173FF>.</white>'
+  switched: '<white>Cambiaste a <gradient:#A0A0A0:#595959>{skin}</gradient></white>'
+  switched-vanilla: '<white>Restaurado el aspecto <red>vanilla</red></white>'
 
-# -- Sección añadida al lore de ítems con slots --
-# Se renderiza como una sola línea, ej: "[🌷] [🎃] [❄]".
-# Placeholders:
-#   {color}  color de los corchetes (resuelto desde skins.yml)
-#   {icon}   icono por skin configurado en skins.yml
+# -- Layout de la fila de slots ----------------
+# La fila de slots se pinta siempre como la primera línea del lore,
+# al estilo de una línea de encantamiento vanilla. Personaliza el
+# formato con 'row' y cada slot con 'slot-active' / 'slot-inactive'.
+# Los slots se separan por un espacio simple.
 lore:
-  separator: ' '
-  slot-active: '<color:{color}>[<white>{icon}</white>]</color>'
-  slot-inactive: '<color:{color}>[{icon}]</color>'
+  row: '<gray>Skins:</gray> {slots}'
+  slot-active: '<color:{color}>[</color>{icon}<color:{color}>]</color>'
+  slot-inactive: '<color:{color}>[</color>{icon}<color:{color}>]</color>'
