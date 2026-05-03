@@ -17,7 +17,10 @@ public final class SkinConfig {
     public static final int CURRENT_VERSION = 1;
 
     private final Map<String, SkinDefinition> skins;
-    private final String defaultBracketColor;
+    private final String defaultBracketColorActive;
+    private final String defaultBracketColorInactive;
+    private final String defaultIconActive;
+    private final String defaultIconInactive;
 
     public SkinConfig(ConfigurationSection root, Logger logger) {
         final Map<String, SkinDefinition> map = new LinkedHashMap<>();
@@ -31,7 +34,10 @@ public final class SkinConfig {
             }
         }
         this.skins = Collections.unmodifiableMap(map);
-        this.defaultBracketColor = root.getString("default-bracket-color", "gray");
+        this.defaultBracketColorActive = root.getString("default-bracket-color-active", "gray");
+        this.defaultBracketColorInactive = root.getString("default-bracket-color-inactive", "dark_gray");
+        this.defaultIconActive = root.getString("default-icon-active", "");
+        this.defaultIconInactive = root.getString("default-icon-inactive", "");
     }
 
     private SkinDefinition parseSkin(String id, ConfigurationSection root, Logger logger) {
@@ -40,8 +46,8 @@ public final class SkinConfig {
         final List<String> lore;
         final String iconActive;
         final String iconInactive;
-        final String bracketColor;
-        final String bracketColorDefault;
+        final String bracketColorActive;
+        final String bracketColorInactive;
         final String tooltipStyleRaw;
         final CustomModelDataConfig customModelData;
         final TooltipDisplayConfig tooltipDisplay;
@@ -53,8 +59,8 @@ public final class SkinConfig {
             lore = section.isList("lore") ? section.getStringList("lore") : List.of();
             iconActive = section.getString("icon-active", null);
             iconInactive = section.getString("icon-inactive", null);
-            bracketColor = section.getString("bracket-color", null);
-            bracketColorDefault = section.getString("bracket-color-default", null);
+            bracketColorActive = section.getString("bracket-color-active", null);
+            bracketColorInactive = section.getString("bracket-color-inactive", null);
             tooltipStyleRaw = section.getString("tooltip_style", null);
             customModelData = parseCustomModelData(section.getConfigurationSection("custom_model_data"));
             tooltipDisplay = parseTooltipDisplay(id, section.getConfigurationSection("tooltip_display"), logger);
@@ -64,8 +70,8 @@ public final class SkinConfig {
             lore = List.of();
             iconActive = null;
             iconInactive = null;
-            bracketColor = null;
-            bracketColorDefault = null;
+            bracketColorActive = null;
+            bracketColorInactive = null;
             tooltipStyleRaw = null;
             customModelData = null;
             tooltipDisplay = null;
@@ -88,7 +94,7 @@ public final class SkinConfig {
         }
 
         return new SkinDefinition(id, modelKey, name, lore, iconActive, iconInactive,
-                bracketColor, bracketColorDefault, tooltipKey,
+                bracketColorActive, bracketColorInactive, tooltipKey,
                 customModelData, tooltipDisplay);
     }
 
@@ -122,7 +128,8 @@ public final class SkinConfig {
         return skins;
     }
 
-    public String getDefaultBracketColor() {
-        return defaultBracketColor;
-    }
+    public String getDefaultBracketColorActive() { return defaultBracketColorActive; }
+    public String getDefaultBracketColorInactive() { return defaultBracketColorInactive; }
+    public String getDefaultIconActive() { return defaultIconActive; }
+    public String getDefaultIconInactive() { return defaultIconInactive; }
 }

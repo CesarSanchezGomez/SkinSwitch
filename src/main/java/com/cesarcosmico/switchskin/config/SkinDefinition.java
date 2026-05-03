@@ -12,8 +12,8 @@ public record SkinDefinition(
         List<String> lore,
         String iconActive,
         String iconInactive,
-        String bracketColor,
-        String bracketColorDefault,
+        String bracketColorActive,
+        String bracketColorInactive,
         NamespacedKey tooltipStyle,
         @Nullable CustomModelDataConfig customModelData,
         @Nullable TooltipDisplayConfig tooltipDisplay
@@ -34,20 +34,19 @@ public record SkinDefinition(
         return !lore.isEmpty();
     }
 
-    public boolean hasBracketColor() {
-        return bracketColor != null && !bracketColor.isEmpty();
+    public boolean hasBracketColorActive() {
+        return bracketColorActive != null && !bracketColorActive.isEmpty();
     }
 
-    public boolean hasBracketColorDefault() {
-        return bracketColorDefault != null && !bracketColorDefault.isEmpty();
+    public boolean hasBracketColorInactive() {
+        return bracketColorInactive != null && !bracketColorInactive.isEmpty();
     }
 
-    public String activeIcon() {
-        return (iconActive != null && !iconActive.isEmpty()) ? iconActive : id;
+    public boolean hasIconActive() {
+        return iconActive != null && !iconActive.isEmpty();
     }
 
-    public String inactiveIcon() {
-        if (iconInactive != null && !iconInactive.isEmpty()) return iconInactive;
-        return activeIcon();
+    public boolean hasIconInactive() {
+        return iconInactive != null && !iconInactive.isEmpty();
     }
 }

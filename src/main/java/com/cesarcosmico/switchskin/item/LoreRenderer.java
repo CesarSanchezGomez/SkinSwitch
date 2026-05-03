@@ -49,13 +49,11 @@ public final class LoreRenderer {
         final LangConfig lang = langSupplier.get();
         final SkinConfig skinConfig = skinSupplier.get();
         final PlaceholderResolver resolver = placeholderSupplier.get();
-        final String globalDefaultColor = skinConfig.getDefaultBracketColor();
 
         final StringBuilder slots = new StringBuilder();
         for (int i = 0; i < skinIds.size(); i++) {
             if (i > 0) slots.append(SLOT_SEPARATOR);
-            slots.append(renderSlot(lang, skinConfig, skinIds.get(i),
-                    i == currentIndex, globalDefaultColor));
+            slots.append(renderSlot(lang, skinConfig, skinIds.get(i), i == currentIndex));
         }
 
         final String row = resolver.resolve(owner, lang.getRaw("lore.row"))
@@ -63,13 +61,10 @@ public final class LoreRenderer {
         return MINI.deserialize(row).decoration(TextDecoration.ITALIC, false);
     }
 
-    private static String renderSlot(LangConfig lang, SkinConfig skinConfig, String skinId,
-                                     boolean active, String defaultColor) {
+    private static String renderSlot(LangConfig lang, SkinConfig skinConfig, String skinId, boolean active) {
         final SkinDefinition skin = skinConfig.get(skinId).orElse(null);
-        final String icon = skin != null
-                ? (active ? skin.activeIcon() : skin.inactiveIcon())
-                : skinId;
-        final String color = resolveBracketColor(skin, active, defaultColor);
+        final String icon = resolveIcon(skin, skinId, skinConfig, active);
+        final String color = resolveBracketColor(skin, skinConfig, active);
         final String template = lang.getRaw(active ? "lore.slot-active" : "lore.slot-inactive");
         return template
                 .replace("{color}", color)
@@ -77,10 +72,28 @@ public final class LoreRenderer {
                 .replace("{skin}", icon);
     }
 
+    private static String resolveIcon(@Nullable SkinDefinition skin, String skinId,
+                                      SkinConfig config, boolean active) {
+        if (active) {
+            if (skin != null && skin.hasIconActive()) return skin.iconActive();
+            final String def = config.getDefaultIconActive();
+            return def != null && !def.isEmpty() ? def : skinId;
+        }
+        if (skin != null && skin.hasIconInactive()) return skin.iconInactive();
+        if (skin != null && skin.hasIconActive()) return skin.iconActive();
+        final String def = config.getDefaultIconInactive();
+        if (def != null && !def.isEmpty()) return def;
+        final String activeDef = config.getDefaultIconActive();
+        return activeDef != null && !activeDef.isEmpty() ? activeDef : skinId;
+    }
+
     private static String resolveBracketColor(@Nullable SkinDefinition skin,
-                                              boolean active, String defaultColor) {
-        if (skin == null) return defaultColor;
-        if (active) return skin.hasBracketColor() ? skin.bracketColor() : defaultColor;
-        return skin.hasBracketColorDefault() ? skin.bracketColorDefault() : defaultColor;
+                                              SkinConfig config, boolean active) {
+        if (active) {
+            if (skin != null && skin.hasBracketColorActive()) return skin.bracketColorActive();
+            return config.getDefaultBracketColorActive();
+        }
+        if (skin != null && skin.hasBracketColorInactive()) return skin.bracketColorInactive();
+        return config.getDefaultBracketColorInactive();
     }
 }
