@@ -1,9 +1,11 @@
 package com.cesarcosmico.switchskin.config;
 
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Set;
 
 public record SkinDefinition(
         String id,
@@ -18,10 +20,12 @@ public record SkinDefinition(
         @Nullable CustomModelDataConfig customModelData,
         @Nullable TooltipDisplayConfig tooltipDisplay,
         @Nullable TokenVisualConfig tokenSkin,
-        @Nullable TokenVisualConfig tokenTooltip
+        @Nullable TokenVisualConfig tokenTooltip,
+        Set<Material> compatibleMaterials
 ) {
     public SkinDefinition {
         lore = lore == null ? List.of() : List.copyOf(lore);
+        compatibleMaterials = compatibleMaterials == null ? Set.of() : Set.copyOf(compatibleMaterials);
     }
 
     public String nameOrId() {
@@ -50,5 +54,9 @@ public record SkinDefinition(
 
     public boolean hasIconInactive() {
         return iconInactive != null && !iconInactive.isEmpty();
+    }
+
+    public boolean acceptsMaterial(Material material) {
+        return compatibleMaterials.isEmpty() || compatibleMaterials.contains(material);
     }
 }

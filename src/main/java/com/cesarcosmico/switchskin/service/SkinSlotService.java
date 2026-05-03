@@ -38,7 +38,7 @@ public final class SkinSlotService {
 
     public static final int VANILLA_INDEX = -1;
 
-    public enum AddResult { ADDED, UNKNOWN_SKIN, FULL, DUPLICATE, NO_META }
+    public enum AddResult { ADDED, UNKNOWN_SKIN, FULL, DUPLICATE, INCOMPATIBLE, NO_META }
     public enum RemoveResult { REMOVED, INVALID_INDEX, NO_SLOTS, NO_META }
     public enum CycleResult { CYCLED, NO_SLOTS, NO_META, SINGLE_SLOT }
     public enum SelectResult { SELECTED, NO_SLOTS, NO_META, INVALID_INDEX, ALREADY_ACTIVE }
@@ -107,6 +107,7 @@ public final class SkinSlotService {
         if (item == null) return AddResult.NO_META;
         final Optional<SkinDefinition> skinOpt = skinSupplier.get().get(skinId);
         if (skinOpt.isEmpty()) return AddResult.UNKNOWN_SKIN;
+        if (!skinOpt.get().acceptsMaterial(item.getType())) return AddResult.INCOMPATIBLE;
 
         final ItemMeta meta = item.getItemMeta();
         if (meta == null) return AddResult.NO_META;

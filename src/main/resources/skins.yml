@@ -24,6 +24,8 @@
 #         item_model: edosummer:ice_cream_token
 #       token-tooltip:                                                        # OPTIONAL — same idea for the tooltip token
 #         item_model: edosummer:ice_cream_tooltip_token
+#       applies-to:                                                           # OPTIONAL — restrict which materials accept this skin
+#         - '#minecraft:pickaxes'
 #
 # All fields are optional. A skin with only custom_model_data, lore,
 # tooltip_style or any subset is valid. Behavior:
@@ -100,6 +102,16 @@
 #   * 'token-tooltip'        optional. Same shape as token-skin, but for
 #                            the TOOLTIP TOKEN. Falls back to the global
 #                            config.yml.tooltip-token block.
+#   * 'applies-to'           optional list. Restricts which target item
+#                            materials accept this skin's token. Two
+#                            entry formats, mixable:
+#                              - '#minecraft:pickaxes'   # vanilla item tag
+#                                                        # (resolves to all
+#                                                        # pickaxe materials)
+#                              - DIAMOND_SWORD           # explicit material
+#                            Empty / missing list = the skin works on any
+#                            item (current behavior). Unknown materials or
+#                            tags log a warning and are ignored.
 #
 # Skins are visual-only: enchants, material, profile, etc. are NOT
 # accepted. Use a plugin like ItemsAdder if you need that level of
@@ -165,3 +177,5 @@ skins:
     custom_model_data:
       strings:
         - 'glacial'
+    applies-to:
+      - '#minecraft:pickaxes'

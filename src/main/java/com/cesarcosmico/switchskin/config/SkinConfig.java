@@ -2,14 +2,19 @@ package com.cesarcosmico.switchskin.config;
 
 import com.cesarcosmico.switchskin.item.component.CustomModelDataApplier;
 import com.cesarcosmico.switchskin.item.component.TooltipDisplayApplier;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Tag;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.logging.Logger;
 
 public final class SkinConfig {
@@ -58,6 +63,7 @@ public final class SkinConfig {
         final TooltipDisplayConfig tooltipDisplay;
         final TokenVisualConfig tokenSkin;
         final TokenVisualConfig tokenTooltip;
+        final Set<Material> compatibleMaterials;
 
         if (root.isConfigurationSection(id)) {
             final ConfigurationSection section = root.getConfigurationSection(id);
@@ -73,6 +79,7 @@ public final class SkinConfig {
             tooltipDisplay = parseTooltipDisplay(id, section.getConfigurationSection("tooltip_display"), logger);
             tokenSkin = parseTokenVisual(id, "token-skin", section.getConfigurationSection("token-skin"), logger);
             tokenTooltip = parseTokenVisual(id, "token-tooltip", section.getConfigurationSection("token-tooltip"), logger);
+            compatibleMaterials = parseAppliesTo(id, section.getStringList("applies-to"), logger);
         } else {
             itemModelRaw = root.getString(id, "");
             name = null;
@@ -86,6 +93,7 @@ public final class SkinConfig {
             tooltipDisplay = null;
             tokenSkin = null;
             tokenTooltip = null;
+            compatibleMaterials = Set.of();
         }
 
         NamespacedKey modelKey = null;
@@ -106,7 +114,42 @@ public final class SkinConfig {
 
         return new SkinDefinition(id, modelKey, name, lore, iconActive, iconInactive,
                 bracketColorActive, bracketColorInactive, tooltipKey,
-                customModelData, tooltipDisplay, tokenSkin, tokenTooltip);
+                customModelData, tooltipDisplay, tokenSkin, tokenTooltip,
+                compatibleMaterials);
+    }
+
+    private Set<Material> parseAppliesTo(String skinId, List<String> entries, Logger logger) {
+        if (entries == null || entries.isEmpty()) return Set.of();
+        final EnumSet<Material> resolved = EnumSet.noneOf(Material.class);
+        for (String entry : entries) {
+            if (entry == null || entry.isBlank()) continue;
+            final String trimmed = entry.trim();
+            if (trimmed.startsWith("#")) {
+                resolveTag(skinId, trimmed.substring(1), resolved, logger);
+            } else {
+                final Material material = Material.matchMaterial(trimmed);
+                if (material == null) {
+                    logger.warning("Skin '" + skinId + "' has an unknown material in applies-to: " + trimmed);
+                    continue;
+                }
+                resolved.add(material);
+            }
+        }
+        return resolved.isEmpty() ? Set.of() : resolved;
+    }
+
+    private void resolveTag(String skinId, String tagId, Set<Material> sink, Logger logger) {
+        final NamespacedKey key = NamespacedKey.fromString(tagId);
+        if (key == null) {
+            logger.warning("Skin '" + skinId + "' has an invalid tag in applies-to: #" + tagId);
+            return;
+        }
+        final Tag<Material> tag = Bukkit.getTag(Tag.REGISTRY_ITEMS, key, Material.class);
+        if (tag == null) {
+            logger.warning("Skin '" + skinId + "' references an unknown item tag in applies-to: #" + tagId);
+            return;
+        }
+        sink.addAll(tag.getValues());
     }
 
     private CustomModelDataConfig parseCustomModelData(ConfigurationSection section) {

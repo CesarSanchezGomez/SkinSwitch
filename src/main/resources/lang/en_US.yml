@@ -15,6 +15,7 @@ command:
   no-slots: '{prefix} <white>This item has no skin slots.</white>'
   slots-full: '{prefix} <white>This item has reached the maximum slot capacity ({max}).</white>'
   duplicate-slot: '{prefix} <white>That skin is already installed on this item.</white>'
+  skin-incompatible: '{prefix} <red>Skin <white>{skin}</white> can''t be applied to <white>{material}</white>.</red>'
   token-given: '{prefix} <white>Gave <#A0A0A0>{count}</#A0A0A0> token(s) of <#A0A0A0>{skin}</#A0A0A0> to <#A0A0A0>{player}</#A0A0A0>.</white>'
   tooltip-token-given: '{prefix} <white>Gave <#A0A0A0>{count}</#A0A0A0> tooltip token(s) of <#A0A0A0>{skin}</#A0A0A0> to <#A0A0A0>{player}</#A0A0A0>.</white>'
   tooltip-applied: '{prefix} <white>Tooltip <#A0A0A0>{skin}</#A0A0A0> applied.</white>'

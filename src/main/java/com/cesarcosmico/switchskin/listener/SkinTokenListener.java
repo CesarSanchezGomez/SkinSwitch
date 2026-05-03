@@ -73,12 +73,12 @@ public final class SkinTokenListener implements Listener {
         if (skinId == null) return;
 
         final SkinSlotService.AddResult result = skinSlotService.addSlot(target, skinId, player);
+        final SkinDefinition def = skinSupplier.get().get(skinId).orElse(null);
+        final String display = def == null ? skinId : def.nameOrId();
         switch (result) {
             case ADDED -> {
                 CursorUtil.consumeOne(player, cursor);
                 announcerSupplier.get().playTokenSound(player);
-                final SkinDefinition def = skinSupplier.get().get(skinId).orElse(null);
-                final String display = def == null ? skinId : def.nameOrId();
                 langSupplier.get().send(player, "command.slot-added",
                         "{skin}", display,
                         "{count}", String.valueOf(skinSlotService.getSlots(target).size()));
@@ -86,6 +86,9 @@ public final class SkinTokenListener implements Listener {
             case DUPLICATE -> langSupplier.get().send(player, "command.duplicate-slot");
             case FULL -> langSupplier.get().send(player, "command.slots-full",
                     "{max}", String.valueOf(skinSlotService.getSlots(target).size()));
+            case INCOMPATIBLE -> langSupplier.get().send(player, "command.skin-incompatible",
+                    "{skin}", display,
+                    "{material}", target.getType().getKey().value());
             case UNKNOWN_SKIN -> langSupplier.get().send(player, "command.unknown-skin",
                     "{skin}", skinId);
             case NO_META -> {}
