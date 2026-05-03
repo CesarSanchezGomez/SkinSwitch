@@ -41,5 +41,5 @@ skin:
 # Los slots se separan por un espacio simple.
 lore:
   row: '<gray>Skins:</gray> {slots}'
-  slot-active: '{color}[</color>{icon}{color}]</color>'
-  slot-inactive: '{color}[</color>{icon}{color}]</color>'
+  slot-active: '<color:{color}>[</color>{icon}<color:{color}>]</color>'
+  slot-inactive: '<color:{color}>[</color>{icon}<color:{color}>]</color>'

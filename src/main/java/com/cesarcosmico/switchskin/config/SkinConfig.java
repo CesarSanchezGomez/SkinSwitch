@@ -146,7 +146,7 @@ public final class SkinConfig {
     private String parsePerSkinColor(ConfigurationSection section, String key, String skinId, Logger logger) {
         final String raw = section.getString(key, null);
         if (raw == null) return null;
-        if (isValidColorTag(raw)) return raw;
+        if (isValidColorTag(raw)) return stripWrap(raw);
         logger.warning("Skin '" + skinId + "' has invalid " + key + ": '" + raw
                 + "'. Use a MiniMessage color tag like '<gray>' or '<#FCBDE3>'. Falling back to global default.");
         return null;
@@ -154,15 +154,19 @@ public final class SkinConfig {
 
     private static String parseGlobalColor(ConfigurationSection root, String key, String fallback, Logger logger) {
         final String raw = root.getString(key, fallback);
-        if (isValidColorTag(raw)) return raw;
+        if (isValidColorTag(raw)) return stripWrap(raw);
         logger.warning(key + " must be a MiniMessage color tag like '<gray>' or '<#FCBDE3>', got '"
                 + raw + "'. Using bundled default '" + fallback + "'.");
-        return fallback;
+        return stripWrap(fallback);
     }
 
     private static boolean isValidColorTag(String raw) {
         return raw != null && raw.length() >= 2
                 && raw.charAt(0) == '<' && raw.charAt(raw.length() - 1) == '>';
+    }
+
+    private static String stripWrap(String wrapped) {
+        return wrapped.substring(1, wrapped.length() - 1);
     }
 
     public Optional<SkinDefinition> get(String id) {
