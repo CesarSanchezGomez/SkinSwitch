@@ -80,8 +80,6 @@ public final class SwitchSkinPlugin extends JavaPlugin {
         saveDefaultIfMissing("skins.yml");
         final FileConfiguration skinsYml = YamlConfiguration.loadConfiguration(
                 new File(getDataFolder(), "skins.yml"));
-        ConfigVersionChecker.check(skinsYml, "skins.yml",
-                SkinConfig.CURRENT_VERSION, this, getLogger(), "skins");
 
         if (this.langConfig == null) {
             this.langConfig = new LangConfig(this);

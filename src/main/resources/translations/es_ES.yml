@@ -1,0 +1,45 @@
+# SwitchSkin: Español (es_ES)
+config-version: 1
+
+prefix: '<white>[<gradient:#A0A0A0:#595959>SwitchSkin</gradient>]</white>'
+
+# -- Comandos ---------------------------------
+# El prefijo se antepone automáticamente; no lo incluyas aquí.
+command:
+  only-players: '<red>Este comando solo puede ser usado por jugadores.</red>'
+  reload-success: '<white>Configuración recargada exitosamente.</white>'
+  no-item-in-hand: '<red>Debes tener un ítem en la mano principal.</red>'
+  unknown-skin: '<red>Skin desconocida: <white><skin></white>.</red>'
+  slot-added: '<white>Slot <#A0A0A0><skin></#A0A0A0> añadido. Total: <#A0A0A0><count></#A0A0A0>.</white>'
+  slot-removed: '<white>Slot <#A0A0A0><skin></#A0A0A0> eliminado.</white>'
+  invalid-slot: '<red>Índice de slot inválido.</red>'
+  no-slots: '<white>Este ítem no tiene slots de skin.</white>'
+  slots-full: '<white>Este ítem ha alcanzado el límite de slots (<max>).</white>'
+  duplicate-slot: '<white>Esta skin ya está instalada en este ítem.</white>'
+  skin-incompatible: '<red>La skin <white><skin></white> no se puede aplicar a <white><material></white>.</red>'
+  token-given: '<white>Entregaste <#A0A0A0><count></#A0A0A0> token(s) de <#A0A0A0><skin></#A0A0A0> a <#A0A0A0><player></#A0A0A0>.</white>'
+  tooltip-token-given: '<white>Entregaste <#A0A0A0><count></#A0A0A0> token(s) de tooltip <#A0A0A0><skin></#A0A0A0> a <#A0A0A0><player></#A0A0A0>.</white>'
+  tooltip-applied: '<white>Tooltip <#A0A0A0><skin></#A0A0A0> aplicado.</white>'
+  tooltip-removed: '<white>Tooltip eliminado del slot activo.</white>'
+  tooltip-not-applied: '<white>El slot activo no tiene tooltip aplicado.</white>'
+  tooltip-missing: '<red>La skin <white><skin></white> no tiene tooltip_style definido.</red>'
+  tooltip-needs-slot: '<red>Debes añadir primero el slot de skin <white><skin></white> antes de aplicar su tooltip.</red>'
+  tooltip-duplicate: '<white>El tooltip de <#A0A0A0><skin></#A0A0A0> ya está aplicado.</white>'
+  player-not-found: '<red>Jugador no encontrado: <white><player></white>.</red>'
+  single-slot: '<white>Este ítem solo tiene un slot de skin.</white>'
+  already-active: '<white>La skin <#A0A0A0><skin></#A0A0A0> ya está activa.</white>'
+  already-vanilla: '<white>El ítem ya está mostrando su aspecto vanilla.</white>'
+  skin-not-on-item: '<red>La skin <white><skin></white> no está instalada en este ítem.</red>'
+
+# -- Cambio de skin ---------------------------
+skin:
+  switched: '<white>Cambiaste a <gradient:#A0A0A0:#595959><skin></gradient></white>'
+  switched-vanilla: '<white>Restaurado el aspecto <red>vanilla</red></white>'
+
+# -- Layout de la fila de slots ----------------
+# Los tokens {slots}, {icon} y {color} los rellena el renderer (estructural,
+# no son placeholders MiniMessage).
+lore:
+  row: '<gray>Skins:</gray> {slots}'
+  slot-active: '<color:{color}>[</color>{icon}<color:{color}>]</color>'
+  slot-inactive: '<color:{color}>[</color>{icon}<color:{color}>]</color>'
