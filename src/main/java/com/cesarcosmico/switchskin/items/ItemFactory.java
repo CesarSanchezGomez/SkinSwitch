@@ -70,6 +70,9 @@ public final class ItemFactory {
         }
 
         ItemStack stack = new ItemStack(material, Math.max(1, amount));
+        if (material.isAir()) {
+            return stack;
+        }
         applyProfile(stack, components, context);
 
         RtagItem item = new RtagItem(stack);
