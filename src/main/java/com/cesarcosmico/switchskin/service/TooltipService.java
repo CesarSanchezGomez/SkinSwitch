@@ -9,11 +9,7 @@ import com.cesarcosmico.switchskin.service.SkinSlotService.TooltipRemoveResult;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-/**
- * Use-cases for the tooltip token / removal flow. Reads and writes state through
- * {@link SkinStateCodec}, runs the pure {@link SkinLoadout} tooltip transitions
- * and re-renders via {@link SkinAppearanceRenderer}.
- */
+// Tooltip token apply/remove use-cases over the codec + SkinLoadout + renderer.
 public final class TooltipService {
 
     private final SkinStateCodec codec;

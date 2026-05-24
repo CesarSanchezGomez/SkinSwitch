@@ -15,11 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Thin orchestrator over the pure {@link SkinLoadout} state machine and the
- * Bukkit boundary ({@link SkinStateCodec} + {@link SkinAppearanceRenderer}).
- * Each mutation reads the loadout, runs a transition, persists it and re-renders.
- */
+// Thin orchestrator: read loadout -> run a SkinLoadout transition -> persist -> re-render.
 public final class SkinSlotService {
 
     public static final int VANILLA_INDEX = SkinLoadout.VANILLA_INDEX;

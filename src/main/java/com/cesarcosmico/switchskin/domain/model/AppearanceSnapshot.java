@@ -6,12 +6,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-/**
- * Bukkit-free serialized form of an item's original appearance, captured the
- * first time a skin slot is added and restored when the last slot is removed.
- * Components are stored as gson JSON / NamespacedKey strings so the only Bukkit
- * boundary stays in the codec. The referenced config records are pure data.
- */
+// Bukkit-free serialized form of an item's original appearance (gson JSON /
+// NamespacedKey strings), captured on the first slot and restored on the last.
 public record AppearanceSnapshot(
         boolean present,
         List<String> loreJson,

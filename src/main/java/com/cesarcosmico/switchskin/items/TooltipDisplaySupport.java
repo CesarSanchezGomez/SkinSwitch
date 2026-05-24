@@ -11,12 +11,8 @@ import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Bukkit boundary for the live {@code tooltip_display} data component. The skin
- * slot applies the active skin's tooltip_display directly to the held stack (the
- * RTAG dispatch covers menu icons / tokens), so this keeps that one Paper API
- * call plus the reflective component-id registry used to validate config.
- */
+// Applies the live tooltip_display component to a held item (skin-slot path) and
+// validates configured hidden-component ids against the vanilla component set.
 public final class TooltipDisplaySupport {
 
     private static final Map<String, DataComponentType> TYPE_REGISTRY = buildTypeRegistry();

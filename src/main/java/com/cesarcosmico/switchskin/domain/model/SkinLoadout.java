@@ -8,12 +8,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-/**
- * Immutable, Bukkit-free view of an item's skin state: the ordered slots, the
- * active index ({@link #VANILLA_INDEX} = original look) and the set of slots
- * whose tooltip is applied. Transitions return a {@link Change} carrying the
- * next loadout plus a pure outcome; the orchestrator owns side effects.
- */
+// Immutable, Bukkit-free skin state. Transitions return (next loadout, outcome)
+// with no side effects; VANILLA_INDEX = the original look.
 public record SkinLoadout(List<SkinId> slots, int activeIndex, Set<SkinId> tooltips) {
 
     public static final int VANILLA_INDEX = -1;

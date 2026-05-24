@@ -26,12 +26,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-/**
- * The single Bukkit boundary for an item's skin state: translates the item's
- * PersistentDataContainer (and the live tooltip_display component) to and from
- * the Bukkit-free {@link SkinLoadout} / {@link AppearanceSnapshot} domain types.
- * Reuses the existing PDC keys so items skinned before the refactor stay valid.
- */
+// The single Bukkit boundary: item PDC <-> SkinLoadout / AppearanceSnapshot.
+// Reuses the existing PDC keys so items skinned before the refactor stay valid.
 public final class SkinStateCodec {
 
     private static final GsonComponentSerializer GSON = GsonComponentSerializer.gson();

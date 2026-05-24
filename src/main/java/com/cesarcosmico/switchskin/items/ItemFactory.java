@@ -5,28 +5,17 @@ import com.cesarcosmico.switchskin.config.TokenVisualConfig;
 import com.cesarcosmico.switchskin.items.value.ComponentValue;
 import com.cesarcosmico.switchskin.items.value.LiteralValue;
 import com.cesarcosmico.switchskin.items.value.ValueCompiler;
-import com.destroystokyo.paper.profile.PlayerProfile;
-import com.destroystokyo.paper.profile.ProfileProperty;
 import com.saicone.rtag.RtagItem;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.UUID;
 import java.util.logging.Logger;
 
-/**
- * Builds tokens and menu icons from a compiled component AST, applying each
- * vanilla data component through RTAG ({@link ComponentDispatcher}). The only
- * components handled outside the generic dispatch are {@code material} (defines
- * the stack) and {@code profile} (applied via the Paper profile API, since the
- * config format is {@code textures}/name rather than the vanilla component shape).
- */
+/** Builds tokens and menu icons, applying each vanilla data component through RTAG. */
 public final class ItemFactory {
 
     private final Logger logger;
@@ -44,7 +33,6 @@ public final class ItemFactory {
         return ValueCompiler.compileTopLevel(section);
     }
 
-    /** Build an item from a compiled component map. {@code materialOverride} wins over the AST material. */
     public ItemStack build(Map<String, ComponentValue> components, ItemContext context,
                            @Nullable Material materialOverride, int amount) {
         return assemble(components, context, materialOverride, amount, null, false, null);
@@ -65,15 +53,10 @@ public final class ItemFactory {
                                @Nullable String tokenId, boolean skinToken,
                                @Nullable TokenVisualConfig override) {
         Material material = materialOverride != null ? materialOverride : resolveMaterial(components);
-        if (components.containsKey("profile") && material != Material.PLAYER_HEAD) {
-            material = Material.PLAYER_HEAD;
-        }
-
         ItemStack stack = new ItemStack(material, Math.max(1, amount));
         if (material.isAir()) {
             return stack;
         }
-        applyProfile(stack, components, context);
 
         RtagItem item = new RtagItem(stack);
         dispatcher.apply(item, components, context);
@@ -116,30 +99,5 @@ public final class ItemFactory {
             logger.warning("Unknown material: " + name + ", using STONE");
         }
         return Material.STONE;
-    }
-
-    private void applyProfile(ItemStack stack, Map<String, ComponentValue> components, ItemContext context) {
-        ComponentValue value = components.get("profile");
-        if (value == null || !(stack.getItemMeta() instanceof SkullMeta meta)) {
-            return;
-        }
-        Object resolved = value.resolve(context);
-        try {
-            if (resolved instanceof Map<?, ?> map) {
-                Object textures = map.get("textures");
-                if (textures instanceof String encoded && !encoded.isEmpty()) {
-                    PlayerProfile profile = Bukkit.createProfile(UUID.randomUUID());
-                    profile.clearProperties();
-                    profile.setProperty(new ProfileProperty("textures", encoded));
-                    meta.setPlayerProfile(profile);
-                    stack.setItemMeta(meta);
-                }
-            } else if (resolved instanceof String name && !name.isEmpty()) {
-                meta.setPlayerProfile(Bukkit.createProfile(name));
-                stack.setItemMeta(meta);
-            }
-        } catch (RuntimeException invalidProfile) {
-            logger.warning("Invalid profile: " + invalidProfile.getMessage());
-        }
     }
 }

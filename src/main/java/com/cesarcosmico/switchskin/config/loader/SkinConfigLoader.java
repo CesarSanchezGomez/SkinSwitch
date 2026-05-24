@@ -18,22 +18,18 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
-/**
- * Parses the {@code skins} section of skins.yml into {@link SkinDefinition}s,
- * doing deep per-entry validation via {@link SchemaKeys}. Both the flat
- * ({@code id: model:path}) and section skin formats are supported.
- */
+/** Parses skins.yml into SkinDefinitions with deep per-entry validation. */
 public final class SkinConfigLoader {
 
     private static final String FILE = "skins.yml";
 
     private static final Set<String> SKIN_ALLOWED = Set.of(
-            "item_model", "name", "lore", "icon-active", "icon-inactive",
-            "bracket-color-active", "bracket-color-inactive", "tooltip_style",
-            "custom_model_data", "tooltip_display", "token-skin", "token-tooltip", "applies-to");
+            "item-model", "name", "lore", "icon-active", "icon-inactive",
+            "bracket-color-active", "bracket-color-inactive", "tooltip-style",
+            "custom-model-data", "tooltip-display", "token-skin", "token-tooltip", "applies-to");
     private static final Set<String> CMD_ALLOWED = Set.of("floats", "flags", "strings", "colors");
-    private static final Set<String> TOOLTIP_DISPLAY_ALLOWED = Set.of("hide_tooltip", "hidden_components");
-    private static final Set<String> TOKEN_VISUAL_ALLOWED = Set.of("item_model", "custom_model_data");
+    private static final Set<String> TOOLTIP_DISPLAY_ALLOWED = Set.of("hide-tooltip", "hidden-components");
+    private static final Set<String> TOKEN_VISUAL_ALLOWED = Set.of("item-model", "custom-model-data");
 
     private final Logger logger;
 
@@ -71,16 +67,16 @@ public final class SkinConfigLoader {
         if (root.isConfigurationSection(id)) {
             final ConfigurationSection section = root.getConfigurationSection(id);
             SchemaKeys.checkKeys(logger, FILE, "skins." + id, section, SKIN_ALLOWED, Set.of());
-            itemModelRaw = section.getString("item_model", "");
+            itemModelRaw = section.getString("item-model", "");
             name = section.getString("name", null);
             lore = section.isList("lore") ? section.getStringList("lore") : List.of();
             iconActive = section.getString("icon-active", null);
             iconInactive = section.getString("icon-inactive", null);
             bracketColorActive = parsePerSkinColor(section, "bracket-color-active", id);
             bracketColorInactive = parsePerSkinColor(section, "bracket-color-inactive", id);
-            tooltipStyleRaw = section.getString("tooltip_style", null);
-            customModelData = parseCustomModelData(id, section.getConfigurationSection("custom_model_data"));
-            tooltipDisplay = parseTooltipDisplay(id, section.getConfigurationSection("tooltip_display"));
+            tooltipStyleRaw = section.getString("tooltip-style", null);
+            customModelData = parseCustomModelData(id, section.getConfigurationSection("custom-model-data"));
+            tooltipDisplay = parseTooltipDisplay(id, section.getConfigurationSection("tooltip-display"));
             tokenSkin = parseTokenVisual(id, "token-skin", section.getConfigurationSection("token-skin"));
             tokenTooltip = parseTokenVisual(id, "token-tooltip", section.getConfigurationSection("token-tooltip"));
             compatibleMaterials = parseAppliesTo(id, section.getStringList("applies-to"));
@@ -104,7 +100,7 @@ public final class SkinConfigLoader {
         if (!itemModelRaw.isEmpty()) {
             modelKey = NamespacedKey.fromString(itemModelRaw);
             if (modelKey == null) {
-                logger.warning("Skin '" + id + "' has an invalid item_model: " + itemModelRaw);
+                logger.warning("Skin '" + id + "' has an invalid item-model: " + itemModelRaw);
             }
         }
 
@@ -112,7 +108,7 @@ public final class SkinConfigLoader {
         if (tooltipStyleRaw != null && !tooltipStyleRaw.isEmpty()) {
             tooltipKey = NamespacedKey.fromString(tooltipStyleRaw);
             if (tooltipKey == null) {
-                logger.warning("Skin '" + id + "' has an invalid tooltip_style: " + tooltipStyleRaw);
+                logger.warning("Skin '" + id + "' has an invalid tooltip-style: " + tooltipStyleRaw);
             }
         }
 
@@ -158,7 +154,7 @@ public final class SkinConfigLoader {
 
     private CustomModelDataConfig parseCustomModelData(String skinId, ConfigurationSection section) {
         if (section == null) return null;
-        SchemaKeys.checkKeys(logger, FILE, "skins." + skinId + ".custom_model_data", section, CMD_ALLOWED, Set.of());
+        SchemaKeys.checkKeys(logger, FILE, "skins." + skinId + ".custom-model-data", section, CMD_ALLOWED, Set.of());
         final CustomModelDataConfig parsed = new CustomModelDataConfig(
                 section.getFloatList("floats"),
                 section.getBooleanList("flags"),
@@ -169,15 +165,15 @@ public final class SkinConfigLoader {
 
     private TooltipDisplayConfig parseTooltipDisplay(String skinId, ConfigurationSection section) {
         if (section == null) return null;
-        SchemaKeys.checkKeys(logger, FILE, "skins." + skinId + ".tooltip_display", section,
+        SchemaKeys.checkKeys(logger, FILE, "skins." + skinId + ".tooltip-display", section,
                 TOOLTIP_DISPLAY_ALLOWED, Set.of());
         final TooltipDisplayConfig parsed = new TooltipDisplayConfig(
-                section.getBoolean("hide_tooltip", false),
-                section.getStringList("hidden_components"));
+                section.getBoolean("hide-tooltip", false),
+                section.getStringList("hidden-components"));
         for (String componentId : parsed.hiddenComponents()) {
             if (!TooltipDisplaySupport.knowsComponent(componentId)) {
                 logger.warning("Skin '" + skinId
-                        + "' references unknown component in tooltip_display.hidden_components: " + componentId);
+                        + "' references unknown component in tooltip-display.hidden-components: " + componentId);
             }
         }
         return parsed;
@@ -188,14 +184,14 @@ public final class SkinConfigLoader {
         SchemaKeys.checkKeys(logger, FILE, "skins." + skinId + "." + fieldName, section,
                 TOKEN_VISUAL_ALLOWED, Set.of());
         NamespacedKey itemModel = null;
-        final String itemModelRaw = section.getString("item_model", "");
+        final String itemModelRaw = section.getString("item-model", "");
         if (!itemModelRaw.isEmpty()) {
             itemModel = NamespacedKey.fromString(itemModelRaw);
             if (itemModel == null) {
-                logger.warning("Skin '" + skinId + "' has an invalid " + fieldName + ".item_model: " + itemModelRaw);
+                logger.warning("Skin '" + skinId + "' has an invalid " + fieldName + ".item-model: " + itemModelRaw);
             }
         }
-        final CustomModelDataConfig cmd = parseCustomModelData(skinId, section.getConfigurationSection("custom_model_data"));
+        final CustomModelDataConfig cmd = parseCustomModelData(skinId, section.getConfigurationSection("custom-model-data"));
         final TokenVisualConfig visual = new TokenVisualConfig(itemModel, cmd);
         return visual.isEmpty() ? null : visual;
     }

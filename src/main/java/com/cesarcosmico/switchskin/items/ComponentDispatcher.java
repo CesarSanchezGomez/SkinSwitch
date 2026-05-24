@@ -9,9 +9,8 @@ import java.util.logging.Logger;
 
 public final class ComponentDispatcher {
 
-    // Keys handled outside the generic dispatch: 'material' defines the stack,
-    // 'profile' is applied via the Paper profile API, 'symbol' is a menu layout key.
-    private static final Set<String> SKIPPED = Set.of("material", "profile", "symbol");
+    // 'material' defines the stack; 'symbol' is a menu layout key, not a component.
+    private static final Set<String> SKIPPED = Set.of("material", "symbol");
     private static final String VANILLA_NAMESPACE = "minecraft:";
 
     private final Logger logger;

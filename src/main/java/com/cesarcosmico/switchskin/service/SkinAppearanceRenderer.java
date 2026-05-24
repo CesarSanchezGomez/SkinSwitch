@@ -26,12 +26,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
 
-/**
- * Applies the visual look of an item's active skin (or the captured original
- * when vanilla is active) to a held stack: item_model, custom_name, lore row,
- * custom_model_data, tooltip_style and the live tooltip_display component. Pure
- * rendering — reads state through {@link SkinStateCodec}, owns no transitions.
- */
+/** Applies the active skin's look (or the captured original) to a held item. */
 public final class SkinAppearanceRenderer {
 
     private static final MiniMessage MINI = MiniMessage.miniMessage();
@@ -53,11 +48,6 @@ public final class SkinAppearanceRenderer {
         this.logger = logger;
     }
 
-    /**
-     * Renders the active look for a non-empty loadout: skin appearance when a
-     * slot is active, or the captured original when vanilla is active. Mutates
-     * and writes {@code meta}, then applies the live tooltip_display.
-     */
     public void render(ItemStack item, ItemMeta meta, SkinLoadout loadout) {
         final AppearanceSnapshot snapshot = codec.readAppearance(meta);
         final OfflinePlayer owner = resolveOwner(meta);
@@ -80,10 +70,6 @@ public final class SkinAppearanceRenderer {
         applyTooltipDisplay(item, snapshot, activeSkin);
     }
 
-    /**
-     * Restores the captured original look (used when the last slot is removed).
-     * Mutates and writes {@code meta}, then restores the live tooltip_display.
-     */
     public void restoreOriginal(ItemStack item, ItemMeta meta, AppearanceSnapshot snapshot) {
         applyOriginalModel(meta, snapshot);
         applyOriginalName(meta, snapshot);

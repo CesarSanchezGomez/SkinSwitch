@@ -41,7 +41,7 @@ public final class PluginConfig {
         final ConfigurationSection defaults = root.getConfigurationSection("defaults");
         this.defaultMaxSlots = Math.max(1, defaults != null ? defaults.getInt("max-slots", 6) : 6);
 
-        this.token = itemFactory.compile(root.getConfigurationSection("token"));
+        this.token = itemFactory.compile(root.getConfigurationSection("skin-token"));
         this.tooltipToken = itemFactory.compile(root.getConfigurationSection("tooltip-token"));
 
         final ConfigurationSection switchSection = root.getConfigurationSection("switch");
