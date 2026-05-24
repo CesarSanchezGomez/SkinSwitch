@@ -1,10 +1,9 @@
 package com.cesarcosmico.switchskin.config;
 
+import com.cesarcosmico.switchskin.items.CompiledItem;
 import com.cesarcosmico.switchskin.items.ItemFactory;
-import com.cesarcosmico.switchskin.items.value.ComponentValue;
 import org.bukkit.configuration.ConfigurationSection;
 
-import java.util.Map;
 import java.util.logging.Logger;
 
 public final class PluginConfig {
@@ -23,8 +22,8 @@ public final class PluginConfig {
     private final Logger logger;
 
     private int defaultMaxSlots;
-    private Map<String, ComponentValue> token;
-    private Map<String, ComponentValue> tooltipToken;
+    private CompiledItem token;
+    private CompiledItem tooltipToken;
     private SoundConfig switchSound;
     private SoundConfig tokenSound;
     private FeedbackConfig switchFeedback;
@@ -68,8 +67,8 @@ public final class PluginConfig {
     }
 
     public int getDefaultMaxSlots() { return defaultMaxSlots; }
-    public Map<String, ComponentValue> getToken() { return token; }
-    public Map<String, ComponentValue> getTooltipToken() { return tooltipToken; }
+    public CompiledItem getToken() { return token; }
+    public CompiledItem getTooltipToken() { return tooltipToken; }
     public SoundConfig getSwitchSound() { return switchSound; }
     public SoundConfig getTokenSound() { return tokenSound; }
     public FeedbackConfig getSwitchFeedback() { return switchFeedback; }

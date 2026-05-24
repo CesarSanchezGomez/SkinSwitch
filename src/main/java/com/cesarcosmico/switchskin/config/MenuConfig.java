@@ -1,8 +1,8 @@
 package com.cesarcosmico.switchskin.config;
 
+import com.cesarcosmico.switchskin.items.CompiledItem;
 import com.cesarcosmico.switchskin.items.ItemContext;
 import com.cesarcosmico.switchskin.items.ItemFactory;
-import com.cesarcosmico.switchskin.items.value.ComponentValue;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.configuration.ConfigurationSection;
@@ -28,21 +28,21 @@ public final class MenuConfig {
     private final LayoutParser layout;
 
     private final char skinSlotSymbol;
-    private final Map<String, ComponentValue> skinSlotActive;
-    private final Map<String, ComponentValue> skinSlotInactive;
+    private final CompiledItem skinSlotActive;
+    private final CompiledItem skinSlotInactive;
 
     private final char vanillaSymbol;
-    private final Map<String, ComponentValue> vanillaActive;
-    private final Map<String, ComponentValue> vanillaInactive;
+    private final CompiledItem vanillaActive;
+    private final CompiledItem vanillaInactive;
 
     private final char closeSymbol;
-    private final Map<String, ComponentValue> closeIcon;
+    private final CompiledItem closeIcon;
 
     private final char prevSymbol;
-    private final Map<String, ComponentValue> prevIcon;
+    private final CompiledItem prevIcon;
 
     private final char nextSymbol;
-    private final Map<String, ComponentValue> nextIcon;
+    private final CompiledItem nextIcon;
 
     private final char fillEmptySymbol;
     private final Map<Character, ItemStack> decorativeIcons;
@@ -113,25 +113,25 @@ public final class MenuConfig {
 
     public char getSkinSlotSymbol() { return skinSlotSymbol; }
     public Set<Integer> getSkinSlotPositions() { return layout.getSlotsForSymbol(skinSlotSymbol); }
-    public Map<String, ComponentValue> getSkinSlotActive() { return skinSlotActive; }
-    public Map<String, ComponentValue> getSkinSlotInactive() { return skinSlotInactive; }
+    public CompiledItem getSkinSlotActive() { return skinSlotActive; }
+    public CompiledItem getSkinSlotInactive() { return skinSlotInactive; }
 
     public char getVanillaSymbol() { return vanillaSymbol; }
     public Set<Integer> getVanillaPositions() { return layout.getSlotsForSymbol(vanillaSymbol); }
-    public Map<String, ComponentValue> getVanillaActive() { return vanillaActive; }
-    public Map<String, ComponentValue> getVanillaInactive() { return vanillaInactive; }
+    public CompiledItem getVanillaActive() { return vanillaActive; }
+    public CompiledItem getVanillaInactive() { return vanillaInactive; }
 
     public char getCloseSymbol() { return closeSymbol; }
     public Set<Integer> getClosePositions() { return layout.getSlotsForSymbol(closeSymbol); }
-    public Map<String, ComponentValue> getCloseIcon() { return closeIcon; }
+    public CompiledItem getCloseIcon() { return closeIcon; }
 
     public char getPrevSymbol() { return prevSymbol; }
     public Set<Integer> getPrevPositions() { return layout.getSlotsForSymbol(prevSymbol); }
-    public Map<String, ComponentValue> getPrevIcon() { return prevIcon; }
+    public CompiledItem getPrevIcon() { return prevIcon; }
 
     public char getNextSymbol() { return nextSymbol; }
     public Set<Integer> getNextPositions() { return layout.getSlotsForSymbol(nextSymbol); }
-    public Map<String, ComponentValue> getNextIcon() { return nextIcon; }
+    public CompiledItem getNextIcon() { return nextIcon; }
 
     public Map<Character, ItemStack> getDecorativeIcons() { return decorativeIcons; }
 

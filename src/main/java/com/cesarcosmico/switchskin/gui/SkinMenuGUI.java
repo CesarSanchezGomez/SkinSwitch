@@ -3,9 +3,9 @@ package com.cesarcosmico.switchskin.gui;
 import com.cesarcosmico.switchskin.config.MenuConfig;
 import com.cesarcosmico.switchskin.config.SkinConfig;
 import com.cesarcosmico.switchskin.config.SkinDefinition;
+import com.cesarcosmico.switchskin.items.CompiledItem;
 import com.cesarcosmico.switchskin.items.ItemContext;
 import com.cesarcosmico.switchskin.items.ItemFactory;
-import com.cesarcosmico.switchskin.items.value.ComponentValue;
 import com.cesarcosmico.switchskin.service.SkinAppearanceRenderer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -109,7 +109,7 @@ public final class SkinMenuGUI implements InventoryHolder {
             final String skinId = skinIds.get(globalIndex);
             final SkinDefinition def = skinConfig.get(skinId).orElse(null);
             final boolean active = globalIndex == activeIndex;
-            final Map<String, ComponentValue> template = active
+            final CompiledItem template = active
                     ? menu.getSkinSlotActive() : menu.getSkinSlotInactive();
             final String displayName = def != null ? def.nameOrId() : skinId;
             final ItemContext context = ItemContext.forPlayer(viewerId).withSkin(displayName);
@@ -122,7 +122,7 @@ public final class SkinMenuGUI implements InventoryHolder {
 
     private void fillVanillaButton(MenuConfig menu, SkinConfig skinConfig,
                                    List<String> skinIds, int activeIndex) {
-        final Map<String, ComponentValue> template =
+        final CompiledItem template =
                 activeIndex < 0 ? menu.getVanillaActive() : menu.getVanillaInactive();
         final ItemStack item = itemFactory.build(template, ItemContext.forPlayer(viewerId), heldMaterial, 1);
         if (activeIndex >= 0 && activeIndex < skinIds.size()) {
@@ -161,7 +161,7 @@ public final class SkinMenuGUI implements InventoryHolder {
     }
 
     private void fillNav(MenuConfig menu, Set<Integer> positions,
-                         Map<String, ComponentValue> icon, MenuAction action) {
+                         CompiledItem icon, MenuAction action) {
         if (positions.isEmpty()) return;
         final ItemContext context = ItemContext.empty().withExtras(Map.of(
                 "page", String.valueOf(page + 1),

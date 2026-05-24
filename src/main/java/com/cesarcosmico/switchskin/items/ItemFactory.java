@@ -2,8 +2,6 @@ package com.cesarcosmico.switchskin.items;
 
 import com.cesarcosmico.switchskin.config.CustomModelDataConfig;
 import com.cesarcosmico.switchskin.config.TokenVisualConfig;
-import com.cesarcosmico.switchskin.items.value.ComponentValue;
-import com.cesarcosmico.switchskin.items.value.LiteralValue;
 import com.cesarcosmico.switchskin.items.value.ValueCompiler;
 import com.saicone.rtag.RtagItem;
 import org.bukkit.Material;
@@ -26,40 +24,44 @@ public final class ItemFactory {
         this.dispatcher = new ComponentDispatcher(logger);
     }
 
-    public Map<String, ComponentValue> compile(@Nullable ConfigurationSection section) {
-        if (section == null) {
-            return Map.of();
+    public CompiledItem compile(@Nullable ConfigurationSection itemSection) {
+        if (itemSection == null) {
+            return CompiledItem.EMPTY;
         }
-        return ValueCompiler.compileTopLevel(section);
+        Material material = resolveMaterial(itemSection.getString("material"));
+        ConfigurationSection components = itemSection.getConfigurationSection("components");
+        return new CompiledItem(material,
+                components == null ? Map.of() : ValueCompiler.compileTopLevel(components));
     }
 
-    public ItemStack build(Map<String, ComponentValue> components, ItemContext context,
+    public ItemStack build(CompiledItem item, ItemContext context,
                            @Nullable Material materialOverride, int amount) {
-        return assemble(components, context, materialOverride, amount, null, false, null);
+        return assemble(item, context, materialOverride, amount, null, false, null);
     }
 
-    public ItemStack buildSkinToken(Map<String, ComponentValue> base, ItemContext context,
+    public ItemStack buildSkinToken(CompiledItem item, ItemContext context,
                                     int amount, String skinId, @Nullable TokenVisualConfig override) {
-        return assemble(base, context, null, amount, skinId, true, override);
+        return assemble(item, context, null, amount, skinId, true, override);
     }
 
-    public ItemStack buildTooltipToken(Map<String, ComponentValue> base, ItemContext context,
+    public ItemStack buildTooltipToken(CompiledItem item, ItemContext context,
                                        int amount, String skinId, @Nullable TokenVisualConfig override) {
-        return assemble(base, context, null, amount, skinId, false, override);
+        return assemble(item, context, null, amount, skinId, false, override);
     }
 
-    private ItemStack assemble(Map<String, ComponentValue> components, ItemContext context,
+    private ItemStack assemble(CompiledItem compiled, ItemContext context,
                                @Nullable Material materialOverride, int amount,
                                @Nullable String tokenId, boolean skinToken,
                                @Nullable TokenVisualConfig override) {
-        Material material = materialOverride != null ? materialOverride : resolveMaterial(components);
+        Material material = materialOverride != null ? materialOverride
+                : compiled.material() != null ? compiled.material() : Material.STONE;
         ItemStack stack = new ItemStack(material, Math.max(1, amount));
         if (material.isAir()) {
             return stack;
         }
 
         RtagItem item = new RtagItem(stack);
-        dispatcher.apply(item, components, context);
+        dispatcher.apply(item, compiled.components(), context);
         applyTokenOverride(item, override);
         if (tokenId != null) {
             if (skinToken) {
@@ -89,15 +91,16 @@ public final class ItemFactory {
         }
     }
 
-    private Material resolveMaterial(Map<String, ComponentValue> components) {
-        if (components.get("material") instanceof LiteralValue literal
-                && literal.value() instanceof String name) {
-            Material material = Material.matchMaterial(name);
-            if (material != null) {
-                return material;
-            }
-            logger.warning("Unknown material: " + name + ", using STONE");
+    @Nullable
+    private Material resolveMaterial(@Nullable String name) {
+        if (name == null || name.isBlank()) {
+            return null;
         }
+        Material material = Material.matchMaterial(name);
+        if (material != null) {
+            return material;
+        }
+        logger.warning("Unknown material: " + name + ", using STONE");
         return Material.STONE;
     }
 }
