@@ -125,9 +125,6 @@
 # tokens. Originals are captured the first time a slot is added and
 # restored the moment the last slot leaves.
 
-# Internal version — do not edit. Bump = new keys were added.
-config-version: 1
-
 # Slot-row fallbacks. Used whenever a skin omits its own override.
 # Bracket colour values must be MiniMessage colour tags wrapped in angle
 # brackets ('<gray>', '<gold>', '<aqua>', '<#FCBDE3>', …). Bare names

@@ -6,7 +6,7 @@ import com.cesarcosmico.switchskin.domain.id.PlayerId;
 import com.cesarcosmico.switchskin.domain.id.SkinId;
 import com.cesarcosmico.switchskin.domain.model.AppearanceSnapshot;
 import com.cesarcosmico.switchskin.domain.model.SkinLoadout;
-import com.cesarcosmico.switchskin.item.SkinSlotKeys;
+import com.cesarcosmico.switchskin.items.SkinSlotKeys;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.TooltipDisplay;
 import net.kyori.adventure.text.Component;

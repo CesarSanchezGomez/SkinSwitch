@@ -27,9 +27,9 @@
 
 config-version: 1
 
-# Language file to use from the lang/ folder (without .yml)
-# Available: en_US, es_ES (or create your own)
-lang: 'en_US'
+# Language file to use from the translations/ folder (without .yml)
+# Available: en_EN, es_ES (or create your own)
+language: 'en_EN'
 
 defaults:
   # Maximum number of skin slots a single item can hold.
@@ -66,7 +66,7 @@ tokens:
 #   any other character   -> looked up in decorative-icons
 #
 # Pagination: total pages = ceil(item-skin-count / nº of S). The prev/next
-# icons accept {page} and {pages} placeholders.
+# icons accept <page> and <pages> placeholders.
 menu:
   title: '<white><gradient:#A0A0A0:#595959><b>Switch Skin</b></gradient></white>'
   layout:
@@ -87,7 +87,7 @@ menu:
   skin-slot:
     symbol: 'S'
     entry-active:
-      custom_name: '<gradient:#A0A0A0:#595959>{skin}</gradient>'
+      custom_name: '<gradient:#A0A0A0:#595959><skin></gradient>'
       lore:
         - ''
         - ' <white>•</white> <gradient:#B4E488:#7DD031>Active skin</gradient> '
@@ -96,7 +96,7 @@ menu:
         hidden_components:
           - 'attribute_modifiers'
     entry-inactive:
-      custom_name: '<white>{skin}</white>'
+      custom_name: '<white><skin></white>'
       lore:
         - ''
         - ' <gray>Click to switch to this skin.</gray> '
@@ -148,7 +148,7 @@ menu:
     material: 'PLAYER_HEAD'
     profile:
       textures: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODY5NzFkZDg4MWRiYWY0ZmQ2YmNhYTkzNjE0NDkzYzYxMmY4Njk2NDFlZDU5ZDFjOTM2M2EzNjY2YTVmYTYifX19'
-    custom_name: '<white>« Previous</white> <gray>[{page}/{pages}]</gray>'
+    custom_name: '<white>« Previous</white> <gray>[<page>/<pages>]</gray>'
     lore:
       - ''
       - ' <gray>Go to the previous page.</gray> '
@@ -159,7 +159,7 @@ menu:
     material: 'PLAYER_HEAD'
     profile:
       textures: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjMyY2E2NjA1NmI3Mjg2M2U5OGY3ZjMyYmQ3ZDk0YzdhMGQ3OTZhZjY5MWM5YWMzYTkxMzYzMzEzNTIyODhmOSJ9fX0='
-    custom_name: '<white>Next »</white> <gray>[{page}/{pages}]</gray>'
+    custom_name: '<white>Next »</white> <gray>[<page>/<pages>]</gray>'
     lore:
       - ''
       - ' <gray>Go to the next page.</gray> '
@@ -194,19 +194,19 @@ menu:
 
 # Token item used to add a skin slot to a held item. Issued via
 # /ss givetokenskin <player> <skin> <amount>.
-# {skin} is replaced by the linked skin's display name.
+# <skin> is replaced by the linked skin's display name.
 # Accepts the full data-component set from the header. The 'item_model'
 # and 'custom_model_data' values here act as the global fallback —
 # individual skins can override them via 'token-skin' in skins.yml so
 # each skin's token has its own model in inventory.
 token:
   material: 'NAME_TAG'
-  custom_name: '<gradient:#A0A0A0:#595959><b>Skin Slot Token</b></gradient> <gray>—</gray> <white>{skin}</white>'
+  custom_name: '<gradient:#A0A0A0:#595959><b>Skin Slot Token</b></gradient> <gray>—</gray> <white><skin></white>'
   lore:
     - ''
     - ' <white>Right-click this token onto an</white> '
     - ' <white>item in your inventory to add</white> '
-    - ' <white>the <#A0A0A0>{skin}</#A0A0A0> skin slot.</white> '
+    - ' <white>the <#A0A0A0><skin></#A0A0A0> skin slot.</white> '
     - ''
   tooltip_display:
     hidden_components:
@@ -218,12 +218,12 @@ token:
 # 'token-tooltip' in skins.yml.
 tooltip-token:
   material: 'PAPER'
-  custom_name: '<gradient:#A0A0A0:#595959><b>Tooltip Token</b></gradient> <gray>—</gray> <white>{skin}</white>'
+  custom_name: '<gradient:#A0A0A0:#595959><b>Tooltip Token</b></gradient> <gray>—</gray> <white><skin></white>'
   lore:
     - ''
     - ' <white>Right-click this token onto an</white> '
     - ' <white>item in your inventory to apply</white> '
-    - ' <white>the <#A0A0A0>{skin}</#A0A0A0> tooltip style.</white> '
+    - ' <white>the <#A0A0A0><skin></#A0A0A0> tooltip style.</white> '
     - ''
   tooltip_display:
     hidden_components:

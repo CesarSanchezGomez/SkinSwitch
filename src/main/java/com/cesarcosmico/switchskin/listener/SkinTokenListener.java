@@ -1,12 +1,15 @@
 package com.cesarcosmico.switchskin.listener;
 
-import com.cesarcosmico.switchskin.config.LangConfig;
 import com.cesarcosmico.switchskin.config.SkinConfig;
 import com.cesarcosmico.switchskin.config.SkinDefinition;
-import com.cesarcosmico.switchskin.item.TokenFactory;
+import com.cesarcosmico.switchskin.items.PluginItemTag;
 import com.cesarcosmico.switchskin.service.SkinSlotService;
 import com.cesarcosmico.switchskin.service.SwitchAnnouncer;
+import com.cesarcosmico.switchskin.text.MessageManager;
 import com.cesarcosmico.switchskin.util.CursorUtil;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -15,29 +18,21 @@ import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.function.Supplier;
-
 public final class SkinTokenListener implements Listener {
 
-    private final SkinSlotService skinSlotService;
-    private final TokenFactory skinTokenFactory;
-    private final TokenFactory tooltipTokenFactory;
-    private final Supplier<LangConfig> langSupplier;
-    private final Supplier<SkinConfig> skinSupplier;
-    private final Supplier<SwitchAnnouncer> announcerSupplier;
+    private static final String TOKEN_USE_PERMISSION = "switchskin.token.use";
 
-    public SkinTokenListener(SkinSlotService skinSlotService,
-                             TokenFactory skinTokenFactory,
-                             TokenFactory tooltipTokenFactory,
-                             Supplier<LangConfig> langSupplier,
-                             Supplier<SkinConfig> skinSupplier,
-                             Supplier<SwitchAnnouncer> announcerSupplier) {
+    private final SkinSlotService skinSlotService;
+    private final MessageManager messages;
+    private final SkinConfig skinConfig;
+    private final SwitchAnnouncer announcer;
+
+    public SkinTokenListener(SkinSlotService skinSlotService, MessageManager messages,
+                             SkinConfig skinConfig, SwitchAnnouncer announcer) {
         this.skinSlotService = skinSlotService;
-        this.skinTokenFactory = skinTokenFactory;
-        this.tooltipTokenFactory = tooltipTokenFactory;
-        this.langSupplier = langSupplier;
-        this.skinSupplier = skinSupplier;
-        this.announcerSupplier = announcerSupplier;
+        this.messages = messages;
+        this.skinConfig = skinConfig;
+        this.announcer = announcer;
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -55,68 +50,72 @@ public final class SkinTokenListener implements Listener {
         if (target == null || target.getType().isAir()) return;
         if (!(event.getWhoClicked() instanceof Player player)) return;
 
-        if (skinTokenFactory.is(cursor)) {
-            if (skinTokenFactory.is(target) || tooltipTokenFactory.is(target)) return;
+        if (PluginItemTag.readSkinToken(cursor).isPresent()) {
+            if (isToken(target)) return;
             event.setCancelled(true);
-            handleSkinToken(player, cursor, target);
+            if (!player.hasPermission(TOKEN_USE_PERMISSION)) return;
+            handleSkinToken(player, cursor, target, PluginItemTag.readSkinToken(cursor).orElseThrow());
             return;
         }
-        if (tooltipTokenFactory.is(cursor)) {
-            if (skinTokenFactory.is(target) || tooltipTokenFactory.is(target)) return;
+        if (PluginItemTag.readTooltipToken(cursor).isPresent()) {
+            if (isToken(target)) return;
             event.setCancelled(true);
-            handleTooltipToken(player, cursor, target);
+            if (!player.hasPermission(TOKEN_USE_PERMISSION)) return;
+            handleTooltipToken(player, cursor, target, PluginItemTag.readTooltipToken(cursor).orElseThrow());
         }
     }
 
-    private void handleSkinToken(Player player, ItemStack cursor, ItemStack target) {
-        final String skinId = skinTokenFactory.readSkinId(cursor).orElse(null);
-        if (skinId == null) return;
+    private static boolean isToken(ItemStack item) {
+        return PluginItemTag.readSkinToken(item).isPresent()
+                || PluginItemTag.readTooltipToken(item).isPresent();
+    }
 
+    private void handleSkinToken(Player player, ItemStack cursor, ItemStack target, String skinId) {
         final SkinSlotService.AddResult result = skinSlotService.addSlot(target, skinId, player);
-        final SkinDefinition def = skinSupplier.get().get(skinId).orElse(null);
+        final SkinDefinition def = skinConfig.get(skinId).orElse(null);
         final String display = def == null ? skinId : def.nameOrId();
         switch (result) {
             case ADDED -> {
                 CursorUtil.consumeOne(player, cursor);
-                announcerSupplier.get().playTokenSound(player);
-                langSupplier.get().send(player, "command.slot-added",
-                        "{skin}", display,
-                        "{count}", String.valueOf(skinSlotService.getSlots(target).size()));
+                announcer.playTokenSound(player);
+                send(player, "command.slot-added", TagResolver.resolver(
+                        Placeholder.parsed("skin", display),
+                        Placeholder.unparsed("count", String.valueOf(skinSlotService.getSlots(target).size()))));
             }
-            case DUPLICATE -> langSupplier.get().send(player, "command.duplicate-slot");
-            case FULL -> langSupplier.get().send(player, "command.slots-full",
-                    "{max}", String.valueOf(skinSlotService.getSlots(target).size()));
-            case INCOMPATIBLE -> langSupplier.get().send(player, "command.skin-incompatible",
-                    "{skin}", display,
-                    "{material}", target.getType().getKey().value());
-            case UNKNOWN_SKIN -> langSupplier.get().send(player, "command.unknown-skin",
-                    "{skin}", skinId);
-            case NO_META -> {}
+            case DUPLICATE -> send(player, "command.duplicate-slot");
+            case FULL -> send(player, "command.slots-full",
+                    Placeholder.unparsed("max", String.valueOf(skinSlotService.getSlots(target).size())));
+            case INCOMPATIBLE -> send(player, "command.skin-incompatible", TagResolver.resolver(
+                    Placeholder.parsed("skin", display),
+                    Placeholder.unparsed("material", target.getType().getKey().value())));
+            case UNKNOWN_SKIN -> send(player, "command.unknown-skin", Placeholder.parsed("skin", skinId));
+            case NO_META -> { }
         }
     }
 
-    private void handleTooltipToken(Player player, ItemStack cursor, ItemStack target) {
-        final String skinId = tooltipTokenFactory.readSkinId(cursor).orElse(null);
-        if (skinId == null) return;
-
+    private void handleTooltipToken(Player player, ItemStack cursor, ItemStack target, String skinId) {
         final SkinSlotService.TooltipApplyResult result = skinSlotService.applyTooltip(target, skinId);
-        final SkinDefinition def = skinSupplier.get().get(skinId).orElse(null);
+        final SkinDefinition def = skinConfig.get(skinId).orElse(null);
         final String display = def == null ? skinId : def.nameOrId();
         switch (result) {
             case APPLIED -> {
                 CursorUtil.consumeOne(player, cursor);
-                announcerSupplier.get().playTokenSound(player);
-                langSupplier.get().send(player, "command.tooltip-applied", "{skin}", display);
+                announcer.playTokenSound(player);
+                send(player, "command.tooltip-applied", Placeholder.parsed("skin", display));
             }
-            case NO_SKIN_SLOT -> langSupplier.get().send(player, "command.tooltip-needs-slot",
-                    "{skin}", display);
-            case ALREADY_APPLIED -> langSupplier.get().send(player, "command.tooltip-duplicate",
-                    "{skin}", display);
-            case NO_TOOLTIP -> langSupplier.get().send(player, "command.tooltip-missing",
-                    "{skin}", skinId);
-            case UNKNOWN_SKIN -> langSupplier.get().send(player, "command.unknown-skin",
-                    "{skin}", skinId);
-            case NO_META -> {}
+            case NO_SKIN_SLOT -> send(player, "command.tooltip-needs-slot", Placeholder.parsed("skin", display));
+            case ALREADY_APPLIED -> send(player, "command.tooltip-duplicate", Placeholder.parsed("skin", display));
+            case NO_TOOLTIP -> send(player, "command.tooltip-missing", Placeholder.parsed("skin", skinId));
+            case UNKNOWN_SKIN -> send(player, "command.unknown-skin", Placeholder.parsed("skin", skinId));
+            case NO_META -> { }
         }
+    }
+
+    private void send(CommandSender sender, String key) {
+        sender.sendMessage(messages.getPrefixedMessage(key));
+    }
+
+    private void send(CommandSender sender, String key, TagResolver resolver) {
+        sender.sendMessage(messages.getPrefixedMessage(key, resolver));
     }
 }

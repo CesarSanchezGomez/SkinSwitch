@@ -1,4 +1,4 @@
-package com.cesarcosmico.switchskin.placeholder;
+package com.cesarcosmico.switchskin.adapter.placeholderapi;
 
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.OfflinePlayer;

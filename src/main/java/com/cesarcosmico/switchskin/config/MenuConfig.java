@@ -1,6 +1,8 @@
 package com.cesarcosmico.switchskin.config;
 
-import com.cesarcosmico.switchskin.item.ItemFactory;
+import com.cesarcosmico.switchskin.items.ItemContext;
+import com.cesarcosmico.switchskin.items.ItemFactory;
+import com.cesarcosmico.switchskin.items.value.ComponentValue;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.configuration.ConfigurationSection;
@@ -24,31 +26,28 @@ public final class MenuConfig {
 
     private final Component title;
     private final LayoutParser layout;
-    private final ItemFactory itemFactory;
 
     private final char skinSlotSymbol;
-    private final ItemConfig skinSlotActive;
-    private final ItemConfig skinSlotInactive;
+    private final Map<String, ComponentValue> skinSlotActive;
+    private final Map<String, ComponentValue> skinSlotInactive;
 
     private final char vanillaSymbol;
-    private final ItemConfig vanillaActive;
-    private final ItemConfig vanillaInactive;
+    private final Map<String, ComponentValue> vanillaActive;
+    private final Map<String, ComponentValue> vanillaInactive;
 
     private final char closeSymbol;
-    private final ItemConfig closeIcon;
+    private final Map<String, ComponentValue> closeIcon;
 
     private final char prevSymbol;
-    private final ItemConfig prevIcon;
+    private final Map<String, ComponentValue> prevIcon;
 
     private final char nextSymbol;
-    private final ItemConfig nextIcon;
+    private final Map<String, ComponentValue> nextIcon;
 
     private final char fillEmptySymbol;
     private final Map<Character, ItemStack> decorativeIcons;
 
     public MenuConfig(ConfigurationSection root, ItemFactory itemFactory, Logger logger) {
-        this.itemFactory = itemFactory;
-
         final ConfigurationSection effective = root != null ? root : empty();
         this.title = MINI.deserialize(effective.getString("title", DEFAULT_TITLE));
         this.layout = new LayoutParser(
@@ -56,31 +55,31 @@ public final class MenuConfig {
 
         final ConfigurationSection skinSection = effective.getConfigurationSection("skin-slot");
         this.skinSlotSymbol = symbol(skinSection, "S");
-        this.skinSlotActive = itemFactory.parse(
-                skinSection != null ? skinSection.getConfigurationSection("entry-active") : null, "STONE");
-        this.skinSlotInactive = itemFactory.parse(
-                skinSection != null ? skinSection.getConfigurationSection("entry-inactive") : null, "STONE");
+        this.skinSlotActive = itemFactory.compile(
+                skinSection != null ? skinSection.getConfigurationSection("entry-active") : null);
+        this.skinSlotInactive = itemFactory.compile(
+                skinSection != null ? skinSection.getConfigurationSection("entry-inactive") : null);
 
         final ConfigurationSection vanillaSection = effective.getConfigurationSection("vanilla-button");
         this.vanillaSymbol = symbol(vanillaSection, "V");
-        this.vanillaActive = itemFactory.parse(
-                vanillaSection != null ? vanillaSection.getConfigurationSection("active") : null, "BARRIER");
-        this.vanillaInactive = itemFactory.parse(
-                vanillaSection != null ? vanillaSection.getConfigurationSection("inactive") : null, "BARRIER");
+        this.vanillaActive = itemFactory.compile(
+                vanillaSection != null ? vanillaSection.getConfigurationSection("active") : null);
+        this.vanillaInactive = itemFactory.compile(
+                vanillaSection != null ? vanillaSection.getConfigurationSection("inactive") : null);
 
         final ConfigurationSection closeSection = effective.getConfigurationSection("close-button");
         this.closeSymbol = symbol(closeSection, "C");
-        this.closeIcon = itemFactory.parse(closeSection, "OAK_DOOR");
+        this.closeIcon = itemFactory.compile(closeSection);
 
         final ConfigurationSection prevSection = effective.getConfigurationSection("prev-button");
         this.prevSymbol = symbol(prevSection, "P");
-        this.prevIcon = itemFactory.parse(prevSection, "ARROW");
+        this.prevIcon = itemFactory.compile(prevSection);
 
         final ConfigurationSection nextSection = effective.getConfigurationSection("next-button");
         this.nextSymbol = symbol(nextSection, "N");
-        this.nextIcon = itemFactory.parse(nextSection, "ARROW");
+        this.nextIcon = itemFactory.compile(nextSection);
 
-        this.decorativeIcons = parseDecorative(effective.getConfigurationSection("decorative-icons"));
+        this.decorativeIcons = parseDecorative(effective.getConfigurationSection("decorative-icons"), itemFactory);
 
         final String fillRaw = effective.getString("fill-empty", "X");
         this.fillEmptySymbol = fillRaw == null || fillRaw.isEmpty() ? '\0' : fillRaw.charAt(0);
@@ -95,15 +94,15 @@ public final class MenuConfig {
         return raw.isEmpty() ? fallback.charAt(0) : raw.charAt(0);
     }
 
-    private Map<Character, ItemStack> parseDecorative(ConfigurationSection section) {
+    private Map<Character, ItemStack> parseDecorative(ConfigurationSection section, ItemFactory itemFactory) {
         final Map<Character, ItemStack> result = new LinkedHashMap<>();
         if (section == null) return result;
         for (String key : section.getKeys(false)) {
             final ConfigurationSection icon = section.getConfigurationSection(key);
             if (icon == null) continue;
             final char symbol = icon.getString("symbol", "?").charAt(0);
-            final ItemConfig parsed = itemFactory.parse(icon, "AIR");
-            result.put(symbol, itemFactory.build(parsed));
+            final ItemStack built = itemFactory.build(itemFactory.compile(icon), ItemContext.empty(), null, 1);
+            result.put(symbol, built);
         }
         return result;
     }
@@ -111,29 +110,28 @@ public final class MenuConfig {
     public Component getTitle() { return title; }
     public int getInventorySize() { return layout.getInventorySize(); }
     public LayoutParser getLayout() { return layout; }
-    public ItemFactory getItemFactory() { return itemFactory; }
 
     public char getSkinSlotSymbol() { return skinSlotSymbol; }
     public Set<Integer> getSkinSlotPositions() { return layout.getSlotsForSymbol(skinSlotSymbol); }
-    public ItemConfig getSkinSlotActive() { return skinSlotActive; }
-    public ItemConfig getSkinSlotInactive() { return skinSlotInactive; }
+    public Map<String, ComponentValue> getSkinSlotActive() { return skinSlotActive; }
+    public Map<String, ComponentValue> getSkinSlotInactive() { return skinSlotInactive; }
 
     public char getVanillaSymbol() { return vanillaSymbol; }
     public Set<Integer> getVanillaPositions() { return layout.getSlotsForSymbol(vanillaSymbol); }
-    public ItemConfig getVanillaActive() { return vanillaActive; }
-    public ItemConfig getVanillaInactive() { return vanillaInactive; }
+    public Map<String, ComponentValue> getVanillaActive() { return vanillaActive; }
+    public Map<String, ComponentValue> getVanillaInactive() { return vanillaInactive; }
 
     public char getCloseSymbol() { return closeSymbol; }
     public Set<Integer> getClosePositions() { return layout.getSlotsForSymbol(closeSymbol); }
-    public ItemConfig getCloseIcon() { return closeIcon; }
+    public Map<String, ComponentValue> getCloseIcon() { return closeIcon; }
 
     public char getPrevSymbol() { return prevSymbol; }
     public Set<Integer> getPrevPositions() { return layout.getSlotsForSymbol(prevSymbol); }
-    public ItemConfig getPrevIcon() { return prevIcon; }
+    public Map<String, ComponentValue> getPrevIcon() { return prevIcon; }
 
     public char getNextSymbol() { return nextSymbol; }
     public Set<Integer> getNextPositions() { return layout.getSlotsForSymbol(nextSymbol); }
-    public ItemConfig getNextIcon() { return nextIcon; }
+    public Map<String, ComponentValue> getNextIcon() { return nextIcon; }
 
     public Map<Character, ItemStack> getDecorativeIcons() { return decorativeIcons; }
 

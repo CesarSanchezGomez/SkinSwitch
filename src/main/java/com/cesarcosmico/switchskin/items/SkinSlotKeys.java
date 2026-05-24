@@ -1,4 +1,4 @@
-package com.cesarcosmico.switchskin.item;
+package com.cesarcosmico.switchskin.items;
 
 import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -10,8 +10,6 @@ public final class SkinSlotKeys {
     private final NamespacedKey originalLore;
     private final NamespacedKey originalName;
     private final NamespacedKey originalItemModel;
-    private final NamespacedKey tokenSkin;
-    private final NamespacedKey tokenTooltip;
     private final NamespacedKey tooltipSlots;
     private final NamespacedKey originalTooltipStyle;
     private final NamespacedKey ownerUuid;
@@ -32,8 +30,6 @@ public final class SkinSlotKeys {
         this.originalLore = new NamespacedKey(plugin, "original_lore");
         this.originalName = new NamespacedKey(plugin, "original_name");
         this.originalItemModel = new NamespacedKey(plugin, "original_item_model");
-        this.tokenSkin = new NamespacedKey(plugin, "token_skin");
-        this.tokenTooltip = new NamespacedKey(plugin, "token_tooltip");
         this.tooltipSlots = new NamespacedKey(plugin, "tooltip_slots");
         this.originalTooltipStyle = new NamespacedKey(plugin, "original_tooltip_style");
         this.ownerUuid = new NamespacedKey(plugin, "owner_uuid");
@@ -54,8 +50,6 @@ public final class SkinSlotKeys {
     public NamespacedKey originalLore() { return originalLore; }
     public NamespacedKey originalName() { return originalName; }
     public NamespacedKey originalItemModel() { return originalItemModel; }
-    public NamespacedKey tokenSkin() { return tokenSkin; }
-    public NamespacedKey tokenTooltip() { return tokenTooltip; }
     public NamespacedKey tooltipSlots() { return tooltipSlots; }
     public NamespacedKey originalTooltipStyle() { return originalTooltipStyle; }
     public NamespacedKey ownerUuid() { return ownerUuid; }
