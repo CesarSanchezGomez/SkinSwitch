@@ -1,16 +1,13 @@
 # SwitchSkin skins. Each id maps to the look applied while its slot is active.
-# Flat form (model only):  summer_skin: edosummer:ice_cream_pickaxe
-# Section form: any subset of the fields below. name/lore are MiniMessage and
-# support PlaceholderAPI (<player>, %player_name%, ...); the rest are vanilla.
-#   item-model            model swap while active
-#   name / lore           custom-name / lore while active
-#   custom-model-data     floats / flags / strings / colors
-#   tooltip-display       hide-tooltip / hidden-components
-#   tooltip-style         applied only via the tooltip token
+# Plugin fields stay at the top level; vanilla data components go under
+# 'components:' (kebab-case). Same shape inside token-skin / token-tooltip.
+#   name / lore           MiniMessage; support PlaceholderAPI (%player_name% …)
 #   icon-active/-inactive slot-row glyph (falls back to default-icon-*)
 #   bracket-color-*       MiniMessage colour tag like '<gray>' or '<#FCBDE3>'
-#   token-skin/-tooltip   per-skin token overrides (item-model, custom-model-data)
-#   applies-to            material/#tag whitelist; empty = any item
+#   applies-to            material / #tag whitelist; empty = any item
+#   components            item-model, custom-model-data, tooltip-display, tooltip-style
+#   token-skin/-tooltip   per-skin token overrides; same 'components' block
+# Shorthand for "just an item-model" override: 'my_skin: namespace:path'.
 # Originals are captured on the first slot and restored when the last is removed.
 
 # Slot-row fallbacks used when a skin omits its own override.
@@ -21,13 +18,13 @@ default-icon-inactive: '○'
 
 skins:
   summer_skin:
-    item-model: edosummer:ice_cream_pickaxe
     name: '<#FCBDE3>Summer Pickaxe</#FCBDE3>'
     icon-active: '🍦'
     bracket-color-active: '<#FCBDE3>'
+    components:
+      item-model: edosummer:ice_cream_pickaxe
 
   autum_skin:
-    item-model: edoween:bone_set/bone_pickaxe
     name: '<white>🎃</white> <gradient:#FFFFFF:#BDBDBD>MegaPico de hueso</gradient> <white>🎃</white>'
     lore:
       - ''
@@ -38,10 +35,11 @@ skins:
     icon-active: ' <gradient:#FFFFFF:#BDBDBD>⊰ 🎃 ⊱</gradient> '
     icon-inactive: ' <white>⊰ 🎃 ⊱</white> '
     bracket-color-active: '<#414345>'
-    tooltip-style: 'minecraft:white'
+    components:
+      item-model: edoween:bone_set/bone_pickaxe
+      tooltip-style: 'minecraft:white'
 
   winter_skin:
-    item-model: edoxmas:glacial_set/glacial_pickaxe
     name: '<white>❊</white> <gradient:#A6F6FF:#0ED2F7>MegaPico glacial</gradient> <white>❊</white>'
     lore:
       - ''
@@ -52,12 +50,14 @@ skins:
     icon-active: ' <gradient:#A6F6FF:#0ED2F7>⊰ ❊ ⊱</gradient> '
     icon-inactive: ' <white>⊰ ❊ ⊱</white> '
     bracket-color-active: '<#0ED2F7>'
-    tooltip-style: 'minecraft:aqua'
-    tooltip-display:
-      hidden-components:
-        - 'attribute_modifiers'
-    custom-model-data:
-      strings:
-        - 'glacial'
     applies-to:
       - '#minecraft:pickaxes'
+    components:
+      item-model: edoxmas:glacial_set/glacial_pickaxe
+      custom-model-data:
+        strings:
+          - 'glacial'
+      tooltip-display:
+        hidden-components:
+          - 'attribute_modifiers'
+      tooltip-style: 'minecraft:aqua'
