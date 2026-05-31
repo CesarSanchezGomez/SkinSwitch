@@ -26,12 +26,9 @@ public final class SkinConfigLoader {
     private static final Set<String> SKIN_ALLOWED = Set.of(
             "name", "lore", "icon-active", "icon-inactive",
             "bracket-color-active", "bracket-color-inactive",
-            "components", "token-skin", "token-tooltip", "applies-to");
-    private static final Set<String> SKIN_COMPONENTS_ALLOWED = Set.of(
-            "item-model", "custom-model-data", "tooltip-display", "tooltip-style");
-    private static final Set<String> TOKEN_VISUAL_ALLOWED = Set.of("components");
-    private static final Set<String> TOKEN_VISUAL_COMPONENTS_ALLOWED = Set.of(
-            "item-model", "custom-model-data");
+            "item-model", "custom-model-data", "tooltip-display", "tooltip-style",
+            "token-skin", "token-tooltip", "applies-to");
+    private static final Set<String> TOKEN_VISUAL_ALLOWED = Set.of("item-model", "custom-model-data");
     private static final Set<String> CMD_ALLOWED = Set.of("floats", "flags", "strings", "colors");
     private static final Set<String> TOOLTIP_DISPLAY_ALLOWED = Set.of("hide-tooltip", "hidden-components");
 
@@ -80,17 +77,12 @@ public final class SkinConfigLoader {
             bracketColorInactive = parsePerSkinColor(section, "bracket-color-inactive", id);
             compatibleMaterials = parseAppliesTo(id, section.getStringList("applies-to"));
 
-            final ConfigurationSection components = section.getConfigurationSection("components");
-            if (components != null) {
-                SchemaKeys.checkKeys(logger, FILE, path + ".components", components,
-                        SKIN_COMPONENTS_ALLOWED, Set.of());
-                itemModelRaw = components.getString("item-model", "");
-                tooltipStyleRaw = components.getString("tooltip-style", null);
-                customModelData = parseCustomModelData(path + ".components",
-                        components.getConfigurationSection("custom-model-data"));
-                tooltipDisplay = parseTooltipDisplay(id, path + ".components",
-                        components.getConfigurationSection("tooltip-display"));
-            }
+            itemModelRaw = section.getString("item-model", "");
+            tooltipStyleRaw = section.getString("tooltip-style", null);
+            customModelData = parseCustomModelData(path,
+                    section.getConfigurationSection("custom-model-data"));
+            tooltipDisplay = parseTooltipDisplay(id, path,
+                    section.getConfigurationSection("tooltip-display"));
 
             tokenSkin = parseTokenVisual(id, "token-skin", section.getConfigurationSection("token-skin"));
             tokenTooltip = parseTokenVisual(id, "token-tooltip", section.getConfigurationSection("token-tooltip"));
@@ -185,22 +177,17 @@ public final class SkinConfigLoader {
         if (section == null) return null;
         final String tokenPath = "skins." + skinId + "." + fieldName;
         SchemaKeys.checkKeys(logger, FILE, tokenPath, section, TOKEN_VISUAL_ALLOWED, Set.of());
-        final ConfigurationSection components = section.getConfigurationSection("components");
-        if (components == null) return null;
-        SchemaKeys.checkKeys(logger, FILE, tokenPath + ".components", components,
-                TOKEN_VISUAL_COMPONENTS_ALLOWED, Set.of());
 
         NamespacedKey itemModel = null;
-        final String itemModelRaw = components.getString("item-model", "");
+        final String itemModelRaw = section.getString("item-model", "");
         if (!itemModelRaw.isEmpty()) {
             itemModel = NamespacedKey.fromString(itemModelRaw);
             if (itemModel == null) {
-                logger.warning("Skin '" + skinId + "' has an invalid " + fieldName
-                        + ".components.item-model: " + itemModelRaw);
+                logger.warning("Skin '" + skinId + "' has an invalid " + fieldName + ".item-model: " + itemModelRaw);
             }
         }
-        final CustomModelDataConfig cmd = parseCustomModelData(tokenPath + ".components",
-                components.getConfigurationSection("custom-model-data"));
+        final CustomModelDataConfig cmd = parseCustomModelData(tokenPath,
+                section.getConfigurationSection("custom-model-data"));
         final TokenVisualConfig visual = new TokenVisualConfig(itemModel, cmd);
         return visual.isEmpty() ? null : visual;
     }

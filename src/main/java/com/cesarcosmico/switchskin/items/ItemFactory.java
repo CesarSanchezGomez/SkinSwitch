@@ -28,10 +28,9 @@ public final class ItemFactory {
         if (itemSection == null) {
             return CompiledItem.EMPTY;
         }
-        Material material = resolveMaterial(itemSection.getString("material"));
-        ConfigurationSection components = itemSection.getConfigurationSection("components");
-        return new CompiledItem(material,
-                components == null ? Map.of() : ValueCompiler.compileTopLevel(components));
+        return new CompiledItem(
+                resolveMaterial(itemSection.getString("material")),
+                ValueCompiler.compileTopLevel(itemSection));
     }
 
     public ItemStack build(CompiledItem item, ItemContext context,
