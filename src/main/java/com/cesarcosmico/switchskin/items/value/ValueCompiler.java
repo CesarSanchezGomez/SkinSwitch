@@ -11,8 +11,9 @@ public final class ValueCompiler {
 
     private ValueCompiler() {}
 
-    public static Map<String, ComponentValue> compileTopLevel(ConfigurationSection section) {
+    public static Map<String, ComponentValue> compileComponents(ConfigurationSection section) {
         Map<String, ComponentValue> out = new LinkedHashMap<>();
+        if (section == null) return out;
         for (String rawKey : section.getKeys(false)) {
             String key = canonicalize(rawKey);
             out.put(key, compile(section.get(rawKey), key));

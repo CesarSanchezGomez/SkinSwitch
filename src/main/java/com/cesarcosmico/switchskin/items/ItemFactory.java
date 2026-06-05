@@ -30,7 +30,7 @@ public final class ItemFactory {
         }
         return new CompiledItem(
                 resolveMaterial(itemSection.getString("material")),
-                ValueCompiler.compileTopLevel(itemSection));
+                ValueCompiler.compileComponents(itemSection.getConfigurationSection("components")));
     }
 
     public ItemStack build(CompiledItem item, ItemContext context,

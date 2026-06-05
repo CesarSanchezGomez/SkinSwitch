@@ -1,7 +1,7 @@
-# SwitchSkin — all text is MiniMessage. Each menu icon / token declares its
-# base 'material' (and 'symbol' for menu layout) alongside any vanilla data
-# component (kebab-case: custom-name, item-model, tooltip-display, profile…).
-# Only custom-name and lore are MiniMessage; the rest follow the vanilla format.
+# SwitchSkin. Each menu icon / token declares its 'material' (and 'symbol' for
+# the menu layout) plus a 'components:' block holding vanilla data components in
+# kebab-case (custom-name, lore, item-model, tooltip-display, profile…). Only
+# custom-name and lore are MiniMessage; the rest follow Mojang's vanilla format.
 config-version: 1
 
 # Translation file from translations/ (without .yml). Bundled: en_EN, es_ES.
@@ -45,85 +45,92 @@ menu:
   skin-slot:
     symbol: 'S'
     entry-active:
-      custom-name: '<gradient:#A0A0A0:#595959><skin></gradient>'
-      lore:
-        - ''
-        - ' <white>•</white> <gradient:#B4E488:#7DD031>Active skin</gradient> '
-        - ''
-      tooltip-display:
-        hidden-components:
-          - 'attribute_modifiers'
+      components:
+        custom-name: '<gradient:#A0A0A0:#595959><skin></gradient>'
+        lore:
+          - ''
+          - ' <white>•</white> <gradient:#B4E488:#7DD031>Active skin</gradient> '
+          - ''
+        tooltip-display:
+          hidden-components:
+            - 'attribute_modifiers'
     entry-inactive:
-      custom-name: '<white><skin></white>'
-      lore:
-        - ''
-        - ' <gray>Click to switch to this skin.</gray> '
-        - ''
-      tooltip-display:
-        hidden-components:
-          - 'attribute_modifiers'
+      components:
+        custom-name: '<white><skin></white>'
+        lore:
+          - ''
+          - ' <gray>Click to switch to this skin.</gray> '
+          - ''
+        tooltip-display:
+          hidden-components:
+            - 'attribute_modifiers'
 
   vanilla-button:
     symbol: 'V'
     active:
-      custom-name: '<gradient:#A0A0A0:#595959><b>Vanilla</b></gradient> <gray>[active]</gray>'
-      lore:
-        - ''
-        - ' <gray>The original look is showing.</gray> '
-        - ' <gray>Click any skin to reapply it.</gray> '
-        - ''
-      tooltip-display:
-        hidden-components:
-          - 'attribute_modifiers'
+      components:
+        custom-name: '<gradient:#A0A0A0:#595959><b>Vanilla</b></gradient> <gray>[active]</gray>'
+        lore:
+          - ''
+          - ' <gray>The original look is showing.</gray> '
+          - ' <gray>Click any skin to reapply it.</gray> '
+          - ''
+        tooltip-display:
+          hidden-components:
+            - 'attribute_modifiers'
     inactive:
-      custom-name: '<gradient:#A0A0A0:#595959><b>Vanilla</b></gradient>'
-      lore:
-        - ''
-        - ' <gray>Restore the original look</gray> '
-        - ' <gray>without losing your tokens.</gray> '
-        - ''
-      tooltip-display:
-        hidden-components:
-          - 'attribute_modifiers'
+      components:
+        custom-name: '<gradient:#A0A0A0:#595959><b>Vanilla</b></gradient>'
+        lore:
+          - ''
+          - ' <gray>Restore the original look</gray> '
+          - ' <gray>without losing your tokens.</gray> '
+          - ''
+        tooltip-display:
+          hidden-components:
+            - 'attribute_modifiers'
 
   close-button:
     symbol: 'C'
     material: 'PLAYER_HEAD'
-    profile:
-      properties:
-        - name: 'textures'
-          value: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjNmNzRlYWQ5ZjA3MGNmMzEwMTQ1MzgxYjc5ZTQ0MTdlYTQ5MzBlYmQwMjQxMjE1NzcwNWY0OTliMDg4MDgwMiJ9fX0='
-    custom-name: '<gradient:#A0A0A0:#595959><b>Close</b></gradient>'
-    lore:
-      - ''
-      - ' <gray>Closes this menu.</gray> '
-      - ''
+    components:
+      profile:
+        properties:
+          - name: 'textures'
+            value: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjNmNzRlYWQ5ZjA3MGNmMzEwMTQ1MzgxYjc5ZTQ0MTdlYTQ5MzBlYmQwMjQxMjE1NzcwNWY0OTliMDg4MDgwMiJ9fX0='
+      custom-name: '<gradient:#A0A0A0:#595959><b>Close</b></gradient>'
+      lore:
+        - ''
+        - ' <gray>Closes this menu.</gray> '
+        - ''
 
   prev-button:
     symbol: 'P'
     material: 'PLAYER_HEAD'
-    profile:
-      properties:
-        - name: 'textures'
-          value: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODY5NzFkZDg4MWRiYWY0ZmQ2YmNhYTkzNjE0NDkzYzYxMmY4Njk2NDFlZDU5ZDFjOTM2M2EzNjY2YTVmYTYifX19'
-    custom-name: '<white>« Previous</white> <gray>[<page>/<pages>]</gray>'
-    lore:
-      - ''
-      - ' <gray>Go to the previous page.</gray> '
-      - ''
+    components:
+      profile:
+        properties:
+          - name: 'textures'
+            value: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODY5NzFkZDg4MWRiYWY0ZmQ2YmNhYTkzNjE0NDkzYzYxMmY4Njk2NDFlZDU5ZDFjOTM2M2EzNjY2YTVmYTYifX19'
+      custom-name: '<white>« Previous</white> <gray>[<page>/<pages>]</gray>'
+      lore:
+        - ''
+        - ' <gray>Go to the previous page.</gray> '
+        - ''
 
   next-button:
     symbol: 'N'
     material: 'PLAYER_HEAD'
-    profile:
-      properties:
-        - name: 'textures'
-          value: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjMyY2E2NjA1NmI3Mjg2M2U5OGY3ZjMyYmQ3ZDk0YzdhMGQ3OTZhZjY5MWM5YWMzYTkxMzYzMzEzNTIyODhmOSJ9fX0='
-    custom-name: '<white>Next »</white> <gray>[<page>/<pages>]</gray>'
-    lore:
-      - ''
-      - ' <gray>Go to the next page.</gray> '
-      - ''
+    components:
+      profile:
+        properties:
+          - name: 'textures'
+            value: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjMyY2E2NjA1NmI3Mjg2M2U5OGY3ZjMyYmQ3ZDk0YzdhMGQ3OTZhZjY5MWM5YWMzYTkxMzYzMzEzNTIyODhmOSJ9fX0='
+      custom-name: '<white>Next »</white> <gray>[<page>/<pages>]</gray>'
+      lore:
+        - ''
+        - ' <gray>Go to the next page.</gray> '
+        - ''
 
   decorative-icons:
     air:
@@ -132,47 +139,53 @@ menu:
     black-pane:
       symbol: 'W'
       material: 'BLACK_STAINED_GLASS_PANE'
-      tooltip-display:
-        hide-tooltip: true
+      components:
+        tooltip-display:
+          hide-tooltip: true
     gray-pane:
       symbol: 'X'
       material: 'GRAY_STAINED_GLASS_PANE'
-      tooltip-display:
-        hide-tooltip: true
+      components:
+        tooltip-display:
+          hide-tooltip: true
     polished-deepslate:
       symbol: 'Y'
       material: 'POLISHED_DEEPSLATE'
-      tooltip-display:
-        hide-tooltip: true
+      components:
+        tooltip-display:
+          hide-tooltip: true
     polished-deepslate-slab:
       symbol: 'Z'
       material: 'POLISHED_DEEPSLATE_SLAB'
-      tooltip-display:
-        hide-tooltip: true
+      components:
+        tooltip-display:
+          hide-tooltip: true
 
 # Skin token (/ss givetokenskin). <skin> = skin display name. Per-skin model
 # overrides live under token-skin in skins.yml.
 skin-token:
   material: 'NAME_TAG'
-  custom-name: '<gradient:#A0A0A0:#595959><b>Skin Slot Token</b></gradient> <gray>—</gray> <white><skin></white>'
-  lore:
-    - ''
-    - ' <white>Right-click onto an item to add</white> '
-    - ' <white>the <#A0A0A0><skin></#A0A0A0> skin slot.</white> '
-    - ''
-  tooltip-display:
-    hidden-components:
-      - 'attribute_modifiers'
+  components:
+    custom-name: '<gradient:#A0A0A0:#595959><b>Skin Slot Token</b></gradient> <gray>—</gray> <white><skin></white>'
+    lore:
+      - ''
+      - ' <white>Right-click onto an item to add</white> '
+      - ' <white>the <#A0A0A0><skin></#A0A0A0> skin slot.</white> '
+      - ''
+    tooltip-display:
+      hidden-components:
+        - 'attribute_modifiers'
 
 # Tooltip token (/ss givetokentooltip). Overrides under token-tooltip in skins.yml.
 tooltip-token:
   material: 'PAPER'
-  custom-name: '<gradient:#A0A0A0:#595959><b>Tooltip Token</b></gradient> <gray>—</gray> <white><skin></white>'
-  lore:
-    - ''
-    - ' <white>Right-click onto an item to apply</white> '
-    - ' <white>the <#A0A0A0><skin></#A0A0A0> tooltip style.</white> '
-    - ''
-  tooltip-display:
-    hidden-components:
-      - 'attribute_modifiers'
+  components:
+    custom-name: '<gradient:#A0A0A0:#595959><b>Tooltip Token</b></gradient> <gray>—</gray> <white><skin></white>'
+    lore:
+      - ''
+      - ' <white>Right-click onto an item to apply</white> '
+      - ' <white>the <#A0A0A0><skin></#A0A0A0> tooltip style.</white> '
+      - ''
+    tooltip-display:
+      hidden-components:
+        - 'attribute_modifiers'
