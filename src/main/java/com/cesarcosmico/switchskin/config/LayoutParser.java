@@ -42,6 +42,10 @@ public final class LayoutParser {
         return slotsBySymbol.getOrDefault(symbol, Collections.emptySet());
     }
 
+    public Set<Character> getSymbols() {
+        return slotsBySymbol.keySet();
+    }
+
     public char getSymbolAt(int slot) {
         final int row = slot / 9;
         final int col = slot % 9;

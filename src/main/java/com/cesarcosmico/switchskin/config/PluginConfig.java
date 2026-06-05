@@ -29,14 +29,15 @@ public final class PluginConfig {
     private FeedbackConfig switchFeedback;
     private MenuConfig menu;
 
-    public PluginConfig(ConfigurationSection root, ItemFactory itemFactory, Logger logger) {
+    public PluginConfig(ConfigurationSection root, ConfigurationSection menuRoot,
+                        ItemFactory itemFactory, Logger logger) {
         this.itemFactory = itemFactory;
         this.logger = logger;
-        load(root);
+        load(root, menuRoot);
     }
 
     /** Reloads every value in place so held references stay valid across a reload. */
-    public void load(ConfigurationSection root) {
+    public void load(ConfigurationSection root, ConfigurationSection menuRoot) {
         final ConfigurationSection defaults = root.getConfigurationSection("defaults");
         this.defaultMaxSlots = Math.max(1, defaults != null ? defaults.getInt("max-slots", 6) : 6);
 
@@ -53,7 +54,7 @@ public final class PluginConfig {
         this.tokenSound = readSound(tokensSection != null ? tokensSection.getConfigurationSection("sound") : null,
                 "minecraft:entity.experience_orb.pickup", 1.4f);
 
-        this.menu = new MenuConfig(root.getConfigurationSection("menu"), itemFactory, logger);
+        this.menu = new MenuConfig(menuRoot, itemFactory, logger);
     }
 
     private SoundConfig readSound(ConfigurationSection section, String defaultKey, float defaultPitch) {

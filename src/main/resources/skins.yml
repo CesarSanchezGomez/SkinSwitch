@@ -7,7 +7,7 @@
 #   icon-active / icon-inactive   slot-row glyph (falls back to default-icon-*)
 #   bracket-color-*               MiniMessage colour tag like '<gray>' or '<#FCBDE3>'
 #   applies-to                    material / #tag whitelist; empty = any item
-#   token-skin / token-tooltip    per-skin token overrides; same 'components:' block
+#   token-skin / token-tooltip    optional per-skin token look; same 'components:' block
 # Shorthand for an item-model-only skin: 'my_skin: namespace:path'.
 # Originals are captured on the first slot and restored when the last is removed.
 

@@ -1,0 +1,137 @@
+# SwitchSkin selection menu (/ss menu). Layout symbols: S = skin slot,
+# V = vanilla button, C = close, P = prev page, N = next page. Any other char is
+# a decorative icon and must be defined under 'decorative-icons:' below; an
+# undefined symbol leaves its slots empty. 'fill-empty' must name a decorative
+# symbol (used for a hidden prev/next slot). Each icon declares its 'material'
+# (and the structural 'symbol') plus a 'components:' block of vanilla data
+# components in kebab-case; only custom-name and lore are MiniMessage. Skin and
+# vanilla icons inherit the held item's material.
+config-version: 1
+
+title: '<white><gradient:#A0A0A0:#595959><b>Switch Skin</b></gradient></white>'
+layout:
+  - 'WXYZVZYXW'
+  - 'XAAAAAAAX'
+  - 'WASSSSSAW'
+  - 'XAAAAAAAX'
+  - 'WXYPCNYXW'
+fill-empty: 'Z'
+
+skin-slot:
+  symbol: 'S'
+  entry-active:
+    components:
+      custom-name: '<gradient:#A0A0A0:#595959><skin></gradient>'
+      lore:
+        - ''
+        - ' <white>•</white> <gradient:#B4E488:#7DD031>Active skin</gradient> '
+        - ''
+      tooltip-display:
+        hidden-components:
+          - 'attribute_modifiers'
+  entry-inactive:
+    components:
+      custom-name: '<white><skin></white>'
+      lore:
+        - ''
+        - ' <gray>Click to switch to this skin.</gray> '
+        - ''
+      tooltip-display:
+        hidden-components:
+          - 'attribute_modifiers'
+
+vanilla-button:
+  symbol: 'V'
+  active:
+    components:
+      custom-name: '<gradient:#A0A0A0:#595959><b>Vanilla</b></gradient> <gray>[active]</gray>'
+      lore:
+        - ''
+        - ' <gray>The original look is showing.</gray> '
+        - ' <gray>Click any skin to reapply it.</gray> '
+        - ''
+      tooltip-display:
+        hidden-components:
+          - 'attribute_modifiers'
+  inactive:
+    components:
+      custom-name: '<gradient:#A0A0A0:#595959><b>Vanilla</b></gradient>'
+      lore:
+        - ''
+        - ' <gray>Restore the original look</gray> '
+        - ' <gray>without losing your tokens.</gray> '
+        - ''
+      tooltip-display:
+        hidden-components:
+          - 'attribute_modifiers'
+
+close-button:
+  symbol: 'C'
+  material: 'PLAYER_HEAD'
+  components:
+    profile:
+      properties:
+        - name: 'textures'
+          value: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjNmNzRlYWQ5ZjA3MGNmMzEwMTQ1MzgxYjc5ZTQ0MTdlYTQ5MzBlYmQwMjQxMjE1NzcwNWY0OTliMDg4MDgwMiJ9fX0='
+    custom-name: '<gradient:#A0A0A0:#595959><b>Close</b></gradient>'
+    lore:
+      - ''
+      - ' <gray>Closes this menu.</gray> '
+      - ''
+
+prev-button:
+  symbol: 'P'
+  material: 'PLAYER_HEAD'
+  components:
+    profile:
+      properties:
+        - name: 'textures'
+          value: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODY5NzFkZDg4MWRiYWY0ZmQ2YmNhYTkzNjE0NDkzYzYxMmY4Njk2NDFlZDU5ZDFjOTM2M2EzNjY2YTVmYTYifX19'
+    custom-name: '<white>« Previous</white> <gray>[<page>/<pages>]</gray>'
+    lore:
+      - ''
+      - ' <gray>Go to the previous page.</gray> '
+      - ''
+
+next-button:
+  symbol: 'N'
+  material: 'PLAYER_HEAD'
+  components:
+    profile:
+      properties:
+        - name: 'textures'
+          value: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjMyY2E2NjA1NmI3Mjg2M2U5OGY3ZjMyYmQ3ZDk0YzdhMGQ3OTZhZjY5MWM5YWMzYTkxMzYzMzEzNTIyODhmOSJ9fX0='
+    custom-name: '<white>Next »</white> <gray>[<page>/<pages>]</gray>'
+    lore:
+      - ''
+      - ' <gray>Go to the next page.</gray> '
+      - ''
+
+decorative-icons:
+  air:
+    symbol: 'A'
+    material: 'AIR'
+  black-pane:
+    symbol: 'W'
+    material: 'BLACK_STAINED_GLASS_PANE'
+    components:
+      tooltip-display:
+        hide-tooltip: true
+  gray-pane:
+    symbol: 'X'
+    material: 'GRAY_STAINED_GLASS_PANE'
+    components:
+      tooltip-display:
+        hide-tooltip: true
+  polished-deepslate:
+    symbol: 'Y'
+    material: 'POLISHED_DEEPSLATE'
+    components:
+      tooltip-display:
+        hide-tooltip: true
+  polished-deepslate-slab:
+    symbol: 'Z'
+    material: 'POLISHED_DEEPSLATE_SLAB'
+    components:
+      tooltip-display:
+        hide-tooltip: true

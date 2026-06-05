@@ -8,6 +8,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,8 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 public final class MenuConfig {
+
+    public static final int CURRENT_VERSION = 1;
 
     private static final MiniMessage MINI = MiniMessage.miniMessage();
     private static final String DEFAULT_TITLE =
@@ -83,10 +86,27 @@ public final class MenuConfig {
 
         final String fillRaw = effective.getString("fill-empty", "X");
         this.fillEmptySymbol = fillRaw == null || fillRaw.isEmpty() ? '\0' : fillRaw.charAt(0);
+
+        validateSymbols(logger);
     }
 
     private static ConfigurationSection empty() {
         return new org.bukkit.configuration.MemoryConfiguration();
+    }
+
+    private void validateSymbols(Logger logger) {
+        final Set<Character> backed = new HashSet<>(decorativeIcons.keySet());
+        backed.add(skinSlotSymbol);
+        backed.add(vanillaSymbol);
+        backed.add(closeSymbol);
+        backed.add(prevSymbol);
+        backed.add(nextSymbol);
+        for (char symbol : layout.getSymbols()) {
+            if (!backed.contains(symbol)) {
+                logger.warning("menu.yml: layout symbol '" + symbol
+                        + "' has no matching button or decorative-icon (its slots stay empty).");
+            }
+        }
     }
 
     private static char symbol(ConfigurationSection section, String fallback) {

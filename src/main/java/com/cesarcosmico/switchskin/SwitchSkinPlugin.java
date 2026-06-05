@@ -6,6 +6,7 @@ import com.cesarcosmico.switchskin.adapter.placeholderapi.PlaceholderResolver;
 import com.cesarcosmico.switchskin.command.CommandManager;
 import com.cesarcosmico.switchskin.config.ConfigLoader;
 import com.cesarcosmico.switchskin.config.ConfigVersionChecker;
+import com.cesarcosmico.switchskin.config.MenuConfig;
 import com.cesarcosmico.switchskin.config.PluginConfig;
 import com.cesarcosmico.switchskin.config.SkinConfig;
 import com.cesarcosmico.switchskin.gui.SkinMenuGUI;
@@ -28,6 +29,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 
 public final class SwitchSkinPlugin extends JavaPlugin {
@@ -72,7 +74,7 @@ public final class SwitchSkinPlugin extends JavaPlugin {
         try {
             reloadConfig();
             configLoader.load();
-            pluginConfig.load(getConfig());
+            pluginConfig.load(getConfig(), loadMenu());
             skinConfig.load(loadSkins());
             messageManager.reload();
             checkConfigVersions();
@@ -94,7 +96,7 @@ public final class SwitchSkinPlugin extends JavaPlugin {
         itemFactory = new ItemFactory(getLogger());
 
         skinConfig = new SkinConfig(loadSkins(), getLogger());
-        pluginConfig = new PluginConfig(getConfig(), itemFactory, getLogger());
+        pluginConfig = new PluginConfig(getConfig(), loadMenu(), itemFactory, getLogger());
 
         checkConfigVersions();
     }
@@ -147,8 +149,18 @@ public final class SwitchSkinPlugin extends JavaPlugin {
         return YamlConfiguration.loadConfiguration(file);
     }
 
+    private YamlConfiguration loadMenu() {
+        final File file = new File(getDataFolder(), "menu.yml");
+        if (!file.exists()) {
+            saveResource("menu.yml", false);
+        }
+        return YamlConfiguration.loadConfiguration(file);
+    }
+
     private void checkConfigVersions() {
         ConfigVersionChecker.check(getConfig(), "config.yml",
                 PluginConfig.CURRENT_VERSION, this, getLogger());
+        ConfigVersionChecker.check(loadMenu(), "menu.yml",
+                MenuConfig.CURRENT_VERSION, this, getLogger(), Set.of("decorative-icons"));
     }
 }
