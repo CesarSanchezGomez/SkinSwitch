@@ -139,8 +139,7 @@ public final class SkinAppearanceRenderer {
     private void applyLore(ItemMeta meta, AppearanceSnapshot snapshot, SkinLoadout loadout,
                            @Nullable SkinDefinition activeSkin, @Nullable OfflinePlayer owner) {
         final List<Component> baseLore = resolveBaseLore(snapshot, activeSkin, owner);
-        meta.lore(loreRenderer.render(baseLore, idStrings(loadout), loadout.activeIndex(),
-                tooltipStrings(loadout), owner));
+        meta.lore(loreRenderer.render(baseLore, idStrings(loadout), loadout.activeIndex(), owner));
     }
 
     private List<Component> resolveBaseLore(AppearanceSnapshot snapshot,
@@ -232,9 +231,5 @@ public final class SkinAppearanceRenderer {
 
     private static List<String> idStrings(SkinLoadout loadout) {
         return loadout.slots().stream().map(SkinId::value).toList();
-    }
-
-    private static List<String> tooltipStrings(SkinLoadout loadout) {
-        return loadout.tooltips().stream().map(SkinId::value).toList();
     }
 }
