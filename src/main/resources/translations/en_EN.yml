@@ -1,0 +1,47 @@
+# SwitchSkin: English (en_EN)
+config-version: 1
+
+prefix: '<white>[<gradient:#A0A0A0:#595959>SwitchSkin</gradient>]</white>'
+
+# -- Commands ---------------------------------
+# The prefix is prepended automatically; do not include it here.
+command:
+  only-players: '<red>This command can only be used by players.</red>'
+  reload-success: '<white>Configuration reloaded successfully.</white>'
+  no-item-in-hand: '<red>You must hold an item in your main hand.</red>'
+  unknown-skin: '<red>Unknown skin: <white><skin></white>.</red>'
+  slot-added: '<white>Slot <#A0A0A0><skin></#A0A0A0> added. Total: <#A0A0A0><count></#A0A0A0>.</white>'
+  slot-removed: '<white>Slot <#A0A0A0><skin></#A0A0A0> removed.</white>'
+  invalid-slot: '<red>Invalid slot index.</red>'
+  no-slots: '<white>This item has no skin slots.</white>'
+  slots-full: '<white>This item has reached the maximum slot capacity (<max>).</white>'
+  duplicate-slot: '<white>That skin is already installed on this item.</white>'
+  skin-incompatible: '<red>Skin <white><skin></white> can''t be applied to <white><material></white>.</red>'
+  token-given: '<white>Gave <#A0A0A0><count></#A0A0A0> token(s) of <#A0A0A0><skin></#A0A0A0> to <#A0A0A0><player></#A0A0A0>.</white>'
+  tooltip-token-given: '<white>Gave <#A0A0A0><count></#A0A0A0> tooltip token(s) of <#A0A0A0><skin></#A0A0A0> to <#A0A0A0><player></#A0A0A0>.</white>'
+  tooltip-applied: '<white>Tooltip <#A0A0A0><skin></#A0A0A0> applied.</white>'
+  tooltip-removed: '<white>Tooltip removed from the active slot.</white>'
+  tooltip-not-applied: '<white>The active slot has no tooltip applied.</white>'
+  tooltip-missing: '<red>Skin <white><skin></white> has no tooltip_style defined.</red>'
+  tooltip-needs-slot: '<red>You must add the <white><skin></white> skin slot before applying its tooltip.</red>'
+  tooltip-duplicate: '<white>The <#A0A0A0><skin></#A0A0A0> tooltip is already applied.</white>'
+  player-not-found: '<red>Player not found: <white><player></white>.</red>'
+  single-slot: '<white>This item only has one skin slot.</white>'
+  already-active: '<white>Skin <#A0A0A0><skin></#A0A0A0> is already active.</white>'
+  already-vanilla: '<white>The item is already showing its vanilla look.</white>'
+  skin-not-on-item: '<red>Skin <white><skin></white> is not installed on this item.</red>'
+
+# -- Skin switching ---------------------------
+# Sent as an action bar entry by default (controlled by config.yml -> switch.feedback).
+skin:
+  switched: '<white>Switched to <gradient:#A0A0A0:#595959><skin></gradient></white>'
+  switched-vanilla: '<white>Restored <red>vanilla</red> look</white>'
+
+# -- Slot row layout ---------------------------
+# The slot row is rendered as the first line of the item's lore. The tokens
+# {slots}, {icon} and {color} are filled in by the renderer (structural, not
+# MiniMessage placeholders).
+lore:
+  row: '<gray>Skins:</gray> {slots}'
+  slot-active: '<color:{color}>[</color>{icon}<color:{color}>]</color>'
+  slot-inactive: '<color:{color}>[</color>{icon}<color:{color}>]</color>'

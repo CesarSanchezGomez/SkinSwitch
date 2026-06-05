@@ -1,11 +1,12 @@
 package com.cesarcosmico.switchskin.gui;
 
-import com.cesarcosmico.switchskin.config.ItemConfig;
 import com.cesarcosmico.switchskin.config.MenuConfig;
 import com.cesarcosmico.switchskin.config.SkinConfig;
 import com.cesarcosmico.switchskin.config.SkinDefinition;
-import com.cesarcosmico.switchskin.item.ItemFactory;
-import com.cesarcosmico.switchskin.item.component.CustomModelDataApplier;
+import com.cesarcosmico.switchskin.items.CompiledItem;
+import com.cesarcosmico.switchskin.items.ItemContext;
+import com.cesarcosmico.switchskin.items.ItemFactory;
+import com.cesarcosmico.switchskin.service.SkinAppearanceRenderer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -15,10 +16,10 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 public final class SkinMenuGUI implements InventoryHolder {
 
@@ -38,9 +39,13 @@ public final class SkinMenuGUI implements InventoryHolder {
     private final int totalPages;
     private final int pageSize;
     private final Material heldMaterial;
+    private final UUID viewerId;
+    private final ItemFactory itemFactory;
+    private final SkinAppearanceRenderer appearanceRenderer;
 
     public SkinMenuGUI(MenuConfig menuConfig, SkinConfig skinConfig,
-                       List<String> skinIds, int activeIndex, int requestedPage,
+                       ItemFactory itemFactory, SkinAppearanceRenderer appearanceRenderer,
+                       UUID viewerId, List<String> skinIds, int activeIndex, int requestedPage,
                        @NotNull Material heldMaterial) {
         final int size = menuConfig.getInventorySize();
         this.inventory = Bukkit.createInventory(this, size, menuConfig.getTitle());
@@ -49,6 +54,9 @@ public final class SkinMenuGUI implements InventoryHolder {
         this.totalPages = Math.max(1, (int) Math.ceil(skinIds.size() / (double) pageSize));
         this.page = Math.clamp(requestedPage, 0, totalPages - 1);
         this.heldMaterial = heldMaterial;
+        this.viewerId = viewerId;
+        this.itemFactory = itemFactory;
+        this.appearanceRenderer = appearanceRenderer;
 
         populate(menuConfig, skinConfig, skinIds, activeIndex);
     }
@@ -89,7 +97,6 @@ public final class SkinMenuGUI implements InventoryHolder {
 
     private void fillSkinSlots(MenuConfig menu, SkinConfig skinConfig,
                                List<String> skinIds, int activeIndex) {
-        final ItemFactory factory = menu.getItemFactory();
         final int[] slots = sortedSlots(menu.getSkinSlotPositions());
         final int start = page * pageSize;
 
@@ -102,36 +109,24 @@ public final class SkinMenuGUI implements InventoryHolder {
             final String skinId = skinIds.get(globalIndex);
             final SkinDefinition def = skinConfig.get(skinId).orElse(null);
             final boolean active = globalIndex == activeIndex;
-            final ItemConfig template = active ? menu.getSkinSlotActive() : menu.getSkinSlotInactive();
+            final CompiledItem template = active
+                    ? menu.getSkinSlotActive() : menu.getSkinSlotInactive();
             final String displayName = def != null ? def.nameOrId() : skinId;
-            final ItemStack item = factory.build(template, Map.of("{skin}", displayName));
-            item.setType(heldMaterial);
-            applySkinPreview(item, def);
+            final ItemContext context = ItemContext.forPlayer(viewerId).withSkin(displayName);
+            final ItemStack item = itemFactory.build(template, context, heldMaterial, 1);
+            appearanceRenderer.preview(item, def);
             inventory.setItem(slots[i], item);
             actionBySlot[slots[i]] = new MenuAction.SelectSkin(skinId);
         }
     }
 
-    private static void applySkinPreview(ItemStack item, SkinDefinition def) {
-        if (def == null) return;
-        final var meta = item.getItemMeta();
-        if (meta == null) return;
-        if (def.itemModel() != null && meta.getItemModel() == null) {
-            meta.setItemModel(def.itemModel());
-        }
-        item.setItemMeta(meta);
-        if (def.customModelData() != null) {
-            CustomModelDataApplier.applyTo(item, def.customModelData());
-        }
-    }
-
     private void fillVanillaButton(MenuConfig menu, SkinConfig skinConfig,
                                    List<String> skinIds, int activeIndex) {
-        final ItemConfig template = activeIndex < 0 ? menu.getVanillaActive() : menu.getVanillaInactive();
-        final ItemStack item = menu.getItemFactory().build(template);
-        item.setType(heldMaterial);
+        final CompiledItem template =
+                activeIndex < 0 ? menu.getVanillaActive() : menu.getVanillaInactive();
+        final ItemStack item = itemFactory.build(template, ItemContext.forPlayer(viewerId), heldMaterial, 1);
         if (activeIndex >= 0 && activeIndex < skinIds.size()) {
-            applySkinPreview(item, skinConfig.get(skinIds.get(activeIndex)).orElse(null));
+            appearanceRenderer.preview(item, skinConfig.get(skinIds.get(activeIndex)).orElse(null));
         }
         for (int slot : menu.getVanillaPositions()) {
             inventory.setItem(slot, item.clone());
@@ -140,7 +135,7 @@ public final class SkinMenuGUI implements InventoryHolder {
     }
 
     private void fillCloseButton(MenuConfig menu) {
-        final ItemStack item = menu.getItemFactory().build(menu.getCloseIcon());
+        final ItemStack item = itemFactory.build(menu.getCloseIcon(), ItemContext.forPlayer(viewerId), null, 1);
         for (int slot : menu.getClosePositions()) {
             inventory.setItem(slot, item.clone());
             actionBySlot[slot] = new MenuAction.Close();
@@ -165,20 +160,17 @@ public final class SkinMenuGUI implements InventoryHolder {
         inventory.setItem(slot, fill == null ? null : fill.clone());
     }
 
-    private void fillNav(MenuConfig menu, Set<Integer> positions, ItemConfig icon, MenuAction action) {
+    private void fillNav(MenuConfig menu, Set<Integer> positions,
+                         CompiledItem icon, MenuAction action) {
         if (positions.isEmpty()) return;
-        final ItemStack item = menu.getItemFactory().build(icon, pageInfoPlaceholders());
+        final ItemContext context = ItemContext.empty().withExtras(Map.of(
+                "page", String.valueOf(page + 1),
+                "pages", String.valueOf(totalPages)));
+        final ItemStack item = itemFactory.build(icon, context, null, 1);
         for (int slot : positions) {
             inventory.setItem(slot, item.clone());
             actionBySlot[slot] = action;
         }
-    }
-
-    private Map<String, String> pageInfoPlaceholders() {
-        final Map<String, String> placeholders = new HashMap<>();
-        placeholders.put("{page}", String.valueOf(page + 1));
-        placeholders.put("{pages}", String.valueOf(totalPages));
-        return placeholders;
     }
 
     private static int[] sortedSlots(Set<Integer> slots) {

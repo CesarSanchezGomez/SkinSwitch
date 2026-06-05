@@ -27,6 +27,8 @@ repositories {
 dependencies {
     compileOnly("io.papermc.paper:paper-api:26.1.2.build.53-stable")
     compileOnly("me.clip:placeholderapi:2.12.2")
+    implementation("com.saicone:rtag:1.5.16")
+    implementation("com.saicone:rtag-item:1.5.16")
 
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
@@ -37,7 +39,23 @@ tasks.test {
     useJUnitPlatform()
 }
 
+tasks.withType<JavaCompile> {
+    options.compilerArgs.add("-Xlint:deprecation")
+}
+
 tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
     archiveClassifier.set("")
     mergeServiceFiles()
+    relocate("com.saicone.rtag", "com.cesarcosmico.switchskin.libs.rtag")
+}
+
+tasks.named("build") {
+    dependsOn("shadowJar")
+}
+
+tasks.processResources {
+    inputs.property("version", project.version)
+    filesMatching("paper-plugin.yml") {
+        expand("version" to project.version)
+    }
 }

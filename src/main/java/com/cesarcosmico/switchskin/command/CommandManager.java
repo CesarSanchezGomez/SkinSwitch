@@ -7,18 +7,16 @@ import com.cesarcosmico.switchskin.command.feature.ReloadCommand;
 import com.cesarcosmico.switchskin.command.feature.RemoveSlotCommand;
 import com.cesarcosmico.switchskin.command.feature.RemoveTooltipCommand;
 import com.cesarcosmico.switchskin.command.feature.SwitchCommand;
-import com.cesarcosmico.switchskin.config.LangConfig;
 import com.cesarcosmico.switchskin.config.PluginConfig;
 import com.cesarcosmico.switchskin.config.SkinConfig;
-import com.cesarcosmico.switchskin.config.SkinDefinition;
-import com.cesarcosmico.switchskin.item.TokenFactory;
+import com.cesarcosmico.switchskin.items.ItemFactory;
+import com.cesarcosmico.switchskin.service.SkinAppearanceRenderer;
 import com.cesarcosmico.switchskin.service.SkinSlotService;
 import com.cesarcosmico.switchskin.service.SwitchAnnouncer;
+import com.cesarcosmico.switchskin.text.MessageManager;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-
-import java.util.function.Supplier;
 
 public final class CommandManager {
 
@@ -31,26 +29,21 @@ public final class CommandManager {
     private final MenuCommand menuCommand;
     private final SwitchCommand switchCommand;
 
-    public CommandManager(Supplier<LangConfig> langSupplier,
-                          Supplier<SkinConfig> skinSupplier,
-                          Supplier<PluginConfig> pluginSupplier,
-                          Supplier<SkinSlotService> serviceSupplier,
-                          Supplier<TokenFactory> skinTokenSupplier,
-                          Supplier<TokenFactory> tooltipTokenSupplier,
-                          Supplier<SwitchAnnouncer> announcerSupplier,
+    public CommandManager(MessageManager messages, SkinConfig skinConfig, PluginConfig pluginConfig,
+                          SkinSlotService service, SwitchAnnouncer announcer,
+                          ItemFactory itemFactory, SkinAppearanceRenderer appearanceRenderer,
                           Runnable reloadAction) {
-        this.reloadCommand = new ReloadCommand(langSupplier, reloadAction);
-        this.addSlotCommand = new AddSlotCommand(langSupplier, skinSupplier, serviceSupplier);
-        this.removeSlotCommand = new RemoveSlotCommand(langSupplier, serviceSupplier);
+        this.reloadCommand = new ReloadCommand(messages, reloadAction);
+        this.addSlotCommand = new AddSlotCommand(messages, skinConfig, service);
+        this.removeSlotCommand = new RemoveSlotCommand(messages, service);
         this.giveSkinTokenCommand = new GiveTokenCommand("givetokenskin", "command.token-given",
-                langSupplier, skinSupplier, skinTokenSupplier, def -> true);
+                GiveTokenCommand.Kind.SKIN, messages, skinConfig, pluginConfig, itemFactory);
         this.giveTooltipTokenCommand = new GiveTokenCommand("givetokentooltip", "command.tooltip-token-given",
-                langSupplier, skinSupplier, tooltipTokenSupplier,
-                (SkinDefinition def) -> def.tooltipStyle() != null);
-        this.removeTooltipCommand = new RemoveTooltipCommand(langSupplier, serviceSupplier);
-        this.menuCommand = new MenuCommand(langSupplier, skinSupplier, pluginSupplier, serviceSupplier);
-        this.switchCommand = new SwitchCommand(langSupplier, skinSupplier, serviceSupplier,
-                announcerSupplier);
+                GiveTokenCommand.Kind.TOOLTIP, messages, skinConfig, pluginConfig, itemFactory);
+        this.removeTooltipCommand = new RemoveTooltipCommand(messages, service);
+        this.menuCommand = new MenuCommand(messages, skinConfig, pluginConfig, service,
+                itemFactory, appearanceRenderer);
+        this.switchCommand = new SwitchCommand(messages, skinConfig, service, announcer);
     }
 
     public LiteralCommandNode<CommandSourceStack> createCommand() {
@@ -63,7 +56,7 @@ public final class CommandManager {
 
     private LiteralCommandNode<CommandSourceStack> build(String name) {
         return Commands.literal(name)
-                .requires(source -> source.getSender().hasPermission("switchskin.use"))
+                .requires(CommandSupport.permission("switchskin.use"))
                 .executes(menuCommand::execute)
                 .then(reloadCommand.create())
                 .then(addSlotCommand.create())

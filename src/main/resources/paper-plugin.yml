@@ -1,10 +1,10 @@
 name: SwitchSkin
-version: '1.0.0'
+version: '${version}'
 authors:
   - CesarCosmico
 main: com.cesarcosmico.switchskin.SwitchSkinPlugin
 description: Add skin slots to in-hand items and switch between custom item models.
-api-version: '1.21'
+api-version: '26.1'
 
 dependencies:
   server:
@@ -21,10 +21,49 @@ permissions:
       switchskin.use: true
       switchskin.admin: true
 
-  switchskin.admin:
-    description: Allows reloading the config and managing skin slots/tokens
-    default: op
-
   switchskin.use:
-    description: Allows switching skins on items that already have slots
+    description: Player access — menu, switching and consuming tokens on owned items
     default: true
+    children:
+      switchskin.command.menu: true
+      switchskin.command.switch: true
+      switchskin.token.use: true
+
+  switchskin.admin:
+    description: Reload the config and manage skin slots/tokens
+    default: op
+    children:
+      switchskin.command.reload: true
+      switchskin.command.addslot: true
+      switchskin.command.removeslot: true
+      switchskin.command.removetooltip: true
+      switchskin.command.givetokenskin: true
+      switchskin.command.givetokentooltip: true
+
+  switchskin.command.menu:
+    description: Open the skin selection menu
+    default: true
+  switchskin.command.switch:
+    description: Switch the skin of the held item
+    default: true
+  switchskin.token.use:
+    description: Right-click skin/tooltip tokens onto items
+    default: true
+  switchskin.command.reload:
+    description: Reload the SwitchSkin configuration
+    default: op
+  switchskin.command.addslot:
+    description: Add a skin slot to the held item
+    default: op
+  switchskin.command.removeslot:
+    description: Remove a skin slot from the held item
+    default: op
+  switchskin.command.removetooltip:
+    description: Remove the tooltip from the held item
+    default: op
+  switchskin.command.givetokenskin:
+    description: Give a skin token to a player
+    default: op
+  switchskin.command.givetokentooltip:
+    description: Give a tooltip token to a player
+    default: op

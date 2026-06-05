@@ -1,50 +1,48 @@
 package com.cesarcosmico.switchskin.service;
 
-import com.cesarcosmico.switchskin.config.LangConfig;
 import com.cesarcosmico.switchskin.config.PluginConfig;
 import com.cesarcosmico.switchskin.config.SkinDefinition;
+import com.cesarcosmico.switchskin.text.MessageManager;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.entity.Player;
-
-import java.util.function.Supplier;
 
 public final class SwitchAnnouncer {
 
     private static final String VANILLA_KEY = "skin.switched-vanilla";
     private static final String SKIN_KEY = "skin.switched";
 
-    private final Supplier<LangConfig> langSupplier;
-    private final Supplier<PluginConfig> pluginSupplier;
+    private final MessageManager messages;
+    private final PluginConfig pluginConfig;
 
-    public SwitchAnnouncer(Supplier<LangConfig> langSupplier,
-                           Supplier<PluginConfig> pluginSupplier) {
-        this.langSupplier = langSupplier;
-        this.pluginSupplier = pluginSupplier;
+    public SwitchAnnouncer(MessageManager messages, PluginConfig pluginConfig) {
+        this.messages = messages;
+        this.pluginConfig = pluginConfig;
     }
 
     public void announceSwitch(Player player, SkinDefinition skin) {
-        announce(player, SKIN_KEY, "{skin}", skin.nameOrId());
+        announce(player, messages.getMessage(SKIN_KEY, Placeholder.parsed("skin", skin.nameOrId())));
     }
 
     public void announceVanilla(Player player) {
-        announce(player, VANILLA_KEY);
+        announce(player, messages.getMessage(VANILLA_KEY));
     }
 
     public void playTokenSound(Player player) {
-        play(player, pluginSupplier.get().getTokenSound());
-    }
-
-    private void announce(Player player, String key, String... placeholders) {
-        final LangConfig lang = langSupplier.get();
-        if (pluginSupplier.get().getSwitchFeedback().isActionBar()) {
-            lang.sendActionBar(player, key, placeholders);
-        } else {
-            lang.send(player, key, placeholders);
-        }
-        playSwitchSound(player);
+        play(player, pluginConfig.getTokenSound());
     }
 
     public void playSwitchSound(Player player) {
-        play(player, pluginSupplier.get().getSwitchSound());
+        play(player, pluginConfig.getSwitchSound());
+    }
+
+    private void announce(Player player, Component message) {
+        if (pluginConfig.getSwitchFeedback().isActionBar()) {
+            player.sendActionBar(message);
+        } else {
+            player.sendMessage(message);
+        }
+        playSwitchSound(player);
     }
 
     private static void play(Player player, PluginConfig.SoundConfig sound) {

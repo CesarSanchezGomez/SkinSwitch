@@ -1,6 +1,7 @@
 package com.cesarcosmico.switchskin.config;
 
-import com.cesarcosmico.switchskin.item.ItemFactory;
+import com.cesarcosmico.switchskin.items.CompiledItem;
+import com.cesarcosmico.switchskin.items.ItemFactory;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.logging.Logger;
@@ -17,20 +18,30 @@ public final class PluginConfig {
         public boolean isActionBar() { return "actionbar".equalsIgnoreCase(mode); }
     }
 
-    private final int defaultMaxSlots;
-    private final ItemConfig token;
-    private final ItemConfig tooltipToken;
-    private final SoundConfig switchSound;
-    private final SoundConfig tokenSound;
-    private final FeedbackConfig switchFeedback;
-    private final MenuConfig menu;
+    private final ItemFactory itemFactory;
+    private final Logger logger;
+
+    private int defaultMaxSlots;
+    private CompiledItem token;
+    private CompiledItem tooltipToken;
+    private SoundConfig switchSound;
+    private SoundConfig tokenSound;
+    private FeedbackConfig switchFeedback;
+    private MenuConfig menu;
 
     public PluginConfig(ConfigurationSection root, ItemFactory itemFactory, Logger logger) {
+        this.itemFactory = itemFactory;
+        this.logger = logger;
+        load(root);
+    }
+
+    /** Reloads every value in place so held references stay valid across a reload. */
+    public void load(ConfigurationSection root) {
         final ConfigurationSection defaults = root.getConfigurationSection("defaults");
         this.defaultMaxSlots = Math.max(1, defaults != null ? defaults.getInt("max-slots", 6) : 6);
 
-        this.token = itemFactory.parse(root.getConfigurationSection("token"), "NAME_TAG");
-        this.tooltipToken = itemFactory.parse(root.getConfigurationSection("tooltip-token"), "PAPER");
+        this.token = itemFactory.compile(root.getConfigurationSection("skin-token"));
+        this.tooltipToken = itemFactory.compile(root.getConfigurationSection("tooltip-token"));
 
         final ConfigurationSection switchSection = root.getConfigurationSection("switch");
         this.switchSound = readSound(switchSection != null ? switchSection.getConfigurationSection("sound") : null,
@@ -56,8 +67,8 @@ public final class PluginConfig {
     }
 
     public int getDefaultMaxSlots() { return defaultMaxSlots; }
-    public ItemConfig getToken() { return token; }
-    public ItemConfig getTooltipToken() { return tooltipToken; }
+    public CompiledItem getToken() { return token; }
+    public CompiledItem getTooltipToken() { return tooltipToken; }
     public SoundConfig getSwitchSound() { return switchSound; }
     public SoundConfig getTokenSound() { return tokenSound; }
     public FeedbackConfig getSwitchFeedback() { return switchFeedback; }
