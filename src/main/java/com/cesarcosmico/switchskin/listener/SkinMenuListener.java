@@ -2,7 +2,6 @@ package com.cesarcosmico.switchskin.listener;
 
 import com.cesarcosmico.switchskin.config.PluginConfig;
 import com.cesarcosmico.switchskin.config.SkinConfig;
-import com.cesarcosmico.switchskin.config.SkinDefinition;
 import com.cesarcosmico.switchskin.gui.SkinMenuGUI;
 import com.cesarcosmico.switchskin.gui.SkinMenuGUI.MenuAction;
 import com.cesarcosmico.switchskin.items.ItemFactory;
@@ -87,12 +86,9 @@ public final class SkinMenuListener implements Listener {
                 service.getActiveSkin(heldItem).ifPresent(s -> announcer.announceSwitch(player, s));
                 reopenAtPage(player, gui.getPage());
             }
-            case ALREADY_ACTIVE -> {
-                final SkinDefinition def = skinConfig.get(skinId).orElse(null);
-                final String display = def == null ? skinId : def.nameOrId();
-                player.sendMessage(messages.getPrefixedMessage("command.already-active",
-                        Placeholder.parsed("skin", display)));
-            }
+            // Re-clicking the active skin in the menu is a no-op: the slot already
+            // shows as active, so a chat message would just spam on repeat clicks.
+            case ALREADY_ACTIVE -> { }
             case NO_SLOTS, INVALID_INDEX -> player.sendMessage(messages.getPrefixedMessage("command.no-slots"));
             case NO_META -> player.sendMessage(messages.getPrefixedMessage("command.no-item-in-hand"));
         }
@@ -106,7 +102,7 @@ public final class SkinMenuListener implements Listener {
                 announcer.announceVanilla(player);
                 reopenAtPage(player, gui.getPage());
             }
-            case ALREADY_VANILLA -> player.sendMessage(messages.getPrefixedMessage("command.already-vanilla"));
+            case ALREADY_VANILLA -> { }
             case NO_SLOTS -> player.sendMessage(messages.getPrefixedMessage("command.no-slots"));
             case NO_META -> player.sendMessage(messages.getPrefixedMessage("command.no-item-in-hand"));
         }
