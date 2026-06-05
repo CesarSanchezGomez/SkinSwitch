@@ -21,11 +21,11 @@ public final class SwitchAnnouncer {
     }
 
     public void announceSwitch(Player player, SkinDefinition skin) {
-        announce(player, messages.getMessage(SKIN_KEY, Placeholder.parsed("skin", skin.nameOrId())));
+        announce(player, messages.getPrefixedMessage(SKIN_KEY, Placeholder.parsed("skin", skin.nameOrId())));
     }
 
     public void announceVanilla(Player player) {
-        announce(player, messages.getMessage(VANILLA_KEY));
+        announce(player, messages.getPrefixedMessage(VANILLA_KEY));
     }
 
     public void playTokenSound(Player player) {
